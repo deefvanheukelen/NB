@@ -464,14 +464,19 @@ button {
 .day-button {
   position: absolute;
   inset: 0;
+  z-index: 2;
   border: none;
   background: none;
+  touch-action: manipulation;
 }
 
 .day-number {
+  position: relative;
+  z-index: 1;
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
+  pointer-events: none;
 }
 
  .day-cell.selected {
@@ -493,11 +498,13 @@ button {
   left: 7px;
   right: 7px;
   bottom: 7px;
+  z-index: 1;
   display: flex;
   align-items: center;
   gap: 3px;
   flex-wrap: nowrap;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .day-dots i {

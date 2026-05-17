@@ -1168,11 +1168,13 @@ function renderCalendar() {
       cell.appendChild(dots);
     }
 
-    cell.querySelector(".day-button").addEventListener("click", () => {
+    const selectCalendarDate = () => {
       state.selectedDate = dateStr;
       renderCalendar();
       renderAgendaList();
-    });
+    };
+
+    cell.addEventListener("click", selectCalendarDate);
 
     grid.appendChild(cell);
   }
@@ -1186,12 +1188,14 @@ function shiftedCalendarMonth(year, month, step) {
 
 function setCalendarMonth(step) {
   const next = shiftedCalendarMonth(state.currentYear, state.currentMonth, step);
+
+  // Alleen de zichtbare kalendermaand wijzigen.
+  // De geselecteerde datum en de afsprakenlijst onder de kalender blijven behouden
+  // tot de gebruiker bewust een dag kiest of op het vandaag-icoontje klikt.
   state.currentYear = next.year;
   state.currentMonth = next.month;
-  state.selectedDate = `${state.currentYear}-${String(state.currentMonth + 1).padStart(2, "0")}-01`;
+
   renderCalendar();
-  renderAgendaList();
-  renderRevenue();
 }
 
 function fillCalendarPreview(preview, year, month) {
@@ -1365,10 +1369,9 @@ function setupCalendarSwipeNavigation() {
       }
 
       horizontal = true;
-      suppressNextClick = true;
     }
 
-    // Alleen bij duidelijke horizontale kalender-swipe blokkeren we de browser-scroll/click.
+    // Alleen bij duidelijke horizontale kalender-swipe blokkeren we de browser-scroll.
     event.preventDefault();
     lastX = x;
   }, { passive: false });
@@ -1383,6 +1386,8 @@ function setupCalendarSwipeNavigation() {
     reset();
 
     if (Math.abs(dx) < threshold) return;
+
+    suppressNextClick = true;
 
     // Links vegen = kalender schuift links = volgende maand. Rechts = vorige maand.
     animateCalendarMonth(dx < 0 ? 1 : -1);
@@ -4627,6 +4632,7 @@ function registerEvents() {
 
   document.getElementById("monthPickerBtn").addEventListener("click", openMonthPicker);
   document.getElementById("monthPickerForm").addEventListener("submit", saveMonthPicker);
+  document.getElementById("todayIconBtn")?.addEventListener("click", jumpToToday);
   document.getElementById("jumpToTodayBtn")?.addEventListener("click", jumpToToday);
 
   document.querySelectorAll(".nav-btn").forEach(btn => {
