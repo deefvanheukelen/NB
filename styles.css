@@ -459,20 +459,18 @@ button {
   justify-content: flex-end;
   padding: 7px;
   position: relative;
+  touch-action: pan-x;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .day-button {
   position: absolute;
   inset: 0;
-  z-index: 2;
   border: none;
   background: none;
-  touch-action: manipulation;
 }
 
 .day-number {
-  position: relative;
-  z-index: 1;
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
@@ -495,16 +493,15 @@ button {
 
 .day-dots {
   position: absolute;
+  pointer-events: none;
   left: 7px;
   right: 7px;
   bottom: 7px;
-  z-index: 1;
   display: flex;
   align-items: center;
   gap: 3px;
   flex-wrap: nowrap;
   overflow: hidden;
-  pointer-events: none;
 }
 
 .day-dots i {
@@ -4073,9 +4070,6 @@ button {
 .calendar-panel {
   position: relative;
   overflow: hidden;
-  touch-action: pan-y;
-  -webkit-user-select: none;
-  user-select: none;
 }
 
 .calendar-panel.is-swiping > :not(.calendar-swipe-preview),
