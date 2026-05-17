@@ -4071,6 +4071,7 @@ function syncServiceDefaults() {
 function openNewAppointmentDialog(prefillCustomerId = null) {
   populateAppointmentForm(prefillCustomerId);
 
+  document.getElementById("appointmentForm")?.classList.remove("appointment-form-edit");
   document.getElementById("appointmentModalTitle").textContent = "Nieuwe afspraak";
   document.getElementById("appointmentId").value = "";
   document.getElementById("appointmentDate").value = state.selectedDate;
@@ -4095,6 +4096,7 @@ function openEditAppointmentDialog(id) {
 
   populateAppointmentForm(app.customerId);
 
+  document.getElementById("appointmentForm")?.classList.add("appointment-form-edit");
   document.getElementById("appointmentModalTitle").textContent = "Afspraak bewerken";
   document.getElementById("appointmentId").value = app.id;
   setAppointmentCustomer(app.customerId);

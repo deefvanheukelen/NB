@@ -4440,3 +4440,76 @@ button {
 .service-sort-card.is-dragging .service-drag-handle span {
   background: #fff;
 }
+
+/* =========================================================
+   AFSPRAAK BEWERKEN: COMPACTE TABELVORM + SCROLLBAAR VENSTER
+   - Raakt swipe/klik-logica niet aan: enkel layout van de modal.
+========================================================= */
+#appointmentDialog.modal {
+  max-height: calc(100dvh - 20px);
+  overflow: hidden;
+}
+
+#appointmentForm.modal-card {
+  max-height: calc(100dvh - 20px);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.appointment-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.appointment-form-field {
+  min-width: 0;
+}
+
+.appointment-form-field .field-label {
+  margin-top: 0;
+}
+
+#appointmentForm .appointment-actions-row {
+  flex: 0 0 auto;
+}
+
+#appointmentForm.appointment-form-edit .appointment-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+#appointmentForm.appointment-form-edit .appointment-form-field-wide {
+  grid-column: 1 / -1;
+}
+
+#appointmentForm.appointment-form-edit .field {
+  min-height: 42px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+#appointmentForm.appointment-form-edit .field-label {
+  margin-bottom: 4px;
+  font-size: 11px;
+}
+
+#appointmentForm.appointment-form-edit .appointment-customer-picker,
+#appointmentForm.appointment-form-edit .appointment-service-picker {
+  gap: 6px;
+}
+
+@media (max-width: 360px) {
+  #appointmentForm.appointment-form-edit .appointment-form-grid {
+    gap: 8px;
+  }
+
+  #appointmentForm.appointment-form-edit .field {
+    min-height: 40px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
