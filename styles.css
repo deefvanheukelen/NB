@@ -4809,3 +4809,133 @@ button {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
+
+/* =========================================================
+   AFSPRAAK DATUM/TIJD PICKERS IN APP-LAYOUT
+========================================================= */
+.appointment-form-field {
+  position: relative;
+}
+
+.appointment-native-picker-input {
+  position: absolute !important;
+  inset: auto !important;
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.appointment-picker-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  width: 100%;
+  background: #ffffff;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.appointment-picker-display:hover,
+.appointment-picker-display:active {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  transform: none;
+}
+
+.appointment-wheel-dialog::backdrop {
+  background: rgba(42, 27, 36, 0.34);
+}
+
+.appointment-wheel-card .revenue-wheel-columns.two-cols {
+  grid-template-columns: 1fr 1fr;
+}
+
+.appointment-wheel-card .revenue-wheel-columns.three-cols {
+  grid-template-columns: 0.82fr 1.28fr 1fr;
+}
+
+.appointment-wheel-card .revenue-wheel-option {
+  font-size: 17px;
+}
+
+@media (max-width: 420px) {
+  .appointment-wheel-card .revenue-wheel-columns.three-cols {
+    grid-template-columns: 0.72fr 1.34fr 0.94fr;
+    gap: 6px;
+  }
+
+  .appointment-wheel-card .revenue-wheel-option {
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
+   OMZET - titel boven tegels + betaalstatuskleuren
+========================================================= */
+.revenue-summary-head {
+  padding: 0 2px 12px;
+}
+
+.revenue-summary-head h2,
+#revenueTitle {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+#revenueChartTitle {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.25;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.revenue-summary-item.revenue-summary-paid {
+  background: #dff3e5;
+  border-color: rgba(45, 139, 78, 0.22);
+}
+
+.revenue-summary-item.revenue-summary-paid .revenue-main-label,
+.revenue-summary-item.revenue-summary-paid strong {
+  color: #2d8b4e;
+}
+
+.revenue-summary-item.revenue-summary-unpaid {
+  background: var(--danger-soft);
+  border-color: rgba(212, 106, 138, 0.28);
+}
+
+.revenue-summary-item.revenue-summary-unpaid .revenue-main-label,
+.revenue-summary-item.revenue-summary-unpaid strong {
+  color: var(--danger);
+}
+
+.revenue-summary-item.revenue-summary-total {
+  background: #fbf7f9;
+}
+
+@media (max-width: 420px) {
+  .revenue-summary-head {
+    padding-bottom: 10px;
+  }
+
+  .revenue-summary-head h2,
+  #revenueTitle {
+    font-size: 15px;
+  }
+
+  #revenueChartTitle {
+    font-size: 14px;
+  }
+}

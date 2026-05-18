@@ -209,18 +209,22 @@
           </section>
 
           <section class="revenue-summary-card">
+            <div class="revenue-summary-head">
+              <h2 id="revenueTitle">Omzet</h2>
+            </div>
+
             <div class="revenue-summary-top">
-              <div class="revenue-summary-item">
+              <div class="revenue-summary-item revenue-summary-total">
                 <span class="revenue-main-label">Totaal</span>
                 <strong id="plannedRevenue">€ 0,00</strong>
               </div>
 
-              <div class="revenue-summary-item">
+              <div class="revenue-summary-item revenue-summary-paid">
                 <span class="revenue-main-label">Betaald</span>
                 <strong id="paidRevenue">€ 0,00</strong>
               </div>
 
-              <div class="revenue-summary-item">
+              <div class="revenue-summary-item revenue-summary-unpaid">
                 <span class="revenue-main-label">Onbetaald</span>
                 <strong id="openRevenue">€ 0,00</strong>
               </div>
@@ -231,7 +235,7 @@
 
           <section class="revenue-chart-card">
             <div class="revenue-chart-head">
-              <h2 id="revenueTitle">Omzet</h2>
+              <h2 id="revenueChartTitle">Grafische evolutie</h2>
               <div id="revenueChartSubtitle" class="revenue-chart-subtitle">Per dag</div>
             </div>
 
@@ -630,12 +634,14 @@
 
         <div class="appointment-form-field">
           <label class="field-label" for="appointmentDate">Datum</label>
-          <input id="appointmentDate" class="field" type="date" required />
+          <input id="appointmentDate" class="field appointment-native-picker-input" type="date" required tabindex="-1" aria-hidden="true" />
+          <button id="appointmentDateDisplayBtn" class="field appointment-picker-display" type="button" aria-label="Datum kiezen">Kies datum</button>
         </div>
 
         <div class="appointment-form-field">
           <label class="field-label" for="appointmentTime">Tijd</label>
-          <input id="appointmentTime" class="field" type="time" required />
+          <input id="appointmentTime" class="field appointment-native-picker-input" type="time" required tabindex="-1" aria-hidden="true" />
+          <button id="appointmentTimeDisplayBtn" class="field appointment-picker-display" type="button" aria-label="Tijd kiezen">Kies tijd</button>
         </div>
 
         <div class="appointment-form-field appointment-form-field-wide">
@@ -1076,6 +1082,31 @@
         </button>
         <button class="btn btn-primary action-btn" type="submit">
           Opslaan
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+
+  <!-- ===================== AFSPRAAK DATUM/TIJD PICKER ===== -->
+  <dialog id="appointmentWheelPickerDialog" class="modal revenue-wheel-dialog appointment-wheel-dialog">
+    <form method="dialog" id="appointmentWheelPickerForm" class="modal-card revenue-wheel-card appointment-wheel-card">
+      <div class="modal-head">
+        <h3 id="appointmentWheelPickerTitle">Kies</h3>
+        <button class="icon-btn" type="button" data-close="appointmentWheelPickerDialog">✕</button>
+      </div>
+
+      <div class="revenue-wheel-shell">
+        <div class="revenue-wheel-highlight" aria-hidden="true"></div>
+        <div id="appointmentWheelColumns" class="revenue-wheel-columns"></div>
+      </div>
+
+      <div class="modal-actions end-only">
+        <button class="btn btn-secondary action-btn" type="button" data-close="appointmentWheelPickerDialog">
+          Annuleren
+        </button>
+        <button id="appointmentWheelConfirmBtn" class="btn btn-primary action-btn" type="submit">
+          OK
         </button>
       </div>
     </form>

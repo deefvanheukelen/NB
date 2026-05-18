@@ -2245,7 +2245,8 @@ function attachRevenueWheelColumnEvents(column, key) {
   const finish = (behavior = "smooth") => {
     const value = updateRevenueWheelColumnSelection(column);
     if (value != null) {
-      revenuePickerState.selected[key] = value;
+      const pickerState = column.closest("#appointmentWheelColumns") ? appointmentPickerState : revenuePickerState;
+      pickerState.selected[key] = value;
       centerRevenueWheelColumn(column, value, behavior);
     }
   };
@@ -2269,7 +2270,8 @@ function attachRevenueWheelColumnEvents(column, key) {
 
   column.querySelectorAll(".revenue-wheel-option").forEach(option => {
     option.addEventListener("click", () => {
-      revenuePickerState.selected[key] = option.dataset.value;
+      const pickerState = column.closest("#appointmentWheelColumns") ? appointmentPickerState : revenuePickerState;
+      pickerState.selected[key] = option.dataset.value;
       centerRevenueWheelColumn(column, option.dataset.value, "smooth");
       window.clearTimeout(timeoutId);
       timeoutId = window.setTimeout(() => finish("smooth"), 130);
@@ -2290,6 +2292,130 @@ function buildRevenueWheelColumn(key, values, formatter = value => value) {
   `;
 }
 
+
+
+
+const appointmentPickerState = {
+  mode: "date",
+  selected: {}
+};
+
+function formatAppointmentDateLabel(dateStr) {
+  if (!dateStr) return "Kies datum";
+  const d = new Date(dateStr + "T00:00:00");
+  if (Number.isNaN(d.getTime())) return "Kies datum";
+  const dayNames = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
+  return `${dayNames[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+}
+
+function formatAppointmentTimeLabel(timeStr) {
+  if (!timeStr) return "Kies tijd";
+  const [h = "00", m = "00"] = String(timeStr).split(":");
+  return `${String(Number(h) || 0).padStart(2, "0")}:${String(Number(m) || 0).padStart(2, "0")}`;
+}
+
+function syncAppointmentDateTimeDisplays() {
+  const dateInput = document.getElementById("appointmentDate");
+  const timeInput = document.getElementById("appointmentTime");
+  const dateBtn = document.getElementById("appointmentDateDisplayBtn");
+  const timeBtn = document.getElementById("appointmentTimeDisplayBtn");
+
+  if (dateBtn && dateInput) dateBtn.textContent = formatAppointmentDateLabel(dateInput.value);
+  if (timeBtn && timeInput) timeBtn.textContent = formatAppointmentTimeLabel(timeInput.value);
+}
+
+function getAppointmentPickerYears(selectedYear) {
+  const data = getData();
+  const appointmentYears = (data.appointments || [])
+    .map(a => Number(String(a.date || "").slice(0, 4)))
+    .filter(Boolean);
+  const currentYear = Number(selectedYear) || today.getFullYear();
+  const minYear = appointmentYears.length ? Math.min(...appointmentYears, currentYear) : currentYear - 3;
+  const maxYear = appointmentYears.length ? Math.max(...appointmentYears, currentYear) : currentYear + 3;
+  return Array.from({ length: (maxYear - minYear + 7) }, (_, i) => minYear - 3 + i);
+}
+
+function openAppointmentWheelPicker(mode) {
+  const dialog = document.getElementById("appointmentWheelPickerDialog");
+  const title = document.getElementById("appointmentWheelPickerTitle");
+  const columnsWrap = document.getElementById("appointmentWheelColumns");
+  if (!dialog || !title || !columnsWrap) return;
+
+  const dateValue = document.getElementById("appointmentDate")?.value || state.selectedDate || todayStr;
+  const timeValue = document.getElementById("appointmentTime")?.value || "10:00";
+  const date = new Date(dateValue + "T00:00:00");
+  const selectedYear = date.getFullYear();
+  const selectedMonthIndex = date.getMonth();
+  const selectedDay = date.getDate();
+  const [rawHour = "10", rawMinute = "00"] = timeValue.split(":");
+  const selectedHour = Math.max(0, Math.min(23, Number(rawHour) || 0));
+  const selectedMinute = Math.max(0, Math.min(59, Number(rawMinute) || 0));
+
+  appointmentPickerState.mode = mode;
+  appointmentPickerState.selected = {};
+
+  if (mode === "time") {
+    title.textContent = "Kies tijd";
+    columnsWrap.className = "revenue-wheel-columns two-cols";
+    const hours = Array.from({ length: 24 }, (_, i) => i);
+    const minutes = Array.from({ length: 60 }, (_, i) => i);
+    columnsWrap.innerHTML =
+      buildRevenueWheelColumn("hour", hours, value => String(value).padStart(2, "0")) +
+      buildRevenueWheelColumn("minute", minutes, value => String(value).padStart(2, "0"));
+    appointmentPickerState.selected.hour = String(selectedHour);
+    appointmentPickerState.selected.minute = String(selectedMinute);
+  } else {
+    title.textContent = "Kies datum";
+    columnsWrap.className = "revenue-wheel-columns three-cols";
+    const years = getAppointmentPickerYears(selectedYear);
+    const months = Array.from({ length: 12 }, (_, i) => i);
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    columnsWrap.innerHTML =
+      buildRevenueWheelColumn("day", days, value => String(value).padStart(2, "0")) +
+      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("year", years, value => value);
+    appointmentPickerState.selected.day = String(selectedDay);
+    appointmentPickerState.selected.monthIndex = String(selectedMonthIndex);
+    appointmentPickerState.selected.year = String(selectedYear);
+  }
+
+  const columns = Array.from(columnsWrap.querySelectorAll(".revenue-wheel-column"));
+  columns.forEach(column => attachRevenueWheelColumnEvents(column, column.dataset.key));
+
+  const centerActiveValues = (behavior = "auto") => {
+    Object.entries(appointmentPickerState.selected).forEach(([key, value]) => {
+      centerRevenueWheelColumn(columnsWrap.querySelector(`[data-key="${key}"]`), value, behavior);
+    });
+  };
+
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "open");
+
+  requestAnimationFrame(() => {
+    centerActiveValues("auto");
+    requestAnimationFrame(() => centerActiveValues("auto"));
+  });
+}
+
+function applyAppointmentWheelPickerSelection() {
+  if (appointmentPickerState.mode === "time") {
+    const hour = Math.max(0, Math.min(23, Number(appointmentPickerState.selected.hour) || 0));
+    const minute = Math.max(0, Math.min(59, Number(appointmentPickerState.selected.minute) || 0));
+    const timeInput = document.getElementById("appointmentTime");
+    if (timeInput) timeInput.value = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+    syncAppointmentDateTimeDisplays();
+    return;
+  }
+
+  const currentDate = new Date((document.getElementById("appointmentDate")?.value || state.selectedDate || todayStr) + "T00:00:00");
+  const year = Number(appointmentPickerState.selected.year || currentDate.getFullYear());
+  const monthIndex = Number(appointmentPickerState.selected.monthIndex || currentDate.getMonth());
+  const rawDay = Number(appointmentPickerState.selected.day || currentDate.getDate());
+  const day = clampRevenueDay(year, monthIndex, rawDay);
+  const dateInput = document.getElementById("appointmentDate");
+  if (dateInput) dateInput.value = formatDateInput(new Date(year, monthIndex, day));
+  syncAppointmentDateTimeDisplays();
+}
 
 function getRevenueWeekOfMonth(date) {
   const day = date.getDate();
@@ -4234,6 +4360,7 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
   document.getElementById("appointmentTime").value = "10:00";
   document.getElementById("appointmentStatus").value = "gepland";
   document.getElementById("appointmentStatusWrap").style.display = "none";
+  syncAppointmentDateTimeDisplays();
 
   const serviceSelect = document.getElementById("appointmentService");
   if (serviceSelect.options.length) {
@@ -4263,6 +4390,7 @@ function openEditAppointmentDialog(id) {
   document.getElementById("appointmentPrice").value = app.price;
   document.getElementById("appointmentStatus").value = app.status;
   document.getElementById("appointmentStatusWrap").style.display = "block";
+  syncAppointmentDateTimeDisplays();
 
   document.getElementById("deleteAppointmentBtn").style.visibility = "visible";
   document.getElementById("appointmentDialog").showModal();
@@ -5153,6 +5281,20 @@ function registerEvents() {
     }
     renderSettings();
   });
+
+  document.getElementById("appointmentDateDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date"));
+  document.getElementById("appointmentTimeDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("time"));
+  document.getElementById("appointmentDate")?.addEventListener("change", syncAppointmentDateTimeDisplays);
+  document.getElementById("appointmentTime")?.addEventListener("change", syncAppointmentDateTimeDisplays);
+
+  const appointmentWheelPickerForm = document.getElementById("appointmentWheelPickerForm");
+  if (appointmentWheelPickerForm) {
+    appointmentWheelPickerForm.addEventListener("submit", event => {
+      event.preventDefault();
+      applyAppointmentWheelPickerSelection();
+      closeDialog("appointmentWheelPickerDialog");
+    });
+  }
 
   document.getElementById("appointmentForm").addEventListener("submit", saveAppointmentFromForm);
   document.getElementById("deleteAppointmentBtn").addEventListener("click", deleteCurrentAppointment);
