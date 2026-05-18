@@ -4498,6 +4498,54 @@ button {
 }
 
 
+
+
+/* =========================================================
+   REGISTREREN - dialog met scrollbare inhoud
+   Zorgt dat de actieknoppen onderaan altijd bereikbaar blijven
+========================================================= */
+#registerDialog.modal {
+  max-height: calc(100dvh - 16px);
+  overflow: hidden;
+}
+
+#registerForm.modal-card {
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(18px + env(safe-area-inset-bottom));
+}
+
+#registerForm .modal-actions {
+  position: sticky;
+  bottom: -1px;
+  z-index: 3;
+  margin-left: -18px;
+  margin-right: -18px;
+  margin-bottom: -18px;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(255,255,255,0.92) 0%, #ffffff 35%, #ffffff 100%);
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 420px) {
+  #registerDialog.modal {
+    max-height: calc(100dvh - 12px);
+  }
+
+  #registerForm.modal-card {
+    max-height: calc(100dvh - 12px);
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  #registerForm .modal-actions {
+    margin-left: -12px;
+    margin-right: -12px;
+    margin-bottom: -14px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  }
+}
+
 /* =========================================================
    GLOBALE ACTIEKNOPPEN - stijl zoals bottom menu
    Wordt hergebruikt voor Opslaan / Annuleren / Verwijderen
@@ -5108,4 +5156,50 @@ button {
   padding: 8px 12px;
   font-size: 14px;
   border-radius: 12px;
+}
+
+
+/* Auth lock: menu onderaan is niet bereikbaar zolang er niet is ingelogd */
+body.auth-locked .bottom-nav {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+body.auth-locked .fab {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+.header-account-icon,
+.header-account-icon svg,
+.header-account-icon path {
+  color: inherit;
+  fill: currentColor !important;
+}
+
+/* =========================================================
+   ACCOUNT / REGISTRATIE EXTRA VELDEN
+========================================================= */
+.optional-label {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.terms-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.terms-checkbox-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-dark);
+  flex: 0 0 auto;
 }
