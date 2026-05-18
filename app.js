@@ -19,7 +19,8 @@ const state = {
   statsTopCustomersVisible: 10,
   revenueInitialized: false,
   revenueSelectedDateSynced: null,
-  revenueSyncSelectedDateOnOpen: true
+  revenueSyncSelectedDateOnOpen: true,
+  showInactiveServices: false
 };
 
 const monthNames = [
@@ -90,7 +91,10 @@ function normalizeData(data) {
 
   return {
     customers: Array.isArray(safe.customers) ? safe.customers : [],
-    services: Array.isArray(safe.services) ? safe.services : [],
+    services: Array.isArray(safe.services) ? safe.services.map(service => ({
+      ...service,
+      isActive: service?.isActive !== false
+    })) : [],
     appointments,
     paymentMethods,
     settings: {
@@ -200,6 +204,30 @@ function serviceById(data, id) {
 
 function fullName(customer) {
   return [customer.firstName || "", customer.lastName || ""].join(" ").trim();
+}
+
+function customerNumber(customer) {
+  const raw = customer?.customerNumber ?? customer?.customer_number ?? customer?.id ?? "";
+  const value = String(raw).trim();
+  if (!value) return "-";
+
+  if (/^\d+$/.test(value)) {
+    return `K${value.padStart(5, "0")}`;
+  }
+
+  return value.startsWith("K") ? value : `K${value}`;
+}
+
+function customerSearchText(customer) {
+  return [
+    fullName(customer),
+    customer.firstName,
+    customer.lastName,
+    customer.phone,
+    String(customer.phone || "").replace(/\D/g, ""),
+    customer.email,
+    customerNumber(customer)
+  ].join(" ").toLowerCase();
 }
 
 function weekBounds(dateStr) {
@@ -1989,9 +2017,12 @@ function renderClients() {
   const q = document.getElementById("clientSearch").value.trim().toLowerCase();
   const list = document.getElementById("clientsList");
 
-  let clients = data.customers.filter(c =>
-    [fullName(c), c.phone, c.email].join(" ").toLowerCase().includes(q)
-  );
+  const compactQuery = q.replace(/\D/g, "");
+  let clients = data.customers.filter(c => {
+    const haystack = customerSearchText(c);
+    const phoneDigits = String(c.phone || "").replace(/\D/g, "");
+    return haystack.includes(q) || (compactQuery && phoneDigits.includes(compactQuery));
+  });
 
   if (state.clientLetter) {
     clients = clients.filter(c => (c.firstName || "").toUpperCase().startsWith(state.clientLetter));
@@ -2008,13 +2039,14 @@ function renderClients() {
 
   clients.forEach(client => {
     const count = data.appointments.filter(a => String(a.customerId) === String(client.id)).length;
+    const phone = String(client.phone || "").trim();
     const card = document.createElement("div");
     card.className = "client-card";
 
     card.innerHTML = `
       <button type="button" data-id="${client.id}">
-        <div class="client-name">${fullName(client)}</div>
-        <div class="meta">${client.phone || "Geen telefoon"} · ${count} afspraken</div>
+        <div class="client-name">${escapeHtml(fullName(client) || "Naamloos")}</div>
+        <div class="meta">${escapeHtml(phone || "Geen gsm")} · ${count} ${count === 1 ? "afspraak" : "afspraken"}</div>
       </button>
     `;
 
@@ -2026,28 +2058,56 @@ function renderClients() {
 function renderServices() {
   const data = getData();
   const list = document.getElementById("servicesList");
+  if (!list) return;
 
-  if (!data.services.length) {
-    list.innerHTML = `<div class="empty-state">Nog geen diensten.</div>`;
-    return;
-  }
+  const services = Array.isArray(data.services) ? data.services : [];
+  const activeServices = services
+    .filter(service => service.isActive !== false)
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
+  const inactiveServices = services
+    .filter(service => service.isActive === false)
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
+  const visibleServices = state.showInactiveServices
+    ? [...activeServices, ...inactiveServices]
+    : activeServices;
 
   list.innerHTML = "";
 
-  data.services.forEach(service => {
-    const card = document.createElement("div");
-    card.className = "service-card";
+  if (!visibleServices.length) {
+    list.innerHTML = `<div class="empty-state">Nog geen actieve diensten.</div>`;
+  } else {
+    visibleServices.forEach(service => {
+      const isInactive = service.isActive === false;
+      const card = document.createElement("div");
+      card.className = `service-card${isInactive ? " service-card-inactive" : ""}`;
 
-    card.innerHTML = `
-      <button type="button" data-id="${service.id}">
-        <div class="client-name">${service.name}</div>
-        <div class="meta">${service.duration} min · ${euro(service.price)}</div>
-      </button>
+      card.innerHTML = `
+        <button type="button" data-id="${service.id}">
+          <div class="client-name">${escapeHtml(service.name || "Naamloze dienst")}</div>
+          <div class="meta">${service.duration} min · ${euro(service.price)}${isInactive ? " · inactief" : ""}</div>
+        </button>
+      `;
+
+      card.querySelector("button").addEventListener("click", () => openEditServiceDialog(service.id));
+      list.appendChild(card);
+    });
+  }
+
+  if (inactiveServices.length) {
+    const toggleWrap = document.createElement("label");
+    toggleWrap.className = "inactive-services-toggle";
+    toggleWrap.innerHTML = `
+      <input id="showInactiveServices" type="checkbox" ${state.showInactiveServices ? "checked" : ""} />
+      <span>Toon inactieve diensten</span>
     `;
 
-    card.querySelector("button").addEventListener("click", () => openEditServiceDialog(service.id));
-    list.appendChild(card);
-  });
+    toggleWrap.querySelector("input").addEventListener("change", event => {
+      state.showInactiveServices = event.target.checked;
+      renderServices();
+    });
+
+    list.appendChild(toggleWrap);
+  }
 }
 
 
@@ -2304,7 +2364,7 @@ function formatAppointmentDateLabel(dateStr) {
   if (!dateStr) return "Kies datum";
   const d = new Date(dateStr + "T00:00:00");
   if (Number.isNaN(d.getTime())) return "Kies datum";
-  const dayNames = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
+  const dayNames = ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"];
   return `${dayNames[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 }
 
@@ -3495,6 +3555,13 @@ function getStatisticsSummary(data = getData()) {
 
   const paidAppointments = appointments.filter(app => app.paid);
   const paidRevenue = paidAppointments.reduce((sum, app) => sum + Number(app.price || 0), 0);
+  const now = new Date();
+  const appointmentDateTime = app => new Date(`${app.date || todayStr}T${app.time || '00:00'}:00`);
+  const pastAppointments = appointments.filter(app => appointmentDateTime(app).getTime() < now.getTime());
+  const futureAppointments = appointments.filter(app => appointmentDateTime(app).getTime() >= now.getTime());
+  const paidRevenueUntilToday = paidAppointments
+    .filter(app => String(app.date || '') <= todayStr)
+    .reduce((sum, app) => sum + Number(app.price || 0), 0);
 
   const serviceUsage = services.map(service => ({
     label: service.name,
@@ -3526,8 +3593,11 @@ function getStatisticsSummary(data = getData()) {
   return {
     appointmentCount: appointments.length,
     customerCount: customers.length,
+    pastAppointmentCount: pastAppointments.length,
+    futureAppointmentCount: futureAppointments.length,
     paidAppointmentCount: paidAppointments.length,
     paidRevenue,
+    paidRevenueUntilToday,
     serviceUsage,
     paymentUsage,
     statusUsage,
@@ -3617,8 +3687,16 @@ function buildStatisticsDonut(items, valueFormatter = value => String(value)) {
   `;
 }
 
-function getTopCustomers(data = getData()) {
+function getStatisticsAppointmentYears(data = getData()) {
+  return Array.from(new Set((data.appointments || [])
+    .map(appointment => Number(String(appointment.date || "").slice(0, 4)))
+    .filter(year => Number.isFinite(year) && year > 0)))
+    .sort((a, b) => b - a);
+}
+
+function getTopCustomers(data = getData(), yearFilter = "all") {
   const totals = new Map();
+  const safeYearFilter = String(yearFilter || "all");
 
   (data.customers || []).forEach(customer => {
     const name = fullName(customer) || 'Onbekend';
@@ -3633,6 +3711,7 @@ function getTopCustomers(data = getData()) {
 
   (data.appointments || []).forEach(appointment => {
     if ((appointment.status || '').toLowerCase() === 'no-show') return;
+    if (safeYearFilter !== 'all' && !String(appointment.date || '').startsWith(safeYearFilter)) return;
     const customer = customerById(data, appointment.customerId);
     const key = customer ? String(customer.id) : `unknown-${appointment.customerId || appointment.id}`;
     const name = customer ? fullName(customer) : 'Onbekend';
@@ -3655,7 +3734,12 @@ function renderStatistics() {
 
   const data = getData();
   const summary = getStatisticsSummary(data);
-  const topCustomers = getTopCustomers(data);
+  const topCustomerYears = getStatisticsAppointmentYears(data);
+  if (state.statsTopCustomersYear !== 'all' && !topCustomerYears.includes(Number(state.statsTopCustomersYear))) {
+    state.statsTopCustomersYear = 'all';
+  }
+  const selectedTopCustomerYear = state.statsTopCustomersYear || 'all';
+  const topCustomers = getTopCustomers(data, selectedTopCustomerYear);
   const visibleCount = Math.max(10, Number(state.statsTopCustomersVisible) || 10);
   const visibleCustomers = topCustomers.slice(0, visibleCount);
   const hasMoreCustomers = visibleCustomers.length < topCustomers.length;
@@ -3668,16 +3752,16 @@ function renderStatistics() {
         <strong>${summary.customerCount}</strong>
       </div>
       <div class="statistics-kpi">
-        <span class="statistics-kpi-label">Aantal afspraken</span>
-        <strong>${summary.appointmentCount}</strong>
+        <span class="statistics-kpi-label">Afgeronde afspraken</span>
+        <strong>${summary.pastAppointmentCount}</strong>
       </div>
       <div class="statistics-kpi">
-        <span class="statistics-kpi-label">Betaalde afspraken</span>
-        <strong>${summary.paidAppointmentCount}</strong>
+        <span class="statistics-kpi-label">Geplande afspraken</span>
+        <strong>${summary.futureAppointmentCount}</strong>
       </div>
       <div class="statistics-kpi">
-        <span class="statistics-kpi-label">Omzet tot op heden</span>
-        <strong>${euro(summary.paidRevenue)}</strong>
+        <span class="statistics-kpi-label">Totale omzet tot vandaag</span>
+        <strong>${euro(summary.paidRevenueUntilToday)}</strong>
       </div>
     </section>
 
@@ -3703,16 +3787,20 @@ function renderStatistics() {
     </section>
 
     <section class="statistics-card">
-      <div class="statistics-card-head">
+      <div class="statistics-card-head statistics-card-head-stacked">
         <h2>Top klanten</h2>
+        <select id="topCustomersYearFilter" class="field compact-field statistics-year-filter" aria-label="Top klanten jaar filteren">
+          <option value="all"${selectedTopCustomerYear === 'all' ? ' selected' : ''}>Alle</option>
+          ${topCustomerYears.map(year => `<option value="${year}"${String(year) === String(selectedTopCustomerYear) ? ' selected' : ''}>${year}</option>`).join('')}
+        </select>
       </div>
       <div class="statistics-top-customers">
         ${visibleCustomers.length ? visibleCustomers.map((customer, index) => `
-          <div class="statistics-top-customer-row">
+          <button class="statistics-top-customer-row" type="button" data-customer-id="${customer.id || ''}">
             <div class="statistics-top-customer-rank">${index + 1}</div>
             <div class="statistics-top-customer-name">${customer.name}</div>
             <strong class="statistics-top-customer-amount">${euro(customer.revenue)}</strong>
-          </div>
+          </button>
         `).join('') : `<div class="statistics-empty">Nog geen klantgegevens beschikbaar.</div>`}
       </div>
       ${(hasMoreCustomers || canShowLessCustomers) ? `
@@ -3723,6 +3811,23 @@ function renderStatistics() {
       ` : ''}
     </section>
   `;
+
+
+  const topCustomersYearFilter = document.getElementById('topCustomersYearFilter');
+  if (topCustomersYearFilter) {
+    topCustomersYearFilter.addEventListener('change', () => {
+      state.statsTopCustomersYear = topCustomersYearFilter.value || 'all';
+      state.statsTopCustomersVisible = 10;
+      renderStatistics();
+    });
+  }
+
+  wrap.querySelectorAll('.statistics-top-customer-row[data-customer-id]').forEach(row => {
+    row.addEventListener('click', () => {
+      const customerId = row.dataset.customerId;
+      if (customerId) openClientDetail(customerId);
+    });
+  });
 
   const moreBtn = document.getElementById('statisticsMoreCustomersBtn');
   if (moreBtn) {
@@ -4097,6 +4202,11 @@ function openClientDetail(clientId) {
       <div class="client-detail-card">
         <div class="client-detail-table">
           <div class="client-detail-row client-detail-row-stacked">
+            <div class="client-detail-label">Klantnummer</div>
+            ${renderClientContactValue('text', customerNumber(client))}
+          </div>
+
+          <div class="client-detail-row client-detail-row-stacked">
             <div class="client-detail-label">Voornaam</div>
             ${renderClientContactValue('text', client.firstName || '-')}
           </div>
@@ -4123,8 +4233,9 @@ function openClientDetail(clientId) {
         </div>
 
         <div class="client-detail-footer">
-          <button class="btn btn-primary client-detail-edit-btn" id="editClientBtn" type="button">
-            Bewerken
+          <button class="btn client-detail-edit-btn app-action-nav-btn" id="editClientBtn" type="button" aria-label="Bewerk">
+            <span class="app-action-nav-ico" aria-hidden="true">${getActionButtonIconSvg('edit')}</span>
+            <span class="app-action-nav-label">Bewerk</span>
           </button>
         </div>
       </div>
@@ -4137,46 +4248,44 @@ function openClientDetail(clientId) {
 
         <div class="client-new-appointment-bar">
           <button
-            class="btn btn-primary client-new-appointment-btn"
+            class="client-inline-add-btn"
             id="newClientAppointmentBtn"
             type="button"
+            aria-label="Nieuwe afspraak"
+            title="Nieuwe afspraak"
           >
-            Nieuwe afspraak
+            +
           </button>
         </div>
 
         <div class="client-appointments-list">
           ${
             appts.length
-              ? appts.map(app => {
+              ? `<div class="appointment-card client-detail-appointment-card">${appts.map(app => {
                   const service = serviceById(data, app.serviceId);
+                  const statusParts = [];
+                  if ((app.status || "").toLowerCase() === "no-show") {
+                    statusParts.push("no show");
+                  } else {
+                    statusParts.push(app.paid ? "betaald" : "onbetaald");
+                    const method = paymentMethodNameForAppointment(app, data);
+                    if (app.paid && method) statusParts.push(method);
+                  }
 
                   return `
-                    <div class="client-appointment-row">
-                      <div class="client-appointment-datecol">
-                        <div class="client-appointment-date">${formatShortDate(app.date)}</div>
-                        <div class="client-appointment-time">${app.time || ""}</div>
+                    <div class="appointment-row client-detail-appointment-row" data-id="${app.id}" role="button" tabindex="0" aria-label="Afspraak bewerken">
+                      <div class="time-block">
+                        <div class="time">${app.time || ""}</div>
+                        <div class="time-end">${formatShortDate(app.date)}</div>
                       </div>
-
-                      <div class="client-appointment-main">
-                        <div class="client-appointment-service">${service ? service.name : "-"}</div>
-                        <div class="client-appointment-status">
-                          ${app.status || "-"}${app.paid ? " · betaald" : ""}
-                        </div>
+                      <div>
+                        <div class="main-name">${service ? service.name : "-"}</div>
+                        <div class="meta">${statusParts.join(" · ")}</div>
                       </div>
-
-                      <div class="client-appointment-actions">
-                        <button
-                          class="btn btn-primary client-appointment-edit-btn from-detail-edit"
-                          data-id="${app.id}"
-                          type="button"
-                        >
-                          Bewerk
-                        </button>
-                      </div>
+                      <span class="price-chip ${app.paid ? "paid" : ""}">${euro(app.price)}</span>
                     </div>
                   `;
-                }).join("")
+                }).join("")}</div>`
               : `<div class="client-appointment-empty">Nog geen afspraken.</div>`
           }
         </div>
@@ -4200,9 +4309,14 @@ function openClientDetail(clientId) {
     });
   }
 
-  content.querySelectorAll(".from-detail-edit").forEach(btn => {
-    btn.addEventListener("click", () => {
-      openEditAppointmentDialog(btn.dataset.id);
+  content.querySelectorAll(".client-detail-appointment-row").forEach(row => {
+    const openAppointment = () => openEditAppointmentDialog(row.dataset.id);
+    row.addEventListener("click", openAppointment);
+    row.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openAppointment();
+      }
     });
   });
 
@@ -4220,9 +4334,15 @@ function createAppointmentForClient(clientId) {
 
 
 function customerSearchText(customer) {
-  return [fullName(customer), customer.phone || "", customer.email || ""]
-    .join(" ")
-    .toLowerCase();
+  return [
+    fullName(customer),
+    customer.firstName,
+    customer.lastName,
+    customer.phone,
+    String(customer.phone || "").replace(/\D/g, ""),
+    customer.email,
+    customerNumber(customer)
+  ].join(" ").toLowerCase();
 }
 
 function setAppointmentCustomer(customerId, { updateSearch = true } = {}) {
@@ -4327,7 +4447,8 @@ function populateAppointmentForm(customerId = null) {
 
   customerSelect.innerHTML = `<option value="">Kies een klant...</option>` +
     data.customers.map(c => `<option value="${c.id}">${fullName(c)}</option>`).join("");
-  serviceSelect.innerHTML = data.services.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+  const activeServices = (data.services || []).filter(service => service.isActive !== false);
+  serviceSelect.innerHTML = activeServices.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
 
   setupAppointmentCustomerSearch();
 
@@ -4378,6 +4499,15 @@ function openEditAppointmentDialog(id) {
   if (!app) return;
 
   populateAppointmentForm(app.customerId);
+
+  const appointmentServiceSelect = document.getElementById("appointmentService");
+  const currentService = serviceById(data, app.serviceId);
+  if (appointmentServiceSelect && currentService && !Array.from(appointmentServiceSelect.options).some(option => String(option.value) === String(currentService.id))) {
+    const option = document.createElement("option");
+    option.value = currentService.id;
+    option.textContent = `${currentService.name} (inactief)`;
+    appointmentServiceSelect.appendChild(option);
+  }
 
   document.getElementById("appointmentForm")?.classList.add("appointment-form-edit");
   document.getElementById("appointmentModalTitle").textContent = "Afspraak bewerken";
@@ -4590,6 +4720,11 @@ function openNewServiceDialog() {
   document.getElementById("serviceDuration").value = 60;
   document.getElementById("servicePrice").value = 65;
 
+  const reactivateWrap = document.getElementById("serviceReactivateWrap");
+  const reactivateCheckbox = document.getElementById("serviceReactivateCheckbox");
+  if (reactivateWrap) reactivateWrap.classList.add("hidden");
+  if (reactivateCheckbox) reactivateCheckbox.checked = false;
+
   document.getElementById("deleteServiceBtn").style.visibility = "hidden";
   document.getElementById("serviceDialog").showModal();
 }
@@ -4599,13 +4734,20 @@ function openEditServiceDialog(id) {
   const service = serviceById(data, id);
   if (!service) return;
 
+  const isInactive = service.isActive === false;
+
   document.getElementById("serviceModalTitle").textContent = "Dienst bewerken";
   document.getElementById("serviceId").value = service.id;
   document.getElementById("serviceName").value = service.name;
   document.getElementById("serviceDuration").value = service.duration;
   document.getElementById("servicePrice").value = service.price;
 
-  document.getElementById("deleteServiceBtn").style.visibility = "visible";
+  const reactivateWrap = document.getElementById("serviceReactivateWrap");
+  const reactivateCheckbox = document.getElementById("serviceReactivateCheckbox");
+  if (reactivateWrap) reactivateWrap.classList.toggle("hidden", !isInactive);
+  if (reactivateCheckbox) reactivateCheckbox.checked = false;
+
+  document.getElementById("deleteServiceBtn").style.visibility = isInactive ? "hidden" : "visible";
   document.getElementById("serviceDialog").showModal();
 }
 
@@ -4795,19 +4937,26 @@ async function saveServiceFromForm(event) {
   event.preventDefault();
 
   const user = await getCurrentUser();
+  const rawId = document.getElementById("serviceId").value;
+  const id = rawId ? Number(rawId) : null;
+  const reactivateChecked = Boolean(document.getElementById("serviceReactivateCheckbox")?.checked);
 
   if (!user) {
     const data = getData();
-    const id = Number(document.getElementById("serviceId").value);
+    const existingService = id ? serviceById(data, id) : null;
+    const nextIsActive = id
+      ? (existingService?.isActive === false ? reactivateChecked : true)
+      : true;
 
     const payload = {
       name: document.getElementById("serviceName").value.trim(),
       duration: Number(document.getElementById("serviceDuration").value),
-      price: Number(document.getElementById("servicePrice").value)
+      price: Number(document.getElementById("servicePrice").value),
+      isActive: nextIsActive
     };
 
     if (id) {
-      Object.assign(serviceById(data, id), payload);
+      Object.assign(existingService, payload);
     } else {
       data.services.push({ id: nextId(data.services), ...payload });
     }
@@ -4818,13 +4967,18 @@ async function saveServiceFromForm(event) {
     return;
   }
 
-  const id = document.getElementById("serviceId").value;
+  const data = getData();
+  const existingService = id ? serviceById(data, id) : null;
+  const nextIsActive = id
+    ? (existingService?.isActive === false ? reactivateChecked : true)
+    : true;
 
   const payload = {
     user_id: user.id,
     name: document.getElementById("serviceName").value.trim(),
     duration: Number(document.getElementById("serviceDuration").value),
-    price: Number(document.getElementById("servicePrice").value)
+    price: Number(document.getElementById("servicePrice").value),
+    is_active: nextIsActive
   };
 
   let error;
@@ -4977,6 +5131,15 @@ async function deleteCurrentAppointment() {
   const id = document.getElementById("appointmentId").value;
   if (!id) return;
 
+  const confirmed = await appConfirm("Deze afspraak wordt definitief verwijderd.", {
+    title: "Afspraak verwijderen",
+    confirmText: "Verwijderen",
+    cancelText: "Annuleren",
+    variant: "danger"
+  });
+
+  if (!confirmed) return;
+
   const user = await getCurrentUser();
 
   if (!user) {
@@ -5008,11 +5171,21 @@ async function deleteCurrentService() {
   const id = document.getElementById("serviceId").value;
   if (!id) return;
 
+  const confirmed = await appConfirm("Deze dienst wordt op inactief gezet en verdwijnt uit de dienstenlijst en nieuwe afspraken. Bestaande afspraken blijven behouden.", {
+    title: "Dienst inactief zetten",
+    confirmText: "Inactief zetten",
+    cancelText: "Annuleren",
+    variant: "danger"
+  });
+
+  if (!confirmed) return;
+
   const user = await getCurrentUser();
 
   if (!user) {
     const data = getData();
-    data.services = data.services.filter(s => String(s.id) !== String(id));
+    const service = serviceById(data, id);
+    if (service) service.isActive = false;
     saveData(data);
     closeDialog("serviceDialog");
     rerenderAll();
@@ -5021,12 +5194,12 @@ async function deleteCurrentService() {
 
   const { error } = await supabaseClient
     .from("services")
-    .delete()
+    .update({ is_active: false })
     .eq("id", Number(id))
     .eq("user_id", user.id);
 
   if (error) {
-    await appAlert("Verwijderen dienst mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
+    await appAlert("Dienst inactief zetten mislukt: " + error.message, { title: "Aanpassen mislukt", variant: "danger" });
     return;
   }
 
@@ -5178,7 +5351,8 @@ function getActionButtonIconSvg(type) {
     save: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="m 1.2487599,6.3350499 -0.09755,-0.067983 V 3.7370896 c 0,-1.9103368 0.012742,-2.5426364 0.052027,-2.58166 0.035778,-0.035538 0.252426,-0.051681 0.6936895,-0.051681 H 2.5385889 V 1.9651164 2.8264842 H 3.7742229 5.009857 V 1.9651173 1.1037498 H 5.3902354 5.7706138 L 6.1067451,1.4396243 6.4428764,1.7754988 6.4308947,4.021599 c -0.00945,1.7724982 -0.023861,2.2579 -0.068322,2.3020623 -0.044619,0.04432 -0.572285,0.058401 -2.5363015,0.067672 C 1.624705,6.4017253 1.3353593,6.3954233 1.24876,6.3350563 Z M 5.2892092,5.8747533 c 0.055268,-0.078383 0.067492,-0.2421888 0.067492,-0.9044356 0,-0.7512913 -0.00616,-0.8148317 -0.086711,-0.8948522 -0.083105,-0.082552 -0.1445187,-0.086135 -1.4769401,-0.086135 -0.8754091,0 -1.4212835,0.016507 -1.4740897,0.044588 -0.078777,0.041885 -0.083861,0.098794 -0.083861,0.9388902 0,0.6381478 0.014902,0.9091103 0.052027,0.9459891 0.038378,0.038125 0.4301191,0.05168 1.4933091,0.05168 1.4402317,0 1.4413315,-6.93e-5 1.508774,-0.09572 z M 4.0993893,1.9651155 V 1.2760213 H 4.4245562 4.7497231 V 1.9651155 2.65421 H 4.4245562 4.0993893 Z" /></svg>`,
     cancel: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="M 3.7216875,1.0757028 A 2.6458266,2.6458266 0 0 0 1.0758545,3.721536 2.6458266,2.6458266 0 0 0 3.7216875,6.3673694 2.6458266,2.6458266 0 0 0 6.3675215,3.721536 2.6458266,2.6458266 0 0 0 3.7216875,1.0757028 Z m -0.82292,1.3657978 c 0.05451,0 0.138465,0.070411 0.447301,0.375477 l 0.380029,0.3754771 0.378179,-0.3754771 c 0.292326,-0.2902706 0.392113,-0.375477 0.439905,-0.375477 0.04347,0 0.107409,0.044353 0.215615,0.1494797 0.208329,0.2023863 0.245294,0.2617301 0.207508,0.3332359 -0.01611,0.030483 -0.188746,0.217296 -0.383726,0.4151581 l -0.35457,0.3598322 0.335512,0.333947 c 0.184481,0.1836653 0.357479,0.3692108 0.384437,0.4123137 0.04674,0.074724 0.04701,0.081153 0.0081,0.1405195 -0.08631,0.1317284 -0.351617,0.3670857 -0.413878,0.3670857 -0.0465,0 -0.150027,-0.088488 -0.439621,-0.376046 L 3.7248165,4.2009804 3.4082215,4.5137358 C 3.2340805,4.6857555 3.0594205,4.8549521 3.0200865,4.8897817 2.9045905,4.9920513 2.8540445,4.9753377 2.6447515,4.766045 2.5193755,4.6406693 2.4577245,4.5608493 2.4577245,4.5238338 c 0,-0.039229 0.110334,-0.1669151 0.381308,-0.4410433 L 3.2204835,3.6969309 2.8390325,3.3116402 c -0.271639,-0.2745061 -0.381308,-0.401336 -0.381308,-0.4407588 0,-0.085362 0.353348,-0.4293808 0.441043,-0.4293808 z" /></svg>`,
     delete: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="m 2.2698341,6.1775822 c -0.1094284,-0.04971 -0.231493,-0.164087 -0.290851,-0.272533 -0.037167,-0.0679 -0.041899,-0.221644 -0.052699,-1.711931 L 1.9144211,2.5557908 1.7067886,2.5489308 1.4991566,2.5420708 V 2.3545326 2.1669857 l 0.1008498,-0.0073 0.1008498,-0.0073 0.013669,-0.1423763 c 0.01596,-0.1662368 0.034542,-0.2158412 0.089015,-0.2376519 0.02183,-0.00874 0.2399086,-0.021819 0.4846179,-0.029062 L 2.7330836,1.7301305 V 1.6192114 c 0,-0.3484396 0.3062313,-0.68698353 0.5910897,-0.68179893 0.077671,0.00141 0.1969862,-0.00708 0.4182785,-0.00708 h 0.4780034 c 0.3249416,0.00541 0.5533562,0.39764923 0.5533562,0.71128873 v 0.095511 l 0.3025494,0.00123 c 0.3906803,0.00158 0.6135415,0.026715 0.6614465,0.07462 0.023407,0.023407 0.042463,0.097122 0.050279,0.1944918 l 0.012586,0.1567987 h 0.091669 0.091669 V 2.3541076 2.543943 H 5.7823104 5.5806105 l -5.209e-4,1.6076662 c -5.104e-4,1.566046 -0.00177,1.61043 -0.048858,1.714448 -0.062582,0.138254 -0.1489784,0.227906 -0.2879761,0.29883 l -0.1119258,0.05711 -1.3830257,-5.24e-4 c -1.288121,-4.9e-4 -1.3895764,-0.0035 -1.4784713,-0.04388 z m 2.8347098,-0.400527 0.070458,-0.06526 0.00704,-1.578004 0.00704,-1.5780044 -1.4415606,-0.00612 -1.4415606,-0.00612 v 1.5800134 1.580014 l 0.069363,0.06936 0.069363,0.06936 H 3.7393895 5.0340922 Z M 2.7330841,4.1931182 V 2.9710547 h 0.2016996 0.2017 v 1.2220635 1.222064 h -0.2017 -0.2016996 z m 0.8067992,0 V 2.9710547 h 0.2017 0.2016996 v 1.2220635 1.222064 h -0.2016996 -0.2017 z m 0.8305286,0 V 2.9710547 H 4.560247 4.7500825 v 1.2220635 1.222064 H 4.560247 4.3704119 Z M 4.3466819,1.6275524 C 4.3525019,1.4948826 4.3066309,1.3905375 4.2264459,1.3628251 4.1044771,1.3096741 4.063522,1.3135821 3.7620234,1.3163031 3.4605248,1.3190231 3.3539331,1.3387671 3.2833638,1.3817941 3.1976948,1.4340251 3.136483,1.5521229 3.136483,1.6651764 v 0.07195 h 0.6050997 0.6050992 z" /></svg>`,
-    ok: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="M 3.0465827,6.023294 C 2.9739427,5.999434 2.8963597,5.944464 2.8604957,5.891429 2.8433557,5.866079 2.7829257,5.76905 2.7262217,5.675813 2.5980057,5.465003 2.4549037,5.256914 2.2820347,5.029908 2.1539417,4.861701 2.1487597,4.852462 2.1487597,4.79231 c 0,-0.05732 0.0045,-0.06692 0.05384,-0.114171 0.117778,-0.112851 0.307085,-0.123696 0.448503,-0.02569 0.05211,0.03611 0.173259,0.200332 0.382098,0.517943 0.07379,0.112229 0.136067,0.204053 0.138384,0.204053 0.0023,0 0.03545,-0.05509 0.07362,-0.122432 0.294617,-0.519657 0.753512,-1.139717 1.196512,-1.616729 0.138195,-0.148805 0.507732,-0.517006 0.587531,-0.585406 0.09414,-0.0807 0.208563,-0.03957 0.208563,0.07497 0,0.0405 -0.0123,0.06068 -0.08951,0.146846 -0.646693,0.721674 -1.206898,1.591625 -1.599732,2.48425 -0.05664,0.128705 -0.126804,0.209421 -0.216681,0.249269 -0.07283,0.03229 -0.214666,0.04128 -0.285304,0.01808 z" /></svg>`
+    ok: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="M 3.0465827,6.023294 C 2.9739427,5.999434 2.8963597,5.944464 2.8604957,5.891429 2.8433557,5.866079 2.7829257,5.76905 2.7262217,5.675813 2.5980057,5.465003 2.4549037,5.256914 2.2820347,5.029908 2.1539417,4.861701 2.1487597,4.852462 2.1487597,4.79231 c 0,-0.05732 0.0045,-0.06692 0.05384,-0.114171 0.117778,-0.112851 0.307085,-0.123696 0.448503,-0.02569 0.05211,0.03611 0.173259,0.200332 0.382098,0.517943 0.07379,0.112229 0.136067,0.204053 0.138384,0.204053 0.0023,0 0.03545,-0.05509 0.07362,-0.122432 0.294617,-0.519657 0.753512,-1.139717 1.196512,-1.616729 0.138195,-0.148805 0.507732,-0.517006 0.587531,-0.585406 0.09414,-0.0807 0.208563,-0.03957 0.208563,0.07497 0,0.0405 -0.0123,0.06068 -0.08951,0.146846 -0.646693,0.721674 -1.206898,1.591625 -1.599732,2.48425 -0.05664,0.128705 -0.126804,0.209421 -0.216681,0.249269 -0.07283,0.03229 -0.214666,0.04128 -0.285304,0.01808 z" /></svg>`,
+    edit: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path style="fill:#000000;stroke-width:0.999997" d="M 0.85745286,4.071847 V 1.4504062 H 2.1945137 c 1.1852598,0 1.3414524,0.00187 1.3757367,0.016158 0.1821091,0.076071 0.1821091,0.3389267 0,0.4149979 -0.034144,0.014263 -0.1685224,0.016158 -1.1468806,0.016158 H 1.3151649 V 4.071851 6.2459823 h 2.1689307 2.168927 l 4.01e-5,-1.0948674 c 4e-5,-0.7592936 0.00334,-1.1076208 0.011408,-1.1364781 0.031955,-0.1169908 0.1497368,-0.1877603 0.2683253,-0.1612213 0.074458,0.016665 0.1476153,0.08657 0.1656811,0.158314 0.00901,0.035891 0.012208,0.3913215 0.012208,1.3650459 V 6.6932919 H 3.4840622 0.8574195 Z M 1.9877636,5.5692403 c -0.015204,-0.011962 -0.027639,-0.032029 -0.027639,-0.044604 0,-0.025965 0.5483906,-1.2375886 0.5834909,-1.2891762 C 2.5561845,4.2169871 3.2293223,3.538324 4.0394791,2.7273167 L 5.5124923,1.2527564 5.9000532,1.6402179 6.2876208,2.0276795 4.8026394,3.513364 C 3.8774492,4.4389925 3.3019711,5.0072229 3.2760466,5.0207316 3.2239172,5.047897 2.0594218,5.5770097 2.0340363,5.5850673 c -0.010727,0.0034 -0.030354,-0.00334 -0.046272,-0.015831 z m 0.8071627,-0.4414675 0.382294,-0.1742256 7.88e-5,-0.058554 c 3.93e-5,-0.032209 0.00314,-0.090873 0.00685,-0.1303713 l 0.00678,-0.071815 -0.1758955,0.00734 -0.1758968,0.00734 0.0052,-0.1724897 0.0052,-0.1724892 -0.1296535,0.00294 -0.1296536,0.00294 -0.1798221,0.3948973 c -0.098902,0.2171933 -0.1798222,0.396247 -0.1798222,0.3978975 0,0.00167 0.00951,0.003 0.021141,0.003 0.065418,0 0.1244966,0.057093 0.1244966,0.1203258 0,0.021421 0.00414,0.026578 0.018206,0.022649 0.010014,-0.0028 0.1902367,-0.08349 0.4004979,-0.1793145 z M 6.0043185,1.535671 5.6166175,1.1483322 5.7466806,1.0199769 C 5.9131089,0.85573486 5.9544308,0.83275836 6.0847341,0.83199986 6.2262851,0.83119926 6.263224,0.85207366 6.4560638,1.0420535 6.684228,1.2668341 6.7154429,1.3166471 6.71607,1.4569327 6.7166037,1.5773005 6.6875837,1.6281002 6.5264658,1.7888632 L 6.3920196,1.9230105 Z" /></svg>`
   };
   return icons[type] || "";
 }
@@ -5489,7 +5663,8 @@ async function loadCustomersFromSupabase() {
     lastName: c.last_name,
     phone: c.phone,
     email: c.email,
-    note: c.note
+    note: c.note,
+    customerNumber: c.customer_number ?? null
   }));
 }
 
@@ -5555,7 +5730,8 @@ async function loadServicesFromSupabase() {
     id: s.id,
     name: s.name,
     duration: s.duration,
-    price: Number(s.price || 0)
+    price: Number(s.price || 0),
+    isActive: s.is_active !== false
   }));
 }
 

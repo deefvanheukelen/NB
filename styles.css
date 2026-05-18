@@ -2922,28 +2922,34 @@ button {
 
 .statistics-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: 8px;
 }
 
 .statistics-kpi {
   border: 1px solid var(--line);
   background: #fffdfd;
-  padding: 14px;
+  padding: 10px 8px;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
 }
 
 .statistics-kpi-label {
   display: block;
   margin-bottom: 6px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 10px;
+  line-height: 1.2;
   text-transform: uppercase;
   font-weight: 700;
 }
 
 .statistics-kpi strong {
-  font-size: 18px;
-  line-height: 1.25;
+  font-size: 16px;
+  line-height: 1.2;
   color: var(--text);
 }
 
@@ -3058,12 +3064,23 @@ button {
 }
 
 .statistics-top-customer-row {
+  width: 100%;
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: center;
   padding: 14px 0;
+  border: none;
   border-top: 1px solid #f1e5eb;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.statistics-top-customer-row:hover,
+.statistics-top-customer-row:active {
+  background: var(--primary-soft);
 }
 
 .statistics-top-customer-row:first-child {
@@ -3117,10 +3134,6 @@ button {
 }
 
 @media (max-width: 520px) {
-  .statistics-kpi-grid {
-    grid-template-columns: 1fr;
-  }
-
   .statistics-card {
     padding: 14px 12px;
   }
@@ -4938,4 +4951,161 @@ button {
   #revenueChartTitle {
     font-size: 14px;
   }
+}
+
+/* =========================================================
+   KLANTDETAIL - afspraken zoals Agenda + plusknop
+========================================================= */
+.client-new-appointment-bar {
+  display: flex;
+  justify-content: center;
+  padding: 12px 14px 14px;
+}
+
+.client-inline-add-btn {
+  width: 52px;
+  height: 52px;
+  border: 1px solid #d5819d;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%);
+  color: #ffffff;
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 400;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 0 3px;
+  box-shadow: 0 2px 4px rgba(165, 116, 140, 0.16);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.client-inline-add-btn:hover {
+  transform: translateY(-1px);
+}
+
+.client-inline-add-btn:active {
+  transform: translateY(0);
+}
+
+.client-detail-appointment-card {
+  margin: 0;
+  border-left: none;
+  border-right: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.client-detail-appointment-row {
+  grid-template-columns: 72px 1fr auto;
+  border-bottom: 1px solid #f1e5eb;
+  cursor: pointer;
+}
+
+.client-detail-appointment-row:last-child {
+  border-bottom: none;
+}
+
+.client-detail-appointment-row:focus-visible {
+  outline: 2px solid rgba(185, 109, 135, 0.35);
+  outline-offset: -2px;
+}
+
+.client-detail-appointment-row .price-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+@media (max-width: 420px) {
+  .client-detail-appointment-row {
+    grid-template-columns: 72px 1fr auto;
+  }
+}
+
+/* Inactieve diensten */
+.service-card-inactive {
+  background: #f1f1f1;
+  border-color: #ded6db;
+  box-shadow: none;
+  opacity: 0.88;
+}
+
+.service-card-inactive button {
+  color: #6f6870;
+}
+
+.service-card-inactive .meta {
+  color: #9a929a;
+}
+
+.inactive-services-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 0;
+  padding: 12px 4px 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.inactive-services-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-dark);
+}
+
+.service-reactivate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f7f4f6;
+  color: var(--text);
+}
+
+.service-reactivate-row span {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.service-reactivate-row strong {
+  font-size: 14px;
+  color: var(--primary-dark);
+}
+
+.service-reactivate-row small {
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.service-reactivate-row input {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+}
+
+/* Top klanten jaarfilter */
+.statistics-card-head-stacked {
+  display: grid;
+  gap: 8px;
+  align-items: start;
+}
+
+.statistics-year-filter {
+  width: min(180px, 100%);
+  min-height: 40px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 12px;
 }
