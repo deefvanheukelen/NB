@@ -2725,7 +2725,8 @@ function renderRevenueChart(filtered, type, anchor) {
 
   const chartData = buildRevenueChartData(filtered, type, anchor);
   const visibleData = chartData.filter(item => item.paid > 0 || item.unpaid > 0);
-  const dataToRender = visibleData.length ? visibleData : chartData;
+  const useFullPeriodWidth = ["week", "month", "year"].includes(type);
+  const dataToRender = useFullPeriodWidth ? chartData : (visibleData.length ? visibleData : chartData);
   const maxValue = Math.max(...dataToRender.map(item => item.paid + item.unpaid), 0);
 
   if (subtitle) {
@@ -2742,7 +2743,7 @@ function renderRevenueChart(filtered, type, anchor) {
   }
 
   chartWrap.innerHTML = `
-    <div class="revenue-bars">
+    <div class="revenue-bars ${useFullPeriodWidth ? `revenue-bars-even revenue-bars-${type}` : ""}" style="--revenue-bar-count:${Math.max(dataToRender.length, 1)}">
       ${dataToRender.map(item => {
         const total = item.paid + item.unpaid;
         const totalHeight = Math.max(8, (total / maxValue) * 220);

@@ -5203,3 +5203,51 @@ body.auth-locked .fab {
   accent-color: var(--primary-dark);
   flex: 0 0 auto;
 }
+
+
+/* =========================================================
+   OMZETGRAFIEK - DYNAMISCHE BALKVERDELING
+   Week/maand/jaar vullen de volledige grafiekbreedte.
+========================================================= */
+.revenue-bars.revenue-bars-even {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  gap: clamp(2px, 1vw, 8px);
+  overflow-x: hidden;
+}
+
+.revenue-bars.revenue-bars-even .revenue-bar-col {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.revenue-bars.revenue-bars-even .revenue-bar-stack {
+  width: min(70%, 22px);
+}
+
+.revenue-bars.revenue-bars-month {
+  gap: clamp(1px, 0.45vw, 3px);
+}
+
+.revenue-bars.revenue-bars-month .revenue-bar-stack {
+  width: min(72%, 10px);
+}
+
+.revenue-bars.revenue-bars-year .revenue-bar-stack {
+  width: min(72%, 18px);
+}
+
+.revenue-bars.revenue-bars-week .revenue-bar-stack {
+  width: min(62%, 28px);
+}
+
+@media (max-width: 420px) {
+  .revenue-bars.revenue-bars-even {
+    gap: 2px;
+  }
+
+  .revenue-bars.revenue-bars-month .revenue-bar-label {
+    font-size: 9px;
+  }
+}
