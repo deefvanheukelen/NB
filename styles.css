@@ -2025,91 +2025,66 @@ button {
 }
 
 .revenue-period-strip {
-  display: flex;
-  gap: 8px;
-  padding: 4px 0 12px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.revenue-period-strip::-webkit-scrollbar {
-  display: none;
-}
-
-.revenue-period-chip {
-  display: inline-grid;
-  grid-template-columns: minmax(0, 1fr) 56px;
-  align-items: stretch;
-  border: 1px solid #d8ccd3;
-  background: #f8f6f7;
-  color: #675e67;
-  min-height: 54px;
-  border-radius: 22px;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  white-space: nowrap;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
-}
-
-.revenue-period-main,
-.revenue-period-toggle {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  min-height: 54px;
-  padding: 0;
-}
-
-.revenue-period-main {
-  padding: 0 18px 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 98px;
-}
-
-.revenue-period-toggle {
-  width: 56px;
   display: grid;
-  place-items: center;
-  border-left: 1px solid rgba(104, 90, 99, 0.18);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 4px 0 12px;
 }
 
-.revenue-period-main:focus-visible,
-.revenue-period-toggle:focus-visible {
-  outline: 2px solid rgba(165, 86, 122, 0.28);
-  outline-offset: -2px;
+.revenue-period-tile {
+  min-width: 0;
+  min-height: 92px;
+  border: 1px solid #d0c8cc;
+  border-radius: 24px;
+  background: #ffffff;
+  color: #555052;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 6px;
+  padding: 12px 8px 10px;
+  font-family: 'Montserrat', sans-serif;
+  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
+  text-align: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.revenue-period-caret {
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 11px solid currentColor;
-  transform: translateY(1px);
-  opacity: 0.86;
+.revenue-period-tile:hover,
+.revenue-period-tile:active {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  transform: translateY(-1px);
 }
 
-.revenue-period-chip.active {
-  background: #a5567a;
-  border-color: #a5567a;
-  color: #fff;
+.revenue-period-tile.active {
+  background: var(--primary-soft);
+  border-color: var(--primary-soft);
+  color: var(--text);
 }
 
-.revenue-period-chip.active .revenue-period-toggle {
-  border-left-color: rgba(255, 255, 255, 0.46);
+.revenue-period-title {
+  display: block;
+  font-size: clamp(13px, 3.6vw, 21px);
+  font-weight: 400;
+  line-height: 1.05;
 }
 
-.revenue-period-chip-wide {
-  min-width: 164px;
+.revenue-period-sub {
+  display: block;
+  align-self: start;
+  font-size: clamp(10px, 2.7vw, 13px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: inherit;
+  word-break: keep-all;
 }
 
-.revenue-period-chip-wide .revenue-period-main {
-  min-width: 108px;
+.revenue-period-year {
+  font-size: clamp(18px, 5.8vw, 28px);
+  line-height: 1;
 }
 
 .revenue-filter-card,
@@ -2176,6 +2151,13 @@ button {
   margin-top: 14px;
 }
 
+.revenue-method-title {
+  margin: 4px 0 8px;
+  color: var(--primary-dark);
+  font-size: 16px;
+  font-weight: 700;
+}
+
 .revenue-method-row {
   display: flex;
   justify-content: space-between;
@@ -2202,7 +2184,7 @@ button {
 
 .revenue-chart-head h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text);
 }
 
@@ -2227,7 +2209,7 @@ button {
   height: 260px;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 2px;
   overflow-x: auto;
   padding: 8px 4px 0;
   scrollbar-width: none;
@@ -2241,14 +2223,14 @@ button {
 
 .revenue-bar-col {
   flex: 0 0 auto;
-  min-width: 22px;
+  min-width: 9px;
   display: grid;
   gap: 8px;
   justify-items: center;
 }
 
 .revenue-bar-stack {
-  width: 18px;
+  width: 4px;
   border-radius: 0;
   display: flex;
   flex-direction: column-reverse;
@@ -2271,7 +2253,7 @@ button {
 }
 
 .revenue-bar-label {
-  font-size: 13px;
+  font-size: 10px;
   color: #453f46;
   white-space: nowrap;
 }
@@ -2303,24 +2285,63 @@ button {
 }
 
 @media (max-width: 420px) {
+  .revenue-summary-card {
+    padding: 12px 10px;
+  }
+
   .revenue-summary-top {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .revenue-summary-item {
+    padding: 10px 4px;
+    text-align: center;
+    gap: 4px;
+  }
+
+  .revenue-main-label {
+    font-size: 13px;
+  }
+
+  .revenue-summary-item strong {
+    font-size: clamp(14px, 4.2vw, 17px);
+    white-space: nowrap;
+  }
+
+  .revenue-method-breakdown {
+    margin-top: 10px;
+  }
+
+  .revenue-method-title {
+    margin: 2px 0 6px;
+    font-size: 15px;
+  }
+
+  .revenue-method-row {
+    font-size: 14px;
   }
 
   .revenue-filter-grid-two {
     grid-template-columns: 1fr;
   }
 
-  .revenue-period-chip-wide {
-    min-width: 118px;
+  .revenue-bars {
+    gap: 2px;
+    padding-inline: 2px;
   }
 
   .revenue-bar-col {
-    min-width: 20px;
+    min-width: 7px;
+    gap: 5px;
   }
 
   .revenue-bar-stack {
-    width: 16px;
+    width: 3px;
+  }
+
+  .revenue-bar-label {
+    font-size: 10px;
   }
 }
 
@@ -2365,6 +2386,10 @@ button {
 
 .revenue-wheel-columns.two-cols {
   grid-template-columns: 1fr 1fr;
+}
+
+.revenue-wheel-columns.three-cols {
+  grid-template-columns: 0.78fr 1.25fr 0.95fr;
 }
 
 .revenue-wheel-column {
@@ -2476,36 +2501,18 @@ button {
     font-size: 9px;
   }
 
-  .revenue-period-chip {
-    grid-template-columns: minmax(0, 1fr) 42px;
-    border-radius: 18px;
-    min-height: 46px;
-    font-size: 14px;
+  .revenue-period-strip {
+    gap: 8px;
+    padding-inline: 0;
   }
 
-  .revenue-period-main,
-  .revenue-period-toggle {
-    min-height: 46px;
+  .revenue-period-tile {
+    min-height: 78px;
+    border-radius: 20px;
+    padding: 10px 4px 8px;
   }
 
-  .revenue-period-main {
-    min-width: 76px;
-    padding: 0 12px 0 14px;
-  }
 
-  .revenue-period-toggle {
-    width: 42px;
-  }
-
-  .revenue-period-caret {
-    border-left-width: 7px;
-    border-right-width: 7px;
-    border-top-width: 9px;
-  }
-
-  .revenue-period-chip-wide {
-    min-width: 130px;
-  }
 }
 
 
@@ -2671,6 +2678,7 @@ button {
   margin-top: 10px;
   border-top: 1px solid #f1e5eb;
 }
+
 
 @media (min-width: 900px) {
   .todo-screen-shell {
@@ -2908,7 +2916,7 @@ button {
 
 .statistics-card-head h2 {
   margin: 0 0 12px;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text);
 }
 
@@ -3078,7 +3086,7 @@ button {
 
 .statistics-top-customer-name {
   min-width: 0;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text);
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -3297,117 +3305,26 @@ button {
 }
 
 .revenue-period-strip.app-control-card {
-  display: grid;
-  gap: 10px;
-  padding: 12px;
   margin-bottom: 10px;
-  overflow: visible;
   border-radius: 0;
-  scrollbar-width: auto;
-}
-
-.revenue-period-row {
-  display: grid;
-  grid-template-columns: minmax(108px, 0.88fr) minmax(0, 1.12fr);
-  gap: 12px;
-  align-items: center;
-}
-
-.revenue-period-row-label {
-  min-width: 0;
-  color: var(--text);
-  font-family: 'Montserrat', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.revenue-period-row .revenue-period-chip {
-  width: 100%;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 48px;
-  min-height: 48px;
-  border-radius: 16px;
-  background: #ffffff;
-  color: var(--text);
-  border-color: var(--line-strong);
-  box-shadow: 0 2px 4px rgba(170, 120, 145, 0.08);
-}
-
-.revenue-period-row .revenue-period-main,
-.revenue-period-row .revenue-period-toggle {
-  min-height: 48px;
-}
-
-.revenue-period-row .revenue-period-main {
-  justify-content: flex-start;
-  min-width: 0;
-  padding: 0 12px 0 14px;
-  overflow: hidden;
-}
-
-.revenue-period-row .revenue-period-main span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.revenue-period-row .revenue-period-toggle {
-  width: 48px;
-  border-left-color: rgba(104, 90, 99, 0.14);
-  background: var(--primary-soft);
-}
-
-.revenue-period-row .revenue-period-chip.active {
-  background: var(--primary-soft);
-  border-color: var(--primary);
-  color: var(--primary-dark);
-  box-shadow: inset 0 0 0 1px rgba(217, 145, 171, 0.24), var(--shadow-soft);
-}
-
-.revenue-period-row .revenue-period-chip.active .revenue-period-toggle {
-  background: var(--primary);
-  color: #ffffff;
-  border-left-color: rgba(185, 109, 135, 0.28);
-}
-
-.revenue-period-row .revenue-period-caret {
-  border-left-width: 7px;
-  border-right-width: 7px;
-  border-top-width: 9px;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
 }
 
 @media (max-width: 400px) {
-  .revenue-period-row {
-    grid-template-columns: minmax(96px, 0.82fr) minmax(0, 1.18fr);
-    gap: 8px;
+  .revenue-period-strip.app-control-card {
+    gap: 7px;
+    padding-left: 4px;
+    padding-right: 4px;
   }
 
-  .revenue-period-row-label {
-    font-size: 14px;
-  }
-
-  .revenue-period-row .revenue-period-chip {
-    grid-template-columns: minmax(0, 1fr) 42px;
-    min-height: 46px;
-    border-radius: 14px;
-    font-size: 14px;
-  }
-
-  .revenue-period-row .revenue-period-main,
-  .revenue-period-row .revenue-period-toggle {
-    min-height: 46px;
-  }
-
-  .revenue-period-row .revenue-period-main {
-    padding: 0 10px 0 12px;
-  }
-
-  .revenue-period-row .revenue-period-toggle {
-    width: 42px;
+  .revenue-period-tile {
+    min-height: 76px;
+    border-radius: 18px;
   }
 }
+
 
 /* =========================================================
    19. DESKTOP / TABLET RESPONSIVE LAYOUT VOOR VOLLEDIGE APP
@@ -3552,6 +3469,59 @@ button {
 
   .statistics-donut-wrap {
     width: clamp(150px, 24vw, 190px);
+  }
+}
+
+
+@media (min-width: 768px) and (max-width: 899px) {
+  .revenue-screen-shell {
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    grid-template-areas:
+      "period summary"
+      "filters chart";
+    gap: 14px;
+    align-content: start;
+    padding: 24px 28px 96px;
+  }
+
+  .revenue-period-strip.app-control-card {
+    grid-area: period;
+    margin-bottom: 0;
+    align-self: start;
+  }
+
+  .revenue-summary-card {
+    grid-area: summary;
+    margin-bottom: 0;
+  }
+
+  .revenue-chart-card {
+    grid-area: chart;
+    margin-bottom: 0;
+    min-width: 0;
+  }
+
+  .revenue-filter-card {
+    grid-area: filters;
+    margin-bottom: 0;
+    align-self: start;
+  }
+
+  .revenue-filter-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .revenue-summary-top {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .revenue-chart-wrap {
+    min-height: 340px;
+  }
+
+  .revenue-bars {
+    height: 310px;
   }
 }
 
@@ -4639,5 +4609,203 @@ button {
   .app-action-nav-icon {
     width: 24px;
     height: 24px;
+  }
+}
+
+/* =========================================================
+   TABLET FIX OMZET
+   - Schakelt de desktop/tablet layout compacter in zodat iPad-breedtes
+     niet in te smalle kolommen vallen.
+========================================================= */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .app-shell {
+    grid-template-columns: 196px minmax(0, 1fr);
+  }
+
+  .bottom-nav {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .nav-btn {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 10px;
+    padding: 11px 12px;
+    font-size: 14px;
+  }
+
+  .revenue-screen-shell {
+    display: grid;
+    grid-template-columns: minmax(250px, 330px) minmax(0, 1fr);
+    grid-template-areas:
+      "period summary"
+      "filters chart";
+    gap: 14px;
+    align-content: start;
+    padding: 22px 24px 88px;
+  }
+
+  .revenue-period-strip.app-control-card {
+    grid-area: period;
+    margin-bottom: 0;
+    align-self: start;
+  }
+
+  .revenue-summary-card {
+    grid-area: summary;
+    min-width: 0;
+    margin-bottom: 0;
+    padding: 12px;
+  }
+
+  .revenue-chart-card {
+    grid-area: chart;
+    min-width: 0;
+    margin-bottom: 0;
+  }
+
+  .revenue-filter-card {
+    grid-area: filters;
+    margin-bottom: 0;
+    align-self: start;
+  }
+
+  .revenue-summary-top {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .revenue-summary-item {
+    padding: 12px 8px;
+  }
+
+  .revenue-summary-item strong {
+    font-size: clamp(14px, 1.65vw, 18px);
+    white-space: nowrap;
+  }
+
+  .revenue-main-label {
+    font-size: 13px;
+  }
+
+  .revenue-method-row {
+    font-size: 13px;
+  }
+
+  .revenue-filter-grid-two {
+    grid-template-columns: 1fr;
+  }
+
+  .revenue-chart-wrap {
+    min-height: 330px;
+  }
+
+  .revenue-bars {
+    height: 300px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 860px) {
+  .app-shell {
+    grid-template-columns: 180px minmax(0, 1fr);
+  }
+
+  .topbar {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .revenue-screen-shell {
+    grid-template-columns: minmax(230px, 295px) minmax(0, 1fr);
+    padding-left: 22px;
+    padding-right: 22px;
+    gap: 12px;
+  }
+
+  .revenue-period-strip {
+    gap: 8px;
+  }
+
+  .revenue-period-tile {
+    min-height: 84px;
+    padding: 10px 6px 8px;
+  }
+}
+
+/* =========================================================
+   TABLET OMZET LAYOUT FIX 2
+   - Op tablets krijgen periodeknoppen en samenvatting opnieuw de volledige breedte.
+   - Zo worden Dag/Week/Maand/Jaar en Totaal/Betaald/Onbetaald niet samengedrukt.
+========================================================= */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .revenue-screen-shell {
+    grid-template-columns: minmax(260px, 340px) minmax(0, 1fr) !important;
+    grid-template-areas:
+      "period period"
+      "summary summary"
+      "filters chart" !important;
+    gap: 14px !important;
+    padding: 22px 24px 88px !important;
+  }
+
+  .revenue-period-strip.app-control-card {
+    grid-area: period !important;
+    width: 100%;
+  }
+
+  .revenue-period-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    padding-bottom: 10px;
+  }
+
+  .revenue-period-tile {
+    min-height: 92px;
+    padding: 12px 8px 10px;
+  }
+
+  .revenue-summary-card {
+    grid-area: summary !important;
+    width: 100%;
+    padding: 14px !important;
+  }
+
+  .revenue-summary-top {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .revenue-summary-item {
+    min-width: 0;
+    padding: 14px 12px !important;
+  }
+
+  .revenue-summary-item strong {
+    font-size: clamp(16px, 2vw, 19px) !important;
+  }
+
+  .revenue-filter-card {
+    grid-area: filters !important;
+    align-self: start;
+  }
+
+  .revenue-chart-card {
+    grid-area: chart !important;
+    align-self: start;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 920px) {
+  .revenue-screen-shell {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "period"
+      "summary"
+      "filters"
+      "chart" !important;
+  }
+
+  .revenue-filter-grid-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }

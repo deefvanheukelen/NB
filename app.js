@@ -16,7 +16,10 @@ const state = {
   previousMainScreen: "clientsScreen",
   clientLetter: "",
   settingsSavePending: false,
-  statsTopCustomersVisible: 10
+  statsTopCustomersVisible: 10,
+  revenueInitialized: false,
+  revenueSelectedDateSynced: null,
+  revenueSyncSelectedDateOnOpen: true
 };
 
 const monthNames = [
@@ -320,6 +323,9 @@ function buildPastAppointmentMessage(payload) {
 }
 
 function jumpToToday() {
+  if (state.selectedDate !== todayStr) {
+    state.revenueSyncSelectedDateOnOpen = true;
+  }
   state.selectedDate = todayStr;
   state.currentYear = today.getFullYear();
   state.currentMonth = today.getMonth();
@@ -1092,7 +1098,15 @@ function switchScreen(screenId, title) {
   updateTopbar(screenId, title);
 
   if (screenId === "revenueScreen") {
-    setRevenuePeriod("day", state.selectedDate || todayStr);
+    const selectedDate = state.selectedDate || todayStr;
+    if (!state.revenueInitialized || state.revenueSyncSelectedDateOnOpen || state.revenueSelectedDateSynced !== selectedDate) {
+      setRevenuePeriod("day", selectedDate);
+      state.revenueInitialized = true;
+      state.revenueSelectedDateSynced = selectedDate;
+      state.revenueSyncSelectedDateOnOpen = false;
+    } else {
+      renderRevenue();
+    }
   }
 
   if (screenId === "statisticsScreen") {
@@ -1184,6 +1198,9 @@ function renderCalendar() {
       if (event) {
         event.preventDefault();
         event.stopPropagation();
+      }
+      if (state.selectedDate !== dateStr) {
+        state.revenueSyncSelectedDateOnOpen = true;
       }
       state.selectedDate = dateStr;
       renderCalendar();
@@ -2046,6 +2063,24 @@ function formatRevenueDayChip(dateStr) {
   return `${days[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
+function formatRevenueDayTile(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  const days = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
+  return `${days[d.getDay()]}<br>${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+}
+
+function formatRevenueWeekTile(dateStr) {
+  const bounds = weekBounds(dateStr);
+  const start = new Date(bounds.start + "T00:00:00");
+  const end = new Date(bounds.end + "T00:00:00");
+  return `${String(start.getDate()).padStart(2, "0")}-${String(start.getMonth() + 1).padStart(2, "0")}-${start.getFullYear()}<br>${String(end.getDate()).padStart(2, "0")}-${String(end.getMonth() + 1).padStart(2, "0")}-${end.getFullYear()}`;
+}
+
+function formatRevenueMonthTile(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return `${longMonthNames[d.getMonth()].charAt(0).toUpperCase() + longMonthNames[d.getMonth()].slice(1)}<br>${d.getFullYear()}`;
+}
+
 function shiftRevenueDate(baseDateStr, mode, step) {
   const d = new Date(baseDateStr + "T00:00:00");
 
@@ -2056,6 +2091,11 @@ function shiftRevenueDate(baseDateStr, mode, step) {
 
   if (mode === "month") {
     d.setMonth(d.getMonth() + step);
+    return formatDateInput(d);
+  }
+
+  if (mode === "week") {
+    d.setDate(d.getDate() + (step * 7));
     return formatDateInput(d);
   }
 
@@ -2079,29 +2119,25 @@ function syncRevenuePeriodChips() {
   const anchor = document.getElementById("revenueDate").value || todayStr;
   const anchorDate = new Date(anchor + "T00:00:00");
 
-  const yearChip = document.getElementById("revenueYearChip");
-  const monthChip = document.getElementById("revenueMonthChip");
-  const dayChip = document.getElementById("revenueDayChip");
+  const yearBtn = document.getElementById("revenueYearBtn");
+  const monthBtn = document.getElementById("revenueMonthBtn");
+  const weekBtn = document.getElementById("revenueWeekBtn");
+  const dayBtn = document.getElementById("revenueDayBtn");
 
   const yearLabel = document.getElementById("revenueYearLabel");
   const monthLabel = document.getElementById("revenueMonthLabel");
+  const weekLabel = document.getElementById("revenueWeekLabel");
   const dayLabel = document.getElementById("revenueDayLabel");
 
-  if (yearLabel) {
-    yearLabel.textContent = String(anchorDate.getFullYear());
-  }
+  if (yearLabel) yearLabel.textContent = String(anchorDate.getFullYear());
+  if (monthLabel) monthLabel.innerHTML = formatRevenueMonthTile(anchor);
+  if (weekLabel) weekLabel.innerHTML = formatRevenueWeekTile(anchor);
+  if (dayLabel) dayLabel.innerHTML = formatRevenueDayTile(anchor);
 
-  if (monthLabel) {
-    monthLabel.textContent = longMonthNames[anchorDate.getMonth()].charAt(0).toUpperCase() + longMonthNames[anchorDate.getMonth()].slice(1);
-  }
-
-  if (dayLabel) {
-    dayLabel.textContent = formatRevenueDayChip(anchor);
-  }
-
-  if (yearChip) yearChip.classList.toggle("active", type === "year");
-  if (monthChip) monthChip.classList.toggle("active", type === "month");
-  if (dayChip) dayChip.classList.toggle("active", type === "day");
+  if (yearBtn) yearBtn.classList.toggle("active", type === "year");
+  if (monthBtn) monthBtn.classList.toggle("active", type === "month");
+  if (weekBtn) weekBtn.classList.toggle("active", type === "week");
+  if (dayBtn) dayBtn.classList.toggle("active", type === "day");
 }
 
 function revenueFilteredAppointments() {
@@ -2115,6 +2151,9 @@ function revenueFilteredAppointments() {
 
   if (type === "day") {
     filtered = filtered.filter(a => a.date === anchor);
+  } else if (type === "week") {
+    const bounds = weekBounds(anchor);
+    filtered = filtered.filter(a => a.date >= bounds.start && a.date <= bounds.end);
   } else if (type === "month") {
     const prefix = anchor.slice(0, 7);
     filtered = filtered.filter(a => a.date.startsWith(prefix));
@@ -2237,7 +2276,10 @@ function attachRevenueWheelColumnEvents(column, key) {
     });
   });
 
-  finish("auto");
+  // Niet meteen finish("auto") uitvoeren: vóór het openen van de dialog
+  // hebben de wielkolommen nog geen betrouwbare hoogte. Daardoor werd de
+  // eerste optie (bv. 01 / Januari / 2024) als actief opgeslagen vóór we
+  // konden centreren op de datum die in Omzet actief is.
 }
 
 function buildRevenueWheelColumn(key, values, formatter = value => value) {
@@ -2248,6 +2290,18 @@ function buildRevenueWheelColumn(key, values, formatter = value => value) {
   `;
 }
 
+
+function getRevenueWeekOfMonth(date) {
+  const day = date.getDate();
+  return Math.min(4, Math.max(1, Math.ceil(day / 7)));
+}
+
+function dateFromRevenueWeekOfMonth(year, monthIndex, weekNumber) {
+  const safeWeek = Math.min(4, Math.max(1, Number(weekNumber) || 1));
+  const day = clampRevenueDay(year, monthIndex, ((safeWeek - 1) * 7) + 1);
+  return new Date(year, monthIndex, day);
+}
+
 function openRevenueWheelPicker(mode) {
   const dialog = document.getElementById("revenueWheelPickerDialog");
   const title = document.getElementById("revenueWheelPickerTitle");
@@ -2256,38 +2310,83 @@ function openRevenueWheelPicker(mode) {
   const anchorDate = new Date(anchor + "T00:00:00");
   const selectedYear = anchorDate.getFullYear();
   const selectedMonthIndex = anchorDate.getMonth();
+  const selectedDay = anchorDate.getDate();
+  const selectedWeek = getRevenueWeekOfMonth(anchorDate);
 
   revenuePickerState.mode = mode;
   revenuePickerState.columns = [];
   revenuePickerState.selected = {};
 
+  const years = getRevenueDataYears();
+  const months = Array.from({ length: 12 }, (_, i) => i);
+
   if (mode === "year") {
     title.textContent = "Kies jaar";
     columnsWrap.className = "revenue-wheel-columns";
-    const years = getRevenueDataYears();
     columnsWrap.innerHTML = buildRevenueWheelColumn("year", years, value => value);
-  } else {
+  } else if (mode === "month") {
     title.textContent = "Kies maand";
-    columnsWrap.className = "revenue-wheel-columns";
-    const months = Array.from({ length: 12 }, (_, i) => i);
+    columnsWrap.className = "revenue-wheel-columns two-cols";
     columnsWrap.innerHTML =
-      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1));
+      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("year", years, value => value);
+  } else if (mode === "week") {
+    title.textContent = "Kies week";
+    columnsWrap.className = "revenue-wheel-columns three-cols";
+    const weeks = [1, 2, 3, 4];
+    columnsWrap.innerHTML =
+      buildRevenueWheelColumn("week", weeks, value => `Week ${value}`) +
+      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("year", years, value => value);
+  } else {
+    title.textContent = "Kies dag";
+    columnsWrap.className = "revenue-wheel-columns three-cols";
+    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    columnsWrap.innerHTML =
+      buildRevenueWheelColumn("day", days, value => String(value).padStart(2, "0")) +
+      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("year", years, value => value);
   }
 
   const columns = Array.from(columnsWrap.querySelectorAll(".revenue-wheel-column"));
   revenuePickerState.columns = columns;
 
-  columns.forEach(column => attachRevenueWheelColumnEvents(column, column.dataset.key));
-
   if (mode === "year") {
-    centerRevenueWheelColumn(columnsWrap.querySelector('[data-key="year"]'), selectedYear);
+    revenuePickerState.selected.year = String(selectedYear);
+  } else if (mode === "month") {
+    revenuePickerState.selected.monthIndex = String(selectedMonthIndex);
+    revenuePickerState.selected.year = String(selectedYear);
+  } else if (mode === "week") {
+    revenuePickerState.selected.week = String(selectedWeek);
+    revenuePickerState.selected.monthIndex = String(selectedMonthIndex);
     revenuePickerState.selected.year = String(selectedYear);
   } else {
-    centerRevenueWheelColumn(columnsWrap.querySelector('[data-key="monthIndex"]'), selectedMonthIndex);
+    revenuePickerState.selected.day = String(selectedDay);
     revenuePickerState.selected.monthIndex = String(selectedMonthIndex);
+    revenuePickerState.selected.year = String(selectedYear);
   }
 
-  if (typeof dialog.showModal === "function") dialog.showModal();
+  columns.forEach(column => attachRevenueWheelColumnEvents(column, column.dataset.key));
+
+  const centerActiveRevenuePickerValues = (behavior = "auto") => {
+    Object.entries(revenuePickerState.selected).forEach(([key, value]) => {
+      centerRevenueWheelColumn(columnsWrap.querySelector(`[data-key="${key}"]`), value, behavior);
+    });
+  };
+
+  if (typeof dialog.showModal === "function") {
+    dialog.showModal();
+  } else {
+    dialog.setAttribute("open", "open");
+  }
+
+  // Dialoginhoud heeft pas na openen betrouwbare hoogtes. Daarom pas na
+  // showModal centreren, zodat de actieve dag/week/maand/jaar zichtbaar
+  // geselecteerd staat i.p.v. de eerste optie in de lijst.
+  requestAnimationFrame(() => {
+    centerActiveRevenuePickerValues("auto");
+    requestAnimationFrame(() => centerActiveRevenuePickerValues("auto"));
+  });
 }
 
 function applyRevenueWheelPickerSelection() {
@@ -2303,21 +2402,39 @@ function applyRevenueWheelPickerSelection() {
     return;
   }
 
-  const year = anchorDate.getFullYear();
+  if (revenuePickerState.mode === "month") {
+    const year = Number(revenuePickerState.selected.year || anchorDate.getFullYear());
+    const monthIndex = Number(revenuePickerState.selected.monthIndex || anchorDate.getMonth());
+    const day = clampRevenueDay(year, monthIndex, currentDay);
+    setRevenuePeriod("month", formatDateInput(new Date(year, monthIndex, day)));
+    return;
+  }
+
+  if (revenuePickerState.mode === "week") {
+    const year = Number(revenuePickerState.selected.year || anchorDate.getFullYear());
+    const monthIndex = Number(revenuePickerState.selected.monthIndex || anchorDate.getMonth());
+    const week = Number(revenuePickerState.selected.week || getRevenueWeekOfMonth(anchorDate));
+    setRevenuePeriod("week", formatDateInput(dateFromRevenueWeekOfMonth(year, monthIndex, week)));
+    return;
+  }
+
+  const year = Number(revenuePickerState.selected.year || anchorDate.getFullYear());
   const monthIndex = Number(revenuePickerState.selected.monthIndex || anchorDate.getMonth());
-  const day = clampRevenueDay(year, monthIndex, currentDay);
-  setRevenuePeriod("month", formatDateInput(new Date(year, monthIndex, day)));
+  const rawDay = Number(revenuePickerState.selected.day || currentDay);
+  const day = clampRevenueDay(year, monthIndex, rawDay);
+  setRevenuePeriod("day", formatDateInput(new Date(year, monthIndex, day)));
 }
 
-function openRevenueDayPicker() {
+function openRevenueDatePicker(mode = "day") {
   const nativeInput = document.getElementById("revenueNativeDatePicker");
   const revenueDate = document.getElementById("revenueDate").value || todayStr;
 
   if (!nativeInput) {
-    setRevenuePeriod("day", revenueDate);
+    setRevenuePeriod(mode, revenueDate);
     return;
   }
 
+  nativeInput.dataset.mode = mode;
   nativeInput.value = revenueDate;
 
   if (typeof nativeInput.showPicker === "function") {
@@ -2325,6 +2442,10 @@ function openRevenueDayPicker() {
   } else {
     nativeInput.click();
   }
+}
+
+function openRevenueDayPicker() {
+  openRevenueDatePicker("day");
 }
 
 
@@ -2336,6 +2457,21 @@ function buildRevenueChartData(filtered, type, anchor) {
       const items = filtered.filter(a => a.date.startsWith(prefix));
       return {
         label: String(index + 1),
+        paid: items.filter(a => a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0),
+        unpaid: items.filter(a => !a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0)
+      };
+    });
+  }
+
+  if (type === "week") {
+    const bounds = weekBounds(anchor);
+    return Array.from({ length: 7 }, (_, index) => {
+      const d = new Date(bounds.start + "T00:00:00");
+      d.setDate(d.getDate() + index);
+      const key = formatDateInput(d);
+      const items = filtered.filter(a => a.date === key);
+      return {
+        label: formatRevenueDayChip(key),
         paid: items.filter(a => a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0),
         unpaid: items.filter(a => !a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0)
       };
@@ -2382,6 +2518,7 @@ function renderRevenueChart(filtered, type, anchor) {
     subtitle.textContent =
       type === "year" ? "Jaaromzet" :
       type === "month" ? "Maandomzet" :
+      type === "week" ? "Weekomzet" :
       "Dagomzet";
   }
 
@@ -2444,6 +2581,10 @@ function getRevenueExportTitle() {
 
   if (type === 'year') return `omzet_${anchor.slice(0, 4)}`;
   if (type === 'month') return `omzet_${anchor.slice(0, 7)}`;
+  if (type === 'week') {
+    const bounds = weekBounds(anchor);
+    return `omzet_week_${bounds.start}_tot_${bounds.end}`;
+  }
   return `omzet_${anchor}`;
 }
 
@@ -2525,7 +2666,7 @@ function downloadRevenueCsv() {
       key = String(app.date || '').slice(0, 7);
       const monthNumber = Number(key.slice(5, 7));
       label = monthNumber ? `${longMonthNames[monthNumber - 1]} ${key.slice(0, 4)}` : key;
-    } else if (periodType === 'month') {
+    } else if (periodType === 'month' || periodType === 'week') {
       label = app.date ? formatLongDate(app.date) : '';
     } else {
       label = app.time || app.date || '';
@@ -2542,11 +2683,12 @@ function downloadRevenueCsv() {
   const periodOverviewTitle =
     periodType === 'year' ? 'TOTALEN PER MAAND' :
     periodType === 'month' ? 'TOTALEN PER DAG' :
+    periodType === 'week' ? 'TOTALEN PER DAG' :
     'TOTALEN PER AFSPRAAKMOMENT';
 
   rows.push([periodOverviewTitle]);
   rows.push([
-    periodType === 'year' ? 'Maand' : periodType === 'month' ? 'Datum' : 'Tijd',
+    periodType === 'year' ? 'Maand' : (periodType === 'month' || periodType === 'week') ? 'Datum' : 'Tijd',
     'Aantal afspraken',
     'Totaal',
     'Betaald',
@@ -2648,7 +2790,7 @@ function getRevenueReportData() {
       key = String(app.date || '').slice(0, 7);
       const monthNumber = Number(key.slice(5, 7));
       label = monthNumber ? `${longMonthNames[monthNumber - 1]} ${key.slice(0, 4)}` : key;
-    } else if (periodType === 'month') {
+    } else if (periodType === 'month' || periodType === 'week') {
       label = app.date ? formatLongDate(app.date) : '';
     } else {
       label = app.time || app.date || '';
@@ -2665,15 +2807,20 @@ function getRevenueReportData() {
   const periodTitle =
     periodType === 'year' ? 'Totalen per maand' :
     periodType === 'month' ? 'Totalen per dag' :
+    periodType === 'week' ? 'Totalen per dag' :
     'Totalen per afspraakmoment';
 
   const periodColumnTitle =
     periodType === 'year' ? 'Maand' :
-    periodType === 'month' ? 'Datum' :
+    (periodType === 'month' || periodType === 'week') ? 'Datum' :
     'Tijd';
 
   let reportTitle = 'Omzetrapport';
   if (periodType === 'day') reportTitle = `Omzetrapport · ${formatLongDate(periodDate)}`;
+  if (periodType === 'week') {
+    const bounds = weekBounds(periodDate);
+    reportTitle = `Omzetrapport · week ${formatLongDate(bounds.start)} t.e.m. ${formatLongDate(bounds.end)}`;
+  }
   if (periodType === 'month') {
     const d = new Date(periodDate + 'T00:00:00');
     reportTitle = `Omzetrapport · ${longMonthNames[d.getMonth()]} ${d.getFullYear()}`;
@@ -3169,6 +3316,10 @@ function renderRevenue() {
 
   let title = "Omzet";
   if (type === "day") title = `Omzet op ${formatLongDate(anchor)}`;
+  if (type === "week") {
+    const bounds = weekBounds(anchor);
+    title = `Omzet ${formatLongDate(bounds.start)} - ${formatLongDate(bounds.end)}`;
+  }
   if (type === "month") {
     const d = new Date(anchor + "T00:00:00");
     title = `Omzet ${longMonthNames[d.getMonth()]} ${d.getFullYear()}`;
@@ -3193,15 +3344,18 @@ function renderRevenue() {
   });
 
   if (methodList) {
-    const methodNames = Object.keys(byMethod).length ? Object.keys(byMethod).sort((a, b) => a.localeCompare(b, "nl-BE")) : getRevenuePaymentFilterOptions(data);
-    methodList.innerHTML = methodNames.length
-      ? methodNames.map(method => `
-          <div class="revenue-method-row">
-            <span>${method}:</span>
-            <strong>${euro(byMethod[method] || 0)}</strong>
-          </div>
-        `).join("")
-      : `<div class="empty-state">Nog geen betaalgegevens.</div>`;
+    const methodNames = Object.keys(byMethod).sort((a, b) => a.localeCompare(b, "nl-BE"));
+    methodList.innerHTML = total > 0 && methodNames.length
+      ? `
+          <h3 class="revenue-method-title">Betaalwijze</h3>
+          ${methodNames.map(method => `
+            <div class="revenue-method-row">
+              <span>${method}:</span>
+              <strong>${euro(byMethod[method] || 0)}</strong>
+            </div>
+          `).join("")}
+        `
+      : "";
   }
 
 
@@ -4895,7 +5049,8 @@ function getActionButtonIconSvg(type) {
   const icons = {
     save: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="m 1.2487599,6.3350499 -0.09755,-0.067983 V 3.7370896 c 0,-1.9103368 0.012742,-2.5426364 0.052027,-2.58166 0.035778,-0.035538 0.252426,-0.051681 0.6936895,-0.051681 H 2.5385889 V 1.9651164 2.8264842 H 3.7742229 5.009857 V 1.9651173 1.1037498 H 5.3902354 5.7706138 L 6.1067451,1.4396243 6.4428764,1.7754988 6.4308947,4.021599 c -0.00945,1.7724982 -0.023861,2.2579 -0.068322,2.3020623 -0.044619,0.04432 -0.572285,0.058401 -2.5363015,0.067672 C 1.624705,6.4017253 1.3353593,6.3954233 1.24876,6.3350563 Z M 5.2892092,5.8747533 c 0.055268,-0.078383 0.067492,-0.2421888 0.067492,-0.9044356 0,-0.7512913 -0.00616,-0.8148317 -0.086711,-0.8948522 -0.083105,-0.082552 -0.1445187,-0.086135 -1.4769401,-0.086135 -0.8754091,0 -1.4212835,0.016507 -1.4740897,0.044588 -0.078777,0.041885 -0.083861,0.098794 -0.083861,0.9388902 0,0.6381478 0.014902,0.9091103 0.052027,0.9459891 0.038378,0.038125 0.4301191,0.05168 1.4933091,0.05168 1.4402317,0 1.4413315,-6.93e-5 1.508774,-0.09572 z M 4.0993893,1.9651155 V 1.2760213 H 4.4245562 4.7497231 V 1.9651155 2.65421 H 4.4245562 4.0993893 Z" /></svg>`,
     cancel: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="M 3.7216875,1.0757028 A 2.6458266,2.6458266 0 0 0 1.0758545,3.721536 2.6458266,2.6458266 0 0 0 3.7216875,6.3673694 2.6458266,2.6458266 0 0 0 6.3675215,3.721536 2.6458266,2.6458266 0 0 0 3.7216875,1.0757028 Z m -0.82292,1.3657978 c 0.05451,0 0.138465,0.070411 0.447301,0.375477 l 0.380029,0.3754771 0.378179,-0.3754771 c 0.292326,-0.2902706 0.392113,-0.375477 0.439905,-0.375477 0.04347,0 0.107409,0.044353 0.215615,0.1494797 0.208329,0.2023863 0.245294,0.2617301 0.207508,0.3332359 -0.01611,0.030483 -0.188746,0.217296 -0.383726,0.4151581 l -0.35457,0.3598322 0.335512,0.333947 c 0.184481,0.1836653 0.357479,0.3692108 0.384437,0.4123137 0.04674,0.074724 0.04701,0.081153 0.0081,0.1405195 -0.08631,0.1317284 -0.351617,0.3670857 -0.413878,0.3670857 -0.0465,0 -0.150027,-0.088488 -0.439621,-0.376046 L 3.7248165,4.2009804 3.4082215,4.5137358 C 3.2340805,4.6857555 3.0594205,4.8549521 3.0200865,4.8897817 2.9045905,4.9920513 2.8540445,4.9753377 2.6447515,4.766045 2.5193755,4.6406693 2.4577245,4.5608493 2.4577245,4.5238338 c 0,-0.039229 0.110334,-0.1669151 0.381308,-0.4410433 L 3.2204835,3.6969309 2.8390325,3.3116402 c -0.271639,-0.2745061 -0.381308,-0.401336 -0.381308,-0.4407588 0,-0.085362 0.353348,-0.4293808 0.441043,-0.4293808 z" /></svg>`,
-    delete: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="m 2.2698341,6.1775822 c -0.1094284,-0.04971 -0.231493,-0.164087 -0.290851,-0.272533 -0.037167,-0.0679 -0.041899,-0.221644 -0.052699,-1.711931 L 1.9144211,2.5557908 1.7067886,2.5489308 1.4991566,2.5420708 V 2.3545326 2.1669857 l 0.1008498,-0.0073 0.1008498,-0.0073 0.013669,-0.1423763 c 0.01596,-0.1662368 0.034542,-0.2158412 0.089015,-0.2376519 0.02183,-0.00874 0.2399086,-0.021819 0.4846179,-0.029062 L 2.7330836,1.7301305 V 1.6192114 c 0,-0.3484396 0.3062313,-0.68698353 0.5910897,-0.68179893 0.077671,0.00141 0.1969862,-0.00708 0.4182785,-0.00708 h 0.4780034 c 0.3249416,0.00541 0.5533562,0.39764923 0.5533562,0.71128873 v 0.095511 l 0.3025494,0.00123 c 0.3906803,0.00158 0.6135415,0.026715 0.6614465,0.07462 0.023407,0.023407 0.042463,0.097122 0.050279,0.1944918 l 0.012586,0.1567987 h 0.091669 0.091669 V 2.3541076 2.543943 H 5.7823104 5.5806105 l -5.209e-4,1.6076662 c -5.104e-4,1.566046 -0.00177,1.61043 -0.048858,1.714448 -0.062582,0.138254 -0.1489784,0.227906 -0.2879761,0.29883 l -0.1119258,0.05711 -1.3830257,-5.24e-4 c -1.288121,-4.9e-4 -1.3895764,-0.0035 -1.4784713,-0.04388 z m 2.8347098,-0.400527 0.070458,-0.06526 0.00704,-1.578004 0.00704,-1.5780044 -1.4415606,-0.00612 -1.4415606,-0.00612 v 1.5800134 1.580014 l 0.069363,0.06936 0.069363,0.06936 H 3.7393895 5.0340922 Z M 2.7330841,4.1931182 V 2.9710547 h 0.2016996 0.2017 v 1.2220635 1.222064 h -0.2017 -0.2016996 z m 0.8067992,0 V 2.9710547 h 0.2017 0.2016996 v 1.2220635 1.222064 h -0.2016996 -0.2017 z m 0.8305286,0 V 2.9710547 H 4.560247 4.7500825 v 1.2220635 1.222064 H 4.560247 4.3704119 Z M 4.3466819,1.6275524 C 4.3525019,1.4948826 4.3066309,1.3905375 4.2264459,1.3628251 4.1044771,1.3096741 4.063522,1.3135821 3.7620234,1.3163031 3.4605248,1.3190231 3.3539331,1.3387671 3.2833638,1.3817941 3.1976948,1.4340251 3.136483,1.5521229 3.136483,1.6651764 v 0.07195 h 0.6050997 0.6050992 z" /></svg>`
+    delete: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="m 2.2698341,6.1775822 c -0.1094284,-0.04971 -0.231493,-0.164087 -0.290851,-0.272533 -0.037167,-0.0679 -0.041899,-0.221644 -0.052699,-1.711931 L 1.9144211,2.5557908 1.7067886,2.5489308 1.4991566,2.5420708 V 2.3545326 2.1669857 l 0.1008498,-0.0073 0.1008498,-0.0073 0.013669,-0.1423763 c 0.01596,-0.1662368 0.034542,-0.2158412 0.089015,-0.2376519 0.02183,-0.00874 0.2399086,-0.021819 0.4846179,-0.029062 L 2.7330836,1.7301305 V 1.6192114 c 0,-0.3484396 0.3062313,-0.68698353 0.5910897,-0.68179893 0.077671,0.00141 0.1969862,-0.00708 0.4182785,-0.00708 h 0.4780034 c 0.3249416,0.00541 0.5533562,0.39764923 0.5533562,0.71128873 v 0.095511 l 0.3025494,0.00123 c 0.3906803,0.00158 0.6135415,0.026715 0.6614465,0.07462 0.023407,0.023407 0.042463,0.097122 0.050279,0.1944918 l 0.012586,0.1567987 h 0.091669 0.091669 V 2.3541076 2.543943 H 5.7823104 5.5806105 l -5.209e-4,1.6076662 c -5.104e-4,1.566046 -0.00177,1.61043 -0.048858,1.714448 -0.062582,0.138254 -0.1489784,0.227906 -0.2879761,0.29883 l -0.1119258,0.05711 -1.3830257,-5.24e-4 c -1.288121,-4.9e-4 -1.3895764,-0.0035 -1.4784713,-0.04388 z m 2.8347098,-0.400527 0.070458,-0.06526 0.00704,-1.578004 0.00704,-1.5780044 -1.4415606,-0.00612 -1.4415606,-0.00612 v 1.5800134 1.580014 l 0.069363,0.06936 0.069363,0.06936 H 3.7393895 5.0340922 Z M 2.7330841,4.1931182 V 2.9710547 h 0.2016996 0.2017 v 1.2220635 1.222064 h -0.2017 -0.2016996 z m 0.8067992,0 V 2.9710547 h 0.2017 0.2016996 v 1.2220635 1.222064 h -0.2016996 -0.2017 z m 0.8305286,0 V 2.9710547 H 4.560247 4.7500825 v 1.2220635 1.222064 H 4.560247 4.3704119 Z M 4.3466819,1.6275524 C 4.3525019,1.4948826 4.3066309,1.3905375 4.2264459,1.3628251 4.1044771,1.3096741 4.063522,1.3135821 3.7620234,1.3163031 3.4605248,1.3190231 3.3539331,1.3387671 3.2833638,1.3817941 3.1976948,1.4340251 3.136483,1.5521229 3.136483,1.6651764 v 0.07195 h 0.6050997 0.6050992 z" /></svg>`,
+    ok: `<svg class="app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="M 3.0465827,6.023294 C 2.9739427,5.999434 2.8963597,5.944464 2.8604957,5.891429 2.8433557,5.866079 2.7829257,5.76905 2.7262217,5.675813 2.5980057,5.465003 2.4549037,5.256914 2.2820347,5.029908 2.1539417,4.861701 2.1487597,4.852462 2.1487597,4.79231 c 0,-0.05732 0.0045,-0.06692 0.05384,-0.114171 0.117778,-0.112851 0.307085,-0.123696 0.448503,-0.02569 0.05211,0.03611 0.173259,0.200332 0.382098,0.517943 0.07379,0.112229 0.136067,0.204053 0.138384,0.204053 0.0023,0 0.03545,-0.05509 0.07362,-0.122432 0.294617,-0.519657 0.753512,-1.139717 1.196512,-1.616729 0.138195,-0.148805 0.507732,-0.517006 0.587531,-0.585406 0.09414,-0.0807 0.208563,-0.03957 0.208563,0.07497 0,0.0405 -0.0123,0.06068 -0.08951,0.146846 -0.646693,0.721674 -1.206898,1.591625 -1.599732,2.48425 -0.05664,0.128705 -0.126804,0.209421 -0.216681,0.249269 -0.07283,0.03229 -0.214666,0.04128 -0.285304,0.01808 z" /></svg>`
   };
   return icons[type] || "";
 }
@@ -4904,7 +5059,8 @@ function applyNavStyleActionButtons(root = document) {
   const actionMap = [
     { type: "save", label: "Opslaan", match: /^(instellingen\s+)?opslaan$/i },
     { type: "cancel", label: "Annuleren", match: /^annuleren$/i },
-    { type: "delete", label: "Verwijderen", match: /^verwijderen$/i }
+    { type: "delete", label: "Verwijderen", match: /^verwijderen$/i },
+    { type: "ok", label: "OK", match: /^(ok|kies)$/i }
   ];
 
   root.querySelectorAll("button").forEach(button => {
@@ -5038,51 +5194,30 @@ function registerEvents() {
     if (el) el.addEventListener("change", renderRevenue);
   });
 
-  const revenueYearMain = document.getElementById("revenueYearMain");
-  const revenueYearToggle = document.getElementById("revenueYearToggle");
-  const revenueMonthMain = document.getElementById("revenueMonthMain");
-  const revenueMonthToggle = document.getElementById("revenueMonthToggle");
-  const revenueDayMain = document.getElementById("revenueDayMain");
-  const revenueDayToggle = document.getElementById("revenueDayToggle");
+  const attachRevenuePeriodButton = (id, mode, openPicker) => {
+    const button = document.getElementById(id);
+    if (!button) return;
 
-  if (revenueYearMain) {
-    revenueYearMain.addEventListener("click", () => {
-      const anchor = document.getElementById("revenueDate").value || todayStr;
-      setRevenuePeriod("year", anchor);
-    });
-  }
+    button.addEventListener("contextmenu", event => event.preventDefault());
+    button.addEventListener("click", event => {
+      event.preventDefault();
 
-  if (revenueYearToggle) {
-    revenueYearToggle.addEventListener("click", () => {
-      openRevenueWheelPicker("year");
-    });
-  }
+      const currentMode = document.getElementById("revenuePeriodType")?.value || "day";
+      const anchor = document.getElementById("revenueDate")?.value || todayStr;
 
-  if (revenueMonthMain) {
-    revenueMonthMain.addEventListener("click", () => {
-      const anchor = document.getElementById("revenueDate").value || todayStr;
-      setRevenuePeriod("month", anchor);
-    });
-  }
+      if (currentMode === mode) {
+        openPicker();
+        return;
+      }
 
-  if (revenueMonthToggle) {
-    revenueMonthToggle.addEventListener("click", () => {
-      openRevenueWheelPicker("month");
+      setRevenuePeriod(mode, anchor);
     });
-  }
+  };
 
-  if (revenueDayMain) {
-    revenueDayMain.addEventListener("click", () => {
-      const anchor = document.getElementById("revenueDate").value || todayStr;
-      setRevenuePeriod("day", anchor);
-    });
-  }
-
-  if (revenueDayToggle) {
-    revenueDayToggle.addEventListener("click", () => {
-      openRevenueDayPicker();
-    });
-  }
+  attachRevenuePeriodButton("revenueYearBtn", "year", () => openRevenueWheelPicker("year"));
+  attachRevenuePeriodButton("revenueMonthBtn", "month", () => openRevenueWheelPicker("month"));
+  attachRevenuePeriodButton("revenueWeekBtn", "week", () => openRevenueWheelPicker("week"));
+  attachRevenuePeriodButton("revenueDayBtn", "day", () => openRevenueWheelPicker("day"));
 
   const revenueWheelPickerForm = document.getElementById("revenueWheelPickerForm");
   if (revenueWheelPickerForm) {
@@ -5098,7 +5233,8 @@ function registerEvents() {
     revenueNativeDatePicker.addEventListener("change", event => {
       const pickedDate = event.target.value;
       if (!pickedDate) return;
-      setRevenuePeriod("day", pickedDate);
+      const mode = event.target.dataset.mode || "day";
+      setRevenuePeriod(mode, pickedDate);
     });
   }
 

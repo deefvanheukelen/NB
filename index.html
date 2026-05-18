@@ -187,41 +187,25 @@
         <section class="revenue-screen-shell">
 
           <section class="revenue-period-strip app-control-card" aria-label="Omzetperiode kiezen">
-            <div class="revenue-period-row">
-              <span class="revenue-period-row-label">Dagomzet</span>
-              <div id="revenueDayChip" class="revenue-period-chip revenue-period-chip-wide" role="group" aria-label="Dag kiezen">
-                <button id="revenueDayMain" class="revenue-period-main" type="button">
-                  <span id="revenueDayLabel">Wo 25-03</span>
-                </button>
-                <button id="revenueDayToggle" class="revenue-period-toggle" type="button" aria-label="Dagkeuze openen">
-                  <span class="revenue-period-caret" aria-hidden="true"></span>
-                </button>
-              </div>
-            </div>
+            <button id="revenueDayBtn" class="revenue-period-tile" type="button" aria-label="Dagomzet kiezen">
+              <span class="revenue-period-title">Dag</span>
+              <span id="revenueDayLabel" class="revenue-period-sub">Vandaag</span>
+            </button>
 
-            <div class="revenue-period-row">
-              <span class="revenue-period-row-label">Maandomzet</span>
-              <div id="revenueMonthChip" class="revenue-period-chip" role="group" aria-label="Maand kiezen">
-                <button id="revenueMonthMain" class="revenue-period-main" type="button">
-                  <span id="revenueMonthLabel">Maart</span>
-                </button>
-                <button id="revenueMonthToggle" class="revenue-period-toggle" type="button" aria-label="Maandkeuze openen">
-                  <span class="revenue-period-caret" aria-hidden="true"></span>
-                </button>
-              </div>
-            </div>
+            <button id="revenueWeekBtn" class="revenue-period-tile" type="button" aria-label="Weekomzet kiezen">
+              <span class="revenue-period-title">Week</span>
+              <span id="revenueWeekLabel" class="revenue-period-sub">Deze week</span>
+            </button>
 
-            <div class="revenue-period-row">
-              <span class="revenue-period-row-label">Jaaromzet</span>
-              <div id="revenueYearChip" class="revenue-period-chip active" role="group" aria-label="Jaar kiezen">
-                <button id="revenueYearMain" class="revenue-period-main" type="button">
-                  <span id="revenueYearLabel">2026</span>
-                </button>
-                <button id="revenueYearToggle" class="revenue-period-toggle" type="button" aria-label="Jaarkeuze openen">
-                  <span class="revenue-period-caret" aria-hidden="true"></span>
-                </button>
-              </div>
-            </div>
+            <button id="revenueMonthBtn" class="revenue-period-tile" type="button" aria-label="Maandomzet kiezen">
+              <span class="revenue-period-title">Maand</span>
+              <span id="revenueMonthLabel" class="revenue-period-sub">Deze maand</span>
+            </button>
+
+            <button id="revenueYearBtn" class="revenue-period-tile" type="button" aria-label="Jaaromzet kiezen">
+              <span class="revenue-period-title">Jaar</span>
+              <span id="revenueYearLabel" class="revenue-period-sub revenue-period-year">2026</span>
+            </button>
           </section>
 
           <section class="revenue-summary-card">
@@ -270,6 +254,7 @@
             <div class="revenue-hidden-inputs" aria-hidden="true">
               <select id="revenuePeriodType" class="field compact-field">
                 <option value="day">Dag</option>
+                <option value="week">Week</option>
                 <option value="month" selected>Maand</option>
                 <option value="year">Jaar</option>
               </select>
