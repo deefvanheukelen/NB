@@ -5297,3 +5297,38 @@ button.is-action-locked .app-action-nav-ico,
 button.is-action-locked .app-action-nav-label {
   opacity: 0.75;
 }
+
+
+/* =========================================================
+   AANPASSINGEN: OPMERKINGEN / DIENSTEN ZOEKEN / STATISTIEKEN
+========================================================= */
+.appointment-main-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.appointment-remarks-star {
+  color: #d4a017;
+  font-size: 15px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.statistics-card-head-stacked {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.statistics-card-head-stacked h2 {
+  margin-bottom: 0;
+}
+
+.statistics-year-filter {
+  margin-bottom: 8px;
+}
+
+.statistics-top-customer-amount {
+  font-size: 14px;
+}
