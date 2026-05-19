@@ -5251,3 +5251,49 @@ body.auth-locked .fab {
     font-size: 9px;
   }
 }
+
+/* =========================================================
+   TAAL / VALUTA EXTRA'S
+========================================================= */
+.settings-info-text {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   OMZET: dynamische staafbreedte voor daggrafiek
+========================================================= */
+.revenue-bars.revenue-bars-day-dynamic {
+  width: 100%;
+  min-width: 100%;
+  gap: var(--revenue-day-gap, 8px);
+  overflow-x: auto;
+  padding-inline: 8px;
+}
+
+.revenue-bars.revenue-bars-day-dynamic .revenue-bar-col {
+  flex: 0 0 var(--revenue-day-col-width, 48px);
+  min-width: var(--revenue-day-col-width, 48px);
+}
+
+.revenue-bars.revenue-bars-day-dynamic .revenue-bar-stack {
+  width: var(--revenue-day-stack-width, 20px);
+  max-width: 72%;
+}
+
+/* =========================================================
+   ACTION LOCK: voorkom dubbele klik / dubbele submit
+========================================================= */
+button.is-action-locked,
+button:disabled.is-action-locked {
+  opacity: 0.62;
+  cursor: wait;
+  pointer-events: none;
+}
+
+button.is-action-locked .app-action-nav-ico,
+button.is-action-locked .app-action-nav-label {
+  opacity: 0.75;
+}

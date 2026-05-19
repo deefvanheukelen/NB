@@ -7,6 +7,311 @@ function formatDateInput(d) {
 
 const todayStr = formatDateInput(today);
 
+
+const SUPPORTED_LANGUAGES = [
+  { code: "nl-BE", label: "Nederlands" },
+  { code: "en-GB", label: "English" },
+  { code: "fr-FR", label: "Français" }
+];
+
+const SUPPORTED_CURRENCIES = [
+  { code: "EUR", label: "Euro", symbol: "€" },
+  { code: "USD", label: "Dollar", symbol: "$" },
+  { code: "GBP", label: "Britse pond", symbol: "£" }
+];
+
+const DEFAULT_LANGUAGE = "nl-BE";
+const DEFAULT_CURRENCY = "EUR";
+
+const i18n = {
+  "nl-BE": {
+    agenda: "Agenda", revenue: "Omzet", clients: "Klanten", services: "Diensten", paymentMethods: "Betaalwijze", statistics: "Statistieken", settings: "Instellingen", account: "Account",
+    save: "Opslaan", cancel: "Annuleren", register: "Registreren", login: "Inloggen", logout: "Uitloggen", editProfile: "Gegevens wijzigen", changePassword: "Wachtwoord wijzigen",
+    language: "Taal", currency: "Valuta", appPreferences: "App-voorkeuren", currencyChangeWarning: "Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.",
+    firstName: "Voornaam", lastName: "Naam", salonName: "Salonnaam", vatNumber: "BTW-nummer", email: "E-mail", password: "Wachtwoord", confirmPassword: "Bevestig wachtwoord", optional: "optioneel",
+    noRevenueForSelection: "Geen omzetgegevens voor deze selectie.", paid: "Betaald", unpaid: "Onbetaald", paymentMethod: "Betaalwijze", unknown: "Onbekend", settingsSaved: "Instellingen opgeslagen.", settingsSavedDevice: "Instellingen opgeslagen op dit toestel.", saveSettings: "Instellingen opslaan", ok: "OK", confirmTitle: "Bevestiging", confirm: "Bevestigen"
+  },
+  "en-GB": {
+    agenda: "Agenda", revenue: "Revenue", clients: "Clients", services: "Services", paymentMethods: "Payment methods", statistics: "Statistics", settings: "Settings", account: "Account",
+    save: "Save", cancel: "Cancel", register: "Register", login: "Log in", logout: "Log out", editProfile: "Edit details", changePassword: "Change password",
+    language: "Language", currency: "Currency", appPreferences: "App preferences", currencyChangeWarning: "New appointments will use this currency from now on. Existing appointments and revenue remain in their original currency and are not converted.",
+    firstName: "First name", lastName: "Last name", salonName: "Salon name", vatNumber: "VAT number", email: "Email", password: "Password", confirmPassword: "Confirm password", optional: "optional",
+    noRevenueForSelection: "No revenue data for this selection.", paid: "Paid", unpaid: "Unpaid", paymentMethod: "Payment method", unknown: "Unknown", settingsSaved: "Settings saved.", settingsSavedDevice: "Settings saved on this device.", saveSettings: "Save settings", ok: "OK", confirmTitle: "Confirmation", confirm: "Confirm"
+  },
+  "fr-FR": {
+    agenda: "Agenda", revenue: "Chiffre d’affaires", clients: "Clients", services: "Services", paymentMethods: "Modes de paiement", statistics: "Statistiques", settings: "Paramètres", account: "Compte",
+    save: "Enregistrer", cancel: "Annuler", register: "S’inscrire", login: "Connexion", logout: "Déconnexion", editProfile: "Modifier les données", changePassword: "Modifier le mot de passe",
+    language: "Langue", currency: "Devise", appPreferences: "Préférences de l’application", currencyChangeWarning: "Les nouveaux rendez-vous utiliseront désormais cette devise. Les rendez-vous et revenus existants restent dans leur devise d’origine et ne sont pas convertis.",
+    firstName: "Prénom", lastName: "Nom", salonName: "Nom du salon", vatNumber: "Numéro de TVA", email: "E-mail", password: "Mot de passe", confirmPassword: "Confirmer le mot de passe", optional: "optionnel",
+    noRevenueForSelection: "Aucune donnée de chiffre d’affaires pour cette sélection.", paid: "Payé", unpaid: "Impayé", paymentMethod: "Mode de paiement", unknown: "Inconnu", settingsSaved: "Paramètres enregistrés.", settingsSavedDevice: "Paramètres enregistrés sur cet appareil.", saveSettings: "Enregistrer les paramètres", ok: "OK", confirmTitle: "Confirmation", confirm: "Confirmer"
+  }
+};
+
+const i18nExtra = {
+  "nl-BE": {
+    planning: "Planning", notifications: "Meldingen", extras: "Interessante extra's", defaultBreak: "Standaard pauze tussen 2 afspraken (min)", overlapWarnings: "Overlapwaarschuwingen", overlapWarningsHint: "Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.", enableNotifications: "Meldingen inschakelen", enableNotificationsHint: "Voorbereid voor afspraakherinneringen in de app.", reminderBefore: "Herinnering vóór afspraak", savePending: "Instellingen opslaan...", notificationsOff: "Meldingen zijn uitgeschakeld.", notificationsActive: "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.", notificationsBlocked: "Meldingen zijn geblokkeerd in je browserinstellingen.", notificationsUnsupported: "Deze browser ondersteunt geen webmeldingen.", notificationsPermissionHint: "Schakel meldingen in en geef toestemming om herinneringen te tonen.", appointmentsOn: "Afspraken op", noAppointmentsOnDay: "Geen afspraken op deze dag.", noClientsFound: "Geen klanten gevonden.", noPhone: "Geen gsm", appointmentSingular: "afspraak", appointmentPlural: "afspraken", noActiveServices: "Nog geen actieve diensten.", inactive: "inactief", showInactiveServices: "Toon inactieve diensten", allPaymentMethods: "Alle betaalwijzen", allStatuses: "Alle statussen", day: "Dag", week: "Week", month: "Maand", year: "Jaar", today: "Vandaag", total: "Totaal", chartTitle: "Grafische weergave", perDay: "Per dag", revenueOn: "Omzet op", revenueReport: "Omzetrapport", paymentMethodTitle: "Betaalwijze", unknownCustomer: "Onbekende klant", chooseMonth: "Maand kiezen", choose: "Kies", newAppointment: "Nieuwe afspraak", editAppointment: "Afspraak bewerken", customer: "Klant", date: "Datum", time: "Tijd", service: "Dienst", duration: "Duur (min)", price: "Prijs", status: "Status", planned: "Gepland", completed: "Afgerond", newClient: "Nieuwe klant", phone: "Telefoon", note: "Notitie", newService: "Nieuwe dienst", serviceName: "Naam dienst", newPaymentMethod: "Nieuwe betaalwijze", paymentMethodName: "Naam betaalwijze", editProfileTitle: "Profiel bewerken", currentPassword: "Huidig wachtwoord", newPassword: "Nieuw wachtwoord", message: "Melding", registerHere: "Nog geen account? Registreer hier"
+  },
+  "en-GB": {
+    planning: "Planning", notifications: "Notifications", extras: "Useful extras", defaultBreak: "Default break between 2 appointments (min)", overlapWarnings: "Overlap warnings", overlapWarningsHint: "Warn when an appointment overlaps with an existing appointment, taking duration and break time into account.", enableNotifications: "Enable notifications", enableNotificationsHint: "Prepared for appointment reminders in the app.", reminderBefore: "Reminder before appointment", savePending: "Saving settings...", notificationsOff: "Notifications are disabled.", notificationsActive: "Notifications are active on this device while the browser or app supports notifications.", notificationsBlocked: "Notifications are blocked in your browser settings.", notificationsUnsupported: "This browser does not support web notifications.", notificationsPermissionHint: "Enable notifications and allow permission to show reminders.", appointmentsOn: "Appointments on", noAppointmentsOnDay: "No appointments on this day.", noClientsFound: "No clients found.", noPhone: "No mobile", appointmentSingular: "appointment", appointmentPlural: "appointments", noActiveServices: "No active services yet.", inactive: "inactive", showInactiveServices: "Show inactive services", allPaymentMethods: "All payment methods", allStatuses: "All statuses", day: "Day", week: "Week", month: "Month", year: "Year", today: "Today", total: "Total", chartTitle: "Chart view", perDay: "Per day", revenueOn: "Revenue on", revenueReport: "Revenue report", paymentMethodTitle: "Payment method", unknownCustomer: "Unknown client", chooseMonth: "Choose month", choose: "Choose", newAppointment: "New appointment", editAppointment: "Edit appointment", customer: "Client", date: "Date", time: "Time", service: "Service", duration: "Duration (min)", price: "Price", status: "Status", planned: "Planned", completed: "Completed", newClient: "New client", phone: "Phone", note: "Note", newService: "New service", serviceName: "Service name", newPaymentMethod: "New payment method", paymentMethodName: "Payment method name", editProfileTitle: "Edit profile", currentPassword: "Current password", newPassword: "New password", message: "Message", registerHere: "No account yet? Register here"
+  },
+  "fr-FR": {
+    planning: "Planning", notifications: "Notifications", extras: "Extras utiles", defaultBreak: "Pause standard entre 2 rendez-vous (min)", overlapWarnings: "Avertissements de chevauchement", overlapWarningsHint: "Avertir lorsqu’un rendez-vous chevauche un rendez-vous existant, en tenant compte de la durée et de la pause.", enableNotifications: "Activer les notifications", enableNotificationsHint: "Prévu pour les rappels de rendez-vous dans l’application.", reminderBefore: "Rappel avant le rendez-vous", savePending: "Enregistrement des paramètres...", notificationsOff: "Les notifications sont désactivées.", notificationsActive: "Les notifications sont actives sur cet appareil tant que le navigateur ou l’application les prend en charge.", notificationsBlocked: "Les notifications sont bloquées dans les paramètres de votre navigateur.", notificationsUnsupported: "Ce navigateur ne prend pas en charge les notifications web.", notificationsPermissionHint: "Activez les notifications et autorisez-les pour afficher les rappels.", appointmentsOn: "Rendez-vous le", noAppointmentsOnDay: "Aucun rendez-vous ce jour-là.", noClientsFound: "Aucun client trouvé.", noPhone: "Pas de GSM", appointmentSingular: "rendez-vous", appointmentPlural: "rendez-vous", noActiveServices: "Aucun service actif pour le moment.", inactive: "inactif", showInactiveServices: "Afficher les services inactifs", allPaymentMethods: "Tous les modes de paiement", allStatuses: "Tous les statuts", day: "Jour", week: "Semaine", month: "Mois", year: "Année", today: "Aujourd’hui", total: "Total", chartTitle: "Vue graphique", perDay: "Par jour", revenueOn: "Chiffre d’affaires le", revenueReport: "Rapport du chiffre d’affaires", paymentMethodTitle: "Mode de paiement", unknownCustomer: "Client inconnu", chooseMonth: "Choisir le mois", choose: "Choisir", newAppointment: "Nouveau rendez-vous", editAppointment: "Modifier le rendez-vous", customer: "Client", date: "Date", time: "Heure", service: "Service", duration: "Durée (min)", price: "Prix", status: "Statut", planned: "Planifié", completed: "Terminé", newClient: "Nouveau client", phone: "Téléphone", note: "Note", newService: "Nouveau service", serviceName: "Nom du service", newPaymentMethod: "Nouveau mode de paiement", paymentMethodName: "Nom du mode de paiement", editProfileTitle: "Modifier le profil", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", message: "Message", registerHere: "Pas encore de compte ? Inscrivez-vous ici"
+  }
+};
+Object.keys(i18nExtra).forEach(lang => Object.assign(i18n[lang], i18nExtra[lang]));
+
+const i18nMore = {
+  "nl-BE": {
+    mondayShort:"Ma", tuesdayShort:"Di", wednesdayShort:"Wo", thursdayShort:"Do", fridayShort:"Vr", saturdayShort:"Za", sundayShort:"Zo",
+    searchClientPlaceholder:"Zoek klant...", searchAppointmentCustomerPlaceholder:"Zoek op naam, telefoon of e-mail...", searchServicePlaceholder:"Zoek dienst...",
+    delete:"Verwijderen", edit:"Bewerk", editClient:"Klant bewerken", editService:"Dienst bewerken", editPaymentMethod:"Betaalwijze bewerken", reactivateService:"Dienst opnieuw actief zetten", reactivateServiceHint:"De dienst verschijnt opnieuw in de actieve dienstenlijst en bij nieuwe afspraken.",
+    customerNumber:"Klantnummer", appointments:"Afspraken", totalLower:"totaal", noAppointmentsYet:"Nog geen afspraken.", noPaymentMethods:"Nog geen betaalwijzen.", paymentSingular:"betaling", paymentPlural:"betalingen",
+    customerCount:"Aantal klanten", pastAppointments:"Afgeronde afspraken", futureAppointments:"Geplande afspraken", totalRevenueUntilToday:"Totale omzet tot vandaag", chosenServices:"Gekozen behandelingen", revenueByService:"Omzet per behandeling", chosenPaymentMethod:"Gekozen betaalwijze", topCustomers:"Top klanten", all:"Alle", noCustomerStats:"Nog geen klantgegevens beschikbaar.", more:"Meer...", less:"Minder",
+    serviceNameRequired:"Geef een naam voor de dienst in.", duplicateServiceTitle:"Dubbele dienstnaam", saveAnyway:"Toch opslaan", saveFailed:"Opslaan mislukt", duplicateServiceMessage:"Er bestaat al een dienst met de naam \"{name}\".\n\nWil je toch opslaan? Dan wordt deze dienst opgeslagen als \"{uniqueName}\".", chooseDate:"Kies datum", chooseTime:"Kies tijd", chooseCustomer:"Kies een klant...", chooseService:"Kies een dienst...", choosePaymentMethod:"Kies een betaalwijze...", chooseConfirm:"Kies", dayRevenue:"Dagomzet", weekRevenue:"Weekomzet", monthRevenue:"Maandomzet", yearRevenue:"Jaaromzet"
+  },
+  "en-GB": {
+    mondayShort:"Mon", tuesdayShort:"Tue", wednesdayShort:"Wed", thursdayShort:"Thu", fridayShort:"Fri", saturdayShort:"Sat", sundayShort:"Sun",
+    searchClientPlaceholder:"Search client...", searchAppointmentCustomerPlaceholder:"Search by name, phone or email...", searchServicePlaceholder:"Search service...",
+    delete:"Delete", edit:"Edit", editClient:"Edit client", editService:"Edit service", editPaymentMethod:"Edit payment method", reactivateService:"Reactivate service", reactivateServiceHint:"The service will appear again in the active services list and for new appointments.",
+    customerNumber:"Client number", appointments:"Appointments", totalLower:"total", noAppointmentsYet:"No appointments yet.", noPaymentMethods:"No payment methods yet.", paymentSingular:"payment", paymentPlural:"payments",
+    customerCount:"Number of clients", pastAppointments:"Completed appointments", futureAppointments:"Planned appointments", totalRevenueUntilToday:"Total revenue until today", chosenServices:"Selected services", revenueByService:"Revenue per service", chosenPaymentMethod:"Selected payment method", topCustomers:"Top clients", all:"All", noCustomerStats:"No client data available yet.", more:"More...", less:"Less",
+    serviceNameRequired:"Enter a service name.", duplicateServiceTitle:"Duplicate service name", saveAnyway:"Save anyway", saveFailed:"Save failed", duplicateServiceMessage:"A service named \"{name}\" already exists.\n\nDo you still want to save it? This service will be saved as \"{uniqueName}\".", chooseDate:"Choose date", chooseTime:"Choose time", chooseCustomer:"Choose a client...", chooseService:"Choose a service...", choosePaymentMethod:"Choose a payment method...", chooseConfirm:"Choose", dayRevenue:"Daily revenue", weekRevenue:"Weekly revenue", monthRevenue:"Monthly revenue", yearRevenue:"Yearly revenue"
+  },
+  "fr-FR": {
+    mondayShort:"Lu", tuesdayShort:"Ma", wednesdayShort:"Me", thursdayShort:"Je", fridayShort:"Ve", saturdayShort:"Sa", sundayShort:"Di",
+    searchClientPlaceholder:"Rechercher un client...", searchAppointmentCustomerPlaceholder:"Rechercher par nom, téléphone ou e-mail...", searchServicePlaceholder:"Rechercher un service...",
+    delete:"Supprimer", edit:"Modifier", editClient:"Modifier le client", editService:"Modifier le service", editPaymentMethod:"Modifier le mode de paiement", reactivateService:"Réactiver le service", reactivateServiceHint:"Le service réapparaîtra dans la liste des services actifs et pour les nouveaux rendez-vous.",
+    customerNumber:"Numéro client", appointments:"Rendez-vous", totalLower:"au total", noAppointmentsYet:"Pas encore de rendez-vous.", noPaymentMethods:"Aucun mode de paiement pour le moment.", paymentSingular:"paiement", paymentPlural:"paiements",
+    customerCount:"Nombre de clients", pastAppointments:"Rendez-vous terminés", futureAppointments:"Rendez-vous planifiés", totalRevenueUntilToday:"Chiffre d’affaires total jusqu’à aujourd’hui", chosenServices:"Soins choisis", revenueByService:"Chiffre d’affaires par soin", chosenPaymentMethod:"Mode de paiement choisi", topCustomers:"Meilleurs clients", all:"Tous", noCustomerStats:"Aucune donnée client disponible pour le moment.", more:"Plus...", less:"Moins",
+    serviceNameRequired:"Indiquez un nom de service.", duplicateServiceTitle:"Nom de service en double", saveAnyway:"Enregistrer quand même", saveFailed:"Échec de l’enregistrement", duplicateServiceMessage:"Un service nommé \"{name}\" existe déjà.\n\nVoulez-vous quand même l’enregistrer ? Ce service sera enregistré sous \"{uniqueName}\".", chooseDate:"Choisir la date", chooseTime:"Choisir l’heure", chooseCustomer:"Choisir un client...", chooseService:"Choisir un service...", choosePaymentMethod:"Choisir un mode de paiement...", chooseConfirm:"Choisir", dayRevenue:"Chiffre d’affaires journalier", weekRevenue:"Chiffre d’affaires hebdomadaire", monthRevenue:"Chiffre d’affaires mensuel", yearRevenue:"Chiffre d’affaires annuel"
+  }
+};
+Object.keys(i18nMore).forEach(lang => Object.assign(i18n[lang], i18nMore[lang]));
+
+
+let currentProfilePreferences = { language: DEFAULT_LANGUAGE, currency: DEFAULT_CURRENCY };
+
+function normalizeLanguage(code) {
+  return SUPPORTED_LANGUAGES.some(item => item.code === code) ? code : DEFAULT_LANGUAGE;
+}
+
+function normalizeCurrency(code) {
+  return SUPPORTED_CURRENCIES.some(item => item.code === code) ? code : DEFAULT_CURRENCY;
+}
+
+function getCurrentLanguage() {
+  return normalizeLanguage(currentProfilePreferences.language || getData()?.settings?.language || DEFAULT_LANGUAGE);
+}
+
+function getCurrentCurrency() {
+  return normalizeCurrency(currentProfilePreferences.currency || getData()?.settings?.currency || DEFAULT_CURRENCY);
+}
+
+function t(key) {
+  const lang = getCurrentLanguage();
+  return i18n[lang]?.[key] || i18n[DEFAULT_LANGUAGE]?.[key] || key;
+}
+
+function getCurrencyLabel(code) {
+  const currency = SUPPORTED_CURRENCIES.find(item => item.code === normalizeCurrency(code));
+  return currency ? `${currency.label} (${currency.code})` : code;
+}
+
+function buildLanguageOptions(selected = DEFAULT_LANGUAGE) {
+  const safe = normalizeLanguage(selected);
+  return SUPPORTED_LANGUAGES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.label}</option>`).join("");
+}
+
+function buildCurrencyOptions(selected = DEFAULT_CURRENCY) {
+  const safe = normalizeCurrency(selected);
+  return SUPPORTED_CURRENCIES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.label} (${item.symbol})</option>`).join("");
+}
+
+function updateStaticI18n() {
+  document.documentElement.lang = getCurrentLanguage().slice(0, 2);
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder));
+  });
+
+  const setText = (selector, key) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = t(key);
+  };
+  const setHtml = (selector, html) => {
+    const el = document.querySelector(selector);
+    if (el) el.innerHTML = html;
+  };
+
+  const selectorMap = [
+    ["#revenueChartTitle", "chartTitle"],
+    ["#revenueChartSubtitle", "perDay"],
+    ["#jumpToTodayBtn", "today"],
+    ['label[for="settingsDefaultBreakMinutes"]', "defaultBreak"],
+    ['label[for="settingsReminderMinutes"]', "reminderBefore"],
+    ['label[for="loginEmail"]', "email"],
+    ['label[for="loginPassword"]', "password"],
+    ['#openRegisterDialogBtn', "registerHere"],
+    ['#monthPickerDialog h3', "chooseMonth"],
+    ['label[for="monthSelect"]', "month"],
+    ['label[for="yearSelect"]', "year"],
+    ['label[for="appointmentCustomerSearch"]', "customer"],
+    ['label[for="appointmentDate"]', "date"],
+    ['label[for="appointmentTime"]', "time"],
+    ['label[for="appointmentServiceSearch"]', "service"],
+    ['label[for="appointmentDuration"]', "duration"],
+    ['label[for="appointmentPrice"]', "price"],
+    ['label[for="appointmentStatus"]', "status"],
+    ['label[for="clientFirstName"]', "firstName"],
+    ['label[for="clientLastName"]', "lastName"],
+    ['label[for="clientPhone"]', "phone"],
+    ['label[for="clientEmail"]', "email"],
+    ['label[for="clientNote"]', "note"],
+    ['label[for="serviceName"]', "serviceName"],
+    ['label[for="serviceDuration"]', "duration"],
+    ['label[for="servicePrice"]', "price"],
+    ['label[for="paymentMethodName"]', "paymentMethodName"],
+    ['label[for="registerFirstName"]', "firstName"],
+    ['label[for="registerLastName"]', "lastName"],
+    ['label[for="registerEmail"]', "email"],
+    ['label[for="registerPassword"]', "password"],
+    ['label[for="registerPasswordConfirm"]', "confirmPassword"],
+    ['label[for="editFirstName"]', "firstName"],
+    ['label[for="editLastName"]', "lastName"],
+    ['label[for="currentPassword"]', "currentPassword"],
+    ['label[for="newPassword"]', "newPassword"],
+    ['label[for="confirmPassword"]', "confirmPassword"],
+    ['#passwordDialog h3', "changePassword"],
+    ['#appMessageDialogTitle', "message"],
+    ['#appointmentWheelPickerTitle', "choose"],
+    ['#revenueWheelPickerTitle', "choose"]
+  ];
+  selectorMap.forEach(([selector, key]) => setText(selector, key));
+
+  setHtml('label[for="registerSalonName"]', `${t("salonName")} <span class="optional-label">${t("optional")}</span>`);
+  setHtml('label[for="registerVatNumber"]', `${t("vatNumber")} <span class="optional-label">${t("optional")}</span>`);
+  setHtml('label[for="editSalonName"]', `${t("salonName")} <span class="optional-label">${t("optional")}</span>`);
+  setHtml('label[for="editVatNumber"]', `${t("vatNumber")} <span class="optional-label">${t("optional")}</span>`);
+
+  document.querySelectorAll(".account-data-label").forEach(el => {
+    const text = el.textContent.trim().toLowerCase();
+    const map = {
+      "voornaam": "firstName", "first name": "firstName", "prénom": "firstName",
+      "familienaam": "lastName", "naam": "lastName", "last name": "lastName", "nom": "lastName",
+      "salonnaam": "salonName", "salon name": "salonName", "nom du salon": "salonName",
+      "btw-nummer": "vatNumber", "vat number": "vatNumber", "numéro de tva": "vatNumber",
+      "e-mail": "email", "email": "email",
+      "wachtwoord": "password", "password": "password", "mot de passe": "password"
+    };
+    const key = map[text];
+    if (key) el.textContent = t(key);
+  });
+
+  const revenuePeriodKeys = ["day", "week", "month", "year"];
+  document.querySelectorAll(".revenue-period-title").forEach((el, index) => {
+    const key = revenuePeriodKeys[index];
+    if (key) el.textContent = t(key);
+  });
+
+  const revenueMainKeys = ["total", "paid", "unpaid"];
+  document.querySelectorAll(".revenue-main-label").forEach((el, index) => {
+    const key = revenueMainKeys[index];
+    if (key) el.textContent = t(key);
+  });
+
+  const settingsLabels = document.querySelectorAll("#settingsScreen .detail-label");
+  [[0, "planning"], [1, "notifications"], [3, "extras"]].forEach(([index, key]) => {
+    if (settingsLabels[index]) settingsLabels[index].textContent = t(key);
+  });
+
+  const authLabel = document.querySelector("#accountGuestView .detail-label");
+  if (authLabel) authLabel.textContent = t("login");
+
+  const statusFilter = document.getElementById("revenuePaymentStatusFilter");
+  if (statusFilter) {
+    const currentValue = statusFilter.value;
+    statusFilter.innerHTML = `
+      <option value="">${t("allStatuses")}</option>
+      <option value="paid">${t("paid")}</option>
+      <option value="unpaid">${t("unpaid")}</option>
+    `;
+    statusFilter.value = currentValue;
+  }
+
+  const periodType = document.getElementById("revenuePeriodType");
+  if (periodType) {
+    const currentValue = periodType.value;
+    periodType.innerHTML = `
+      <option value="day">${t("day")}</option>
+      <option value="week">${t("week")}</option>
+      <option value="month">${t("month")}</option>
+      <option value="year">${t("year")}</option>
+    `;
+    periodType.value = currentValue;
+  }
+
+  const appointmentStatus = document.getElementById("appointmentStatus");
+  if (appointmentStatus) {
+    const currentValue = appointmentStatus.value;
+    appointmentStatus.innerHTML = `
+      <option value="gepland">${t("planned")}</option>
+      <option value="afgerond">${t("completed")}</option>
+      <option value="no-show">No-show</option>
+    `;
+    appointmentStatus.value = currentValue;
+  }
+
+  const weekdayKeys = ["mondayShort", "tuesdayShort", "wednesdayShort", "thursdayShort", "fridayShort", "saturdayShort", "sundayShort"];
+  document.querySelectorAll(".weekday-row span").forEach((el, index) => {
+    if (weekdayKeys[index]) el.textContent = t(weekdayKeys[index]);
+  });
+
+  [["#clientSearch", "searchClientPlaceholder"], ["#appointmentCustomerSearch", "searchAppointmentCustomerPlaceholder"], ["#appointmentServiceSearch", "searchServicePlaceholder"]].forEach(([selector, key]) => {
+    const el = document.querySelector(selector);
+    if (el) el.setAttribute("placeholder", t(key));
+  });
+
+  [["#loginBtn", "login"], ["#logoutBtn", "logout"], ["#editProfileBtn", "editProfile"], ["#changePasswordBtn", "changePassword"], ["#deleteAppointmentBtn", "delete"], ["#deleteServiceBtn", "delete"], ["#deletePaymentMethodBtn", "delete"], ["#appointmentDateDisplayBtn", "chooseDate"], ["#appointmentTimeDisplayBtn", "chooseTime"]].forEach(([selector, key]) => setText(selector, key));
+
+  document.querySelectorAll('button[data-close="appointmentDialog"], button[data-close="clientDialog"], button[data-close="serviceDialog"], button[data-close="paymentMethodDialog"], button[data-close="passwordDialog"], button[data-close="editProfileDialog"]').forEach(btn => {
+    if (!btn.classList.contains("icon-btn")) btn.textContent = t("cancel");
+  });
+  document.querySelectorAll('#appointmentForm button[type="submit"], #clientForm button[type="submit"], #serviceForm button[type="submit"], #paymentMethodForm button[type="submit"], #passwordForm button[type="submit"], #editProfileForm button[type="submit"]').forEach(btn => {
+    btn.textContent = t("save");
+  });
+
+  const overlapLabel = document.querySelector('label[for="settingsOverlapWarningsEnabled"]');
+  if (overlapLabel) {
+    const strong = overlapLabel.querySelector('strong');
+    const small = overlapLabel.querySelector('small');
+    if (strong) strong.textContent = t("overlapWarnings");
+    if (small) small.textContent = t("overlapWarningsHint");
+  }
+  const notificationLabel = document.querySelector('label[for="settingsNotificationsEnabled"]');
+  if (notificationLabel) {
+    const strong = notificationLabel.querySelector('strong');
+    const small = notificationLabel.querySelector('small');
+    if (strong) strong.textContent = t("enableNotifications");
+    if (small) small.textContent = t("enableNotificationsHint");
+  }
+  const serviceReactivate = document.querySelector('#serviceReactivateWrap');
+  if (serviceReactivate) {
+    const strong = serviceReactivate.querySelector('strong');
+    const small = serviceReactivate.querySelector('small');
+    if (strong) strong.textContent = t("reactivateService");
+    if (small) small.textContent = t("reactivateServiceHint");
+  }
+
+  const screenTitle = document.getElementById("screenTitle");
+  if (screenTitle) screenTitle.textContent = getScreenTitle(state.currentScreen, screenTitle.textContent);
+
+  applyNavStyleActionButtons();
+}
+
 const state = {
   currentScreen: "agendaScreen",
   currentYear: today.getFullYear(),
@@ -32,6 +337,20 @@ const longMonthNames = [
   "januari", "februari", "maart", "april", "mei", "juni",
   "juli", "augustus", "september", "oktober", "november", "december"
 ];
+
+function getMonthNameLong(monthIndex) {
+  const d = new Date(2026, Number(monthIndex) || 0, 1);
+  return new Intl.DateTimeFormat(getCurrentLanguage(), { month: "long" }).format(d);
+}
+
+function getMonthNameUpper(monthIndex) {
+  return getMonthNameLong(monthIndex).toLocaleUpperCase(getCurrentLanguage());
+}
+
+function capitalizeFirst(value) {
+  const text = String(value || "");
+  return text ? text.charAt(0).toLocaleUpperCase(getCurrentLanguage()) + text.slice(1) : text;
+}
 
 const defaultPaymentMethods = [
   { id: 1, name: "Cash", sortOrder: 1 },
@@ -68,7 +387,9 @@ function getDefaultSettings() {
     defaultBreakMinutes: 10,
     notificationsEnabled: false,
     reminderMinutes: 30,
-    overlapWarningsEnabled: true
+    overlapWarningsEnabled: true,
+    language: DEFAULT_LANGUAGE,
+    currency: DEFAULT_CURRENCY
   };
 }
 
@@ -85,7 +406,8 @@ function normalizeData(data) {
 
     return {
       ...appointment,
-      paymentMethodName: paymentMethodName ? String(paymentMethodName).trim() : null
+      paymentMethodName: paymentMethodName ? String(paymentMethodName).trim() : null,
+      currency: normalizeCurrency(appointment?.currency || safe.settings?.currency || DEFAULT_CURRENCY)
     };
   }) : [];
 
@@ -173,21 +495,21 @@ function getRevenuePaymentFilterOptions(data = getData()) {
   return Array.from(names).sort((a, b) => a.localeCompare(b, "nl-BE"));
 }
 
-function euro(value) {
-  return new Intl.NumberFormat("nl-BE", {
+function euro(value, currency = getCurrentCurrency()) {
+  return new Intl.NumberFormat(getCurrentLanguage(), {
     style: "currency",
-    currency: "EUR"
+    currency: normalizeCurrency(currency)
   }).format(Number(value || 0));
 }
 
 function formatLongDate(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
-  return `${d.getDate()} ${longMonthNames[d.getMonth()]} ${d.getFullYear()}`;
+  return new Intl.DateTimeFormat(getCurrentLanguage(), { day: "numeric", month: "long", year: "numeric" }).format(d);
 }
 
 function formatShortDate(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
-  return `${d.getDate()} ${longMonthNames[d.getMonth()]}`;
+  return new Intl.DateTimeFormat(getCurrentLanguage(), { day: "numeric", month: "long" }).format(d);
 }
 
 function nextId(items) {
@@ -386,10 +708,10 @@ function closeStyledDialog(dialog) {
 }
 
 function showAppDialog({
-  title = "Melding",
+  title = t("message"),
   message = "",
-  confirmText = "OK",
-  cancelText = "Annuleren",
+  confirmText = t("ok") || "OK",
+  cancelText = t("cancel"),
   showCancel = false,
   variant = "info"
 } = {}) {
@@ -461,9 +783,9 @@ function showAppDialog({
 
 async function appAlert(message, options = {}) {
   await showAppDialog({
-    title: options.title || "Melding",
+    title: options.title || t("message"),
     message,
-    confirmText: options.confirmText || "OK",
+    confirmText: options.confirmText || (t("ok") || "OK"),
     showCancel: false,
     variant: options.variant || "info"
   });
@@ -471,10 +793,10 @@ async function appAlert(message, options = {}) {
 
 async function appConfirm(message, options = {}) {
   return showAppDialog({
-    title: options.title || "Bevestiging",
+    title: options.title || t("confirmTitle"),
     message,
-    confirmText: options.confirmText || "Bevestigen",
-    cancelText: options.cancelText || "Annuleren",
+    confirmText: options.confirmText || t("confirm"),
+    cancelText: options.cancelText || t("cancel"),
     showCancel: true,
     variant: options.variant || "warning"
   });
@@ -497,7 +819,7 @@ async function getCurrentProfile() {
 
     const { data: profile } = await supabaseClient
         .from("profiles")
-        .select("first_name, last_name, salon_name, vat_number, terms_accepted, terms_accepted_at")
+        .select("first_name, last_name, salon_name, vat_number, language, currency, terms_accepted, terms_accepted_at")
         .eq("id", user.id)
         .maybeSingle();
 
@@ -593,6 +915,8 @@ async function upsertProfile(userId, values) {
     last_name: values.last_name || "",
     salon_name: values.salon_name || null,
     vat_number: values.vat_number || null,
+    language: normalizeLanguage(values.language || DEFAULT_LANGUAGE),
+    currency: normalizeCurrency(values.currency || DEFAULT_CURRENCY),
     terms_accepted: Boolean(values.terms_accepted),
     terms_accepted_at: values.terms_accepted_at || null
   };
@@ -607,6 +931,11 @@ async function upsertProfile(userId, values) {
 async function syncAuthUI() {
 	const { data: { user } } = await supabaseClient.auth.getUser();
 	const profile = await getCurrentProfile();
+  currentProfilePreferences = {
+    language: normalizeLanguage(profile?.language || user?.user_metadata?.language || getData()?.settings?.language || DEFAULT_LANGUAGE),
+    currency: normalizeCurrency(profile?.currency || user?.user_metadata?.currency || getData()?.settings?.currency || DEFAULT_CURRENCY)
+  };
+  updateStaticI18n();
 
   setAuthLocked(!user);
 
@@ -622,6 +951,8 @@ async function syncAuthUI() {
   const accountProfileLastName = document.getElementById("accountProfileLastName");
   const accountProfileSalonName = document.getElementById("accountProfileSalonName");
   const accountProfileVatNumber = document.getElementById("accountProfileVatNumber");
+  const accountProfileLanguage = document.getElementById("accountProfileLanguage");
+  const accountProfileCurrency = document.getElementById("accountProfileCurrency");
 
   if (headerUserName) {
     headerUserName.textContent = user ? extractFirstNameFromUser(user, profile) : "log in";
@@ -655,6 +986,8 @@ async function syncAuthUI() {
   if (accountProfileLastName) accountProfileLastName.textContent = lastName || "-";
   if (accountProfileSalonName) accountProfileSalonName.textContent = profile?.salon_name?.trim() || "-";
   if (accountProfileVatNumber) accountProfileVatNumber.textContent = profile?.vat_number?.trim() || "-";
+  if (accountProfileLanguage) accountProfileLanguage.textContent = SUPPORTED_LANGUAGES.find(item => item.code === getCurrentLanguage())?.label || "-";
+  if (accountProfileCurrency) accountProfileCurrency.textContent = getCurrencyLabel(getCurrentCurrency());
 
   if (guestView) guestView.classList.add("hidden");
   if (loggedInView) loggedInView.classList.remove("hidden");
@@ -777,6 +1110,10 @@ async function openEditProfileDialog() {
   document.getElementById("editLastName").value = profile?.last_name || user.user_metadata?.last_name || "";
   document.getElementById("editSalonName").value = profile?.salon_name || "";
   document.getElementById("editVatNumber").value = profile?.vat_number || "";
+  const editLanguage = document.getElementById("editLanguage");
+  const editCurrency = document.getElementById("editCurrency");
+  if (editLanguage) editLanguage.innerHTML = buildLanguageOptions(profile?.language || getCurrentLanguage());
+  if (editCurrency) editCurrency.innerHTML = buildCurrencyOptions(profile?.currency || getCurrentCurrency());
   document.getElementById("editProfileDialog").showModal();
 }
 
@@ -787,6 +1124,8 @@ async function saveProfileFromForm(event) {
   const lastName = document.getElementById("editLastName")?.value.trim();
   const salonName = document.getElementById("editSalonName")?.value.trim() || "";
   const vatNumber = document.getElementById("editVatNumber")?.value.trim() || "";
+  const language = normalizeLanguage(document.getElementById("editLanguage")?.value || getCurrentLanguage());
+  const currency = normalizeCurrency(document.getElementById("editCurrency")?.value || getCurrentCurrency());
 
   if (!firstName || !lastName) {
     await appAlert("Vul voornaam en naam in.", { title: "Profiel", variant: "warning" });
@@ -810,6 +1149,8 @@ async function saveProfileFromForm(event) {
         full_name: `${firstName} ${lastName}`.trim(),
         salon_name: salonName,
         vat_number: vatNumber,
+        language,
+        currency,
         terms_accepted: true
       }
     });
@@ -823,6 +1164,8 @@ async function saveProfileFromForm(event) {
       last_name: lastName,
       salon_name: salonName,
       vat_number: vatNumber,
+      language,
+      currency,
       terms_accepted: true,
       terms_accepted_at: (await getCurrentProfile())?.terms_accepted_at || new Date().toISOString()
     });
@@ -986,6 +1329,8 @@ async function registerAccount(event) {
   const email = document.getElementById("registerEmail").value.trim();
   const password = document.getElementById("registerPassword").value;
   const passwordConfirm = document.getElementById("registerPasswordConfirm").value;
+  const language = normalizeLanguage(document.getElementById("registerLanguage")?.value || DEFAULT_LANGUAGE);
+  const currency = normalizeCurrency(document.getElementById("registerCurrency")?.value || DEFAULT_CURRENCY);
   const termsAccepted = Boolean(document.getElementById("registerTermsAccepted")?.checked);
 
   if (!firstName || !lastName || !email || !password || !passwordConfirm) {
@@ -1013,6 +1358,8 @@ async function registerAccount(event) {
         full_name: `${firstName} ${lastName}`.trim(),
         salon_name: salonName,
         vat_number: vatNumber,
+        language,
+        currency,
         terms_accepted: true
       }
     }
@@ -1030,6 +1377,8 @@ async function registerAccount(event) {
         last_name: lastName,
         salon_name: salonName,
         vat_number: vatNumber,
+        language,
+        currency,
         terms_accepted: true,
         terms_accepted_at: new Date().toISOString()
       });
@@ -1048,11 +1397,11 @@ async function registerAccount(event) {
     await loadAllDataFromSupabase();
     rerenderAll();
     await syncAuthUI();
-    switchScreen("agendaScreen", "Agenda");
+    switchScreen("agendaScreen", t("agenda"));
     await appAlert("Registratie gelukt. Je bent nu ingelogd.", { title: "Registratie gelukt", variant: "success" });
   } else {
     await syncAuthUI();
-    switchScreen("accountScreen", "Account");
+    switchScreen("accountScreen", t("account"));
     await appAlert("Registratie gelukt. Controleer eventueel je mailbox en log daarna in.", { title: "Registratie gelukt", variant: "success" });
   }
 }
@@ -1077,7 +1426,7 @@ async function loginAccount() {
   await loadAllDataFromSupabase();
   rerenderAll();
   await syncAuthUI();
-  switchScreen("agendaScreen", "Agenda");
+  switchScreen("agendaScreen", t("agenda"));
 }
 
 async function logoutAccount() {
@@ -1096,15 +1445,31 @@ async function logoutAccount() {
   seedData();
   rerenderAll();
   await syncAuthUI();
-  switchScreen("accountScreen", "Account");
+  switchScreen("accountScreen", t("account"));
 }
 
 /* =========================
    UI
 ========================= */
 
+
+function getScreenTitle(screenId, fallback = "") {
+  const map = {
+    agendaScreen: "agenda",
+    revenueScreen: "revenue",
+    clientsScreen: "clients",
+    servicesScreen: "services",
+    paymentMethodsScreen: "paymentMethods",
+    statisticsScreen: "statistics",
+    settingsScreen: "settings",
+    accountScreen: "account"
+  };
+  const key = map[screenId];
+  return key ? t(key) : fallback;
+}
+
 function updateTopbar(screenId, title) {
-  document.getElementById("screenTitle").textContent = title;
+  document.getElementById("screenTitle").textContent = getScreenTitle(screenId, title);
 
   const backBtn = document.getElementById("backBtn");
   const fab = document.getElementById("floatingAddBtn");
@@ -1198,7 +1563,7 @@ function renderCalendar() {
   const grid = document.getElementById("calendarGrid");
 
   grid.innerHTML = "";
-  document.getElementById("monthPickerBtn").textContent = `${monthNames[state.currentMonth]} ${state.currentYear}`;
+  document.getElementById("monthPickerBtn").textContent = `${getMonthNameUpper(state.currentMonth)} ${state.currentYear}`;
 
   const first = new Date(state.currentYear, state.currentMonth, 1);
   const last = new Date(state.currentYear, state.currentMonth + 1, 0);
@@ -1339,7 +1704,7 @@ function fillCalendarPreview(preview, year, month) {
   const grid = preview.querySelector(".calendar-grid");
   if (!title || !grid) return;
 
-  title.textContent = `${monthNames[month]} ${year}`;
+  title.textContent = `${getMonthNameUpper(month)} ${year}`;
   grid.innerHTML = "";
 
   const first = new Date(year, month, 1);
@@ -1935,7 +2300,7 @@ function renderAgendaList() {
   const data = getData();
   const list = document.getElementById("agendaList");
 
-  document.getElementById("agendaListTitle").textContent = `Afspraken op ${formatLongDate(state.selectedDate)}`;
+  document.getElementById("agendaListTitle").textContent = `${t("appointmentsOn")} ${formatLongDate(state.selectedDate)}`;
   const jumpBtn = document.getElementById("jumpToTodayBtn");
   if (jumpBtn) {
     jumpBtn.classList.toggle("hidden", state.selectedDate === todayStr);
@@ -1946,7 +2311,7 @@ function renderAgendaList() {
     .sort((a, b) => a.time.localeCompare(b.time));
 
   if (!appts.length) {
-    list.innerHTML = `<div class="empty-state">Geen afspraken op deze dag.</div>`;
+    list.innerHTML = `<div class="empty-state">${t("noAppointmentsOnDay")}</div>`;
     return;
   }
 
@@ -1982,7 +2347,7 @@ function renderAgendaList() {
         <div class="main-name">${customer ? fullName(customer) : "Onbekend"}</div>
         <div class="meta">${appointmentMetaParts.join(" · ")}</div>
       </div>
-      <button class="price-chip ${app.paid ? "paid" : ""}" data-id="${app.id}" type="button">${euro(app.price)}</button>
+      <button class="price-chip ${app.paid ? "paid" : ""}" data-id="${app.id}" type="button">${euro(app.price, app.currency)}</button>
     `;
 
     row.addEventListener("click", (e) => {
@@ -2059,7 +2424,7 @@ function renderClients() {
   clients.sort((a, b) => (a.firstName || "").localeCompare(b.firstName || ""));
 
   if (!clients.length) {
-    list.innerHTML = `<div class="empty-state">Geen klanten gevonden.</div>`;
+    list.innerHTML = `<div class="empty-state">${t("noClientsFound")}</div>`;
     return;
   }
 
@@ -2074,7 +2439,7 @@ function renderClients() {
     card.innerHTML = `
       <button type="button" data-id="${client.id}">
         <div class="client-name">${escapeHtml(fullName(client) || "Naamloos")}</div>
-        <div class="meta">${escapeHtml(phone || "Geen gsm")} · ${count} ${count === 1 ? "afspraak" : "afspraken"}</div>
+        <div class="meta">${escapeHtml(phone || t("noPhone"))} · ${count} ${count === 1 ? t("appointmentSingular") : t("appointmentPlural")}</div>
       </button>
     `;
 
@@ -2102,7 +2467,7 @@ function renderServices() {
   list.innerHTML = "";
 
   if (!visibleServices.length) {
-    list.innerHTML = `<div class="empty-state">Nog geen actieve diensten.</div>`;
+    list.innerHTML = `<div class="empty-state">${t("noActiveServices")}</div>`;
   } else {
     visibleServices.forEach(service => {
       const isInactive = service.isActive === false;
@@ -2112,7 +2477,7 @@ function renderServices() {
       card.innerHTML = `
         <button type="button" data-id="${service.id}">
           <div class="client-name">${escapeHtml(service.name || "Naamloze dienst")}</div>
-          <div class="meta">${service.duration} min · ${euro(service.price)}${isInactive ? " · inactief" : ""}</div>
+          <div class="meta">${service.duration} min · ${euro(service.price)}${isInactive ? ` · ${t("inactive")}` : ""}</div>
         </button>
       `;
 
@@ -2126,7 +2491,7 @@ function renderServices() {
     toggleWrap.className = "inactive-services-toggle";
     toggleWrap.innerHTML = `
       <input id="showInactiveServices" type="checkbox" ${state.showInactiveServices ? "checked" : ""} />
-      <span>Toon inactieve diensten</span>
+      <span>${t("showInactiveServices")}</span>
     `;
 
     toggleWrap.querySelector("input").addEventListener("change", event => {
@@ -2147,14 +2512,14 @@ function paymentMethodLabel(value) {
 
 function formatRevenueDayChip(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
-  const days = ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"];
-  return `${days[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  const day = new Intl.DateTimeFormat(getCurrentLanguage(), { weekday: "short" }).format(d);
+  return `${capitalizeFirst(day)} ${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function formatRevenueDayTile(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
-  const days = ["Zondag", "Maandag", "Dinsdag", "Woensdag", "Donderdag", "Vrijdag", "Zaterdag"];
-  return `${days[d.getDay()]}<br>${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
+  const day = new Intl.DateTimeFormat(getCurrentLanguage(), { weekday: "long" }).format(d);
+  return `${capitalizeFirst(day)}<br>${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 }
 
 function formatRevenueWeekTile(dateStr) {
@@ -2166,7 +2531,7 @@ function formatRevenueWeekTile(dateStr) {
 
 function formatRevenueMonthTile(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
-  return `${longMonthNames[d.getMonth()].charAt(0).toUpperCase() + longMonthNames[d.getMonth()].slice(1)}<br>${d.getFullYear()}`;
+  return `${capitalizeFirst(getMonthNameLong(d.getMonth()))}<br>${d.getFullYear()}`;
 }
 
 function shiftRevenueDate(baseDateStr, mode, step) {
@@ -2264,7 +2629,7 @@ function renderRevenueFilters() {
 
   if (paymentSel) {
     paymentSel.innerHTML =
-      `<option value="">Alle betaalwijzen</option>` +
+      `<option value="">${t("allPaymentMethods")}</option>` +
       getRevenuePaymentFilterOptions(data).map(name => `<option value="${name}">${name}</option>`).join("");
     paymentSel.value = existingPayment;
   }
@@ -2389,15 +2754,15 @@ const appointmentPickerState = {
 };
 
 function formatAppointmentDateLabel(dateStr) {
-  if (!dateStr) return "Kies datum";
+  if (!dateStr) return t("chooseDate");
   const d = new Date(dateStr + "T00:00:00");
-  if (Number.isNaN(d.getTime())) return "Kies datum";
-  const dayNames = ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"];
+  if (Number.isNaN(d.getTime())) return t("chooseDate");
+  const dayNames = [t("sundayShort"), t("mondayShort"), t("tuesdayShort"), t("wednesdayShort"), t("thursdayShort"), t("fridayShort"), t("saturdayShort")];
   return `${dayNames[d.getDay()]} ${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`;
 }
 
 function formatAppointmentTimeLabel(timeStr) {
-  if (!timeStr) return "Kies tijd";
+  if (!timeStr) return t("chooseTime");
   const [h = "00", m = "00"] = String(timeStr).split(":");
   return `${String(Number(h) || 0).padStart(2, "0")}:${String(Number(m) || 0).padStart(2, "0")}`;
 }
@@ -2443,7 +2808,7 @@ function openAppointmentWheelPicker(mode) {
   appointmentPickerState.selected = {};
 
   if (mode === "time") {
-    title.textContent = "Kies tijd";
+    title.textContent = t("chooseTime");
     columnsWrap.className = "revenue-wheel-columns two-cols";
     const hours = Array.from({ length: 24 }, (_, i) => i);
     const minutes = Array.from({ length: 60 }, (_, i) => i);
@@ -2453,14 +2818,14 @@ function openAppointmentWheelPicker(mode) {
     appointmentPickerState.selected.hour = String(selectedHour);
     appointmentPickerState.selected.minute = String(selectedMinute);
   } else {
-    title.textContent = "Kies datum";
+    title.textContent = t("chooseDate");
     columnsWrap.className = "revenue-wheel-columns three-cols";
     const years = getAppointmentPickerYears(selectedYear);
     const months = Array.from({ length: 12 }, (_, i) => i);
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
     columnsWrap.innerHTML =
       buildRevenueWheelColumn("day", days, value => String(value).padStart(2, "0")) +
-      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
       buildRevenueWheelColumn("year", years, value => value);
     appointmentPickerState.selected.day = String(selectedDay);
     appointmentPickerState.selected.monthIndex = String(selectedMonthIndex);
@@ -2542,7 +2907,7 @@ function openRevenueWheelPicker(mode) {
     title.textContent = "Kies maand";
     columnsWrap.className = "revenue-wheel-columns two-cols";
     columnsWrap.innerHTML =
-      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
       buildRevenueWheelColumn("year", years, value => value);
   } else if (mode === "week") {
     title.textContent = "Kies week";
@@ -2550,7 +2915,7 @@ function openRevenueWheelPicker(mode) {
     const weeks = [1, 2, 3, 4];
     columnsWrap.innerHTML =
       buildRevenueWheelColumn("week", weeks, value => `Week ${value}`) +
-      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
       buildRevenueWheelColumn("year", years, value => value);
   } else {
     title.textContent = "Kies dag";
@@ -2558,7 +2923,7 @@ function openRevenueWheelPicker(mode) {
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
     columnsWrap.innerHTML =
       buildRevenueWheelColumn("day", days, value => String(value).padStart(2, "0")) +
-      buildRevenueWheelColumn("monthIndex", months, value => longMonthNames[value].charAt(0).toUpperCase() + longMonthNames[value].slice(1)) +
+      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
       buildRevenueWheelColumn("year", years, value => value);
   }
 
@@ -2728,22 +3093,35 @@ function renderRevenueChart(filtered, type, anchor) {
   const useFullPeriodWidth = ["week", "month", "year"].includes(type);
   const dataToRender = useFullPeriodWidth ? chartData : (visibleData.length ? visibleData : chartData);
   const maxValue = Math.max(...dataToRender.map(item => item.paid + item.unpaid), 0);
+  const isDayChart = type === "day";
+  const renderedBarCount = Math.max(dataToRender.length, 1);
+  const chartAvailableWidth = document.getElementById("revenueChart")?.clientWidth || 320;
+  const dayGap = Math.max(6, Math.min(14, Math.round(chartAvailableWidth * 0.02)));
+  const calculatedDayColumnWidth = isDayChart
+    ? Math.max(32, Math.floor((chartAvailableWidth - ((renderedBarCount - 1) * dayGap) - 16) / renderedBarCount))
+    : null;
+  const dayColumnMinWidth = isDayChart
+    ? Math.max(32, Math.min(92, calculatedDayColumnWidth))
+    : null;
+  const dayStackWidth = isDayChart
+    ? Math.max(8, Math.min(48, Math.round(dayColumnMinWidth * 0.48)))
+    : null;
 
   if (subtitle) {
     subtitle.textContent =
-      type === "year" ? "Jaaromzet" :
-      type === "month" ? "Maandomzet" :
-      type === "week" ? "Weekomzet" :
-      "Dagomzet";
+      type === "year" ? t("yearRevenue") :
+      type === "month" ? t("monthRevenue") :
+      type === "week" ? t("weekRevenue") :
+      t("dayRevenue");
   }
 
   if (!dataToRender.length || maxValue === 0) {
-    chartWrap.innerHTML = `<div class="empty-state">Geen omzetgegevens voor deze selectie.</div>`;
+    chartWrap.innerHTML = `<div class="empty-state">${t("noRevenueForSelection")}</div>`;
     return;
   }
 
   chartWrap.innerHTML = `
-    <div class="revenue-bars ${useFullPeriodWidth ? `revenue-bars-even revenue-bars-${type}` : ""}" style="--revenue-bar-count:${Math.max(dataToRender.length, 1)}">
+    <div class="revenue-bars ${useFullPeriodWidth ? `revenue-bars-even revenue-bars-${type}` : (isDayChart ? "revenue-bars-day-dynamic" : "")}" style="--revenue-bar-count:${renderedBarCount};${isDayChart ? `--revenue-day-gap:${dayGap}px;--revenue-day-col-width:${dayColumnMinWidth}px;--revenue-day-stack-width:${dayStackWidth}px;` : ""}">
       ${dataToRender.map(item => {
         const total = item.paid + item.unpaid;
         const totalHeight = Math.max(8, (total / maxValue) * 220);
@@ -2762,8 +3140,8 @@ function renderRevenueChart(filtered, type, anchor) {
       }).join("")}
     </div>
     <div class="revenue-chart-legend">
-      <span><i class="paid"></i> Betaald</span>
-      <span><i class="unpaid"></i> Onbetaald</span>
+      <span><i class="paid"></i> ${t("paid")}</span>
+      <span><i class="unpaid"></i> ${t("unpaid")}</span>
     </div>
   `;
 
@@ -2880,7 +3258,7 @@ function downloadRevenueCsv() {
     if (periodType === 'year') {
       key = String(app.date || '').slice(0, 7);
       const monthNumber = Number(key.slice(5, 7));
-      label = monthNumber ? `${longMonthNames[monthNumber - 1]} ${key.slice(0, 4)}` : key;
+      label = monthNumber ? `${getMonthNameLong(monthNumber - 1)} ${key.slice(0, 4)}` : key;
     } else if (periodType === 'month' || periodType === 'week') {
       label = app.date ? formatLongDate(app.date) : '';
     } else {
@@ -3004,7 +3382,7 @@ function getRevenueReportData() {
     if (periodType === 'year') {
       key = String(app.date || '').slice(0, 7);
       const monthNumber = Number(key.slice(5, 7));
-      label = monthNumber ? `${longMonthNames[monthNumber - 1]} ${key.slice(0, 4)}` : key;
+      label = monthNumber ? `${getMonthNameLong(monthNumber - 1)} ${key.slice(0, 4)}` : key;
     } else if (periodType === 'month' || periodType === 'week') {
       label = app.date ? formatLongDate(app.date) : '';
     } else {
@@ -3038,7 +3416,7 @@ function getRevenueReportData() {
   }
   if (periodType === 'month') {
     const d = new Date(periodDate + 'T00:00:00');
-    reportTitle = `Omzetrapport · ${longMonthNames[d.getMonth()]} ${d.getFullYear()}`;
+    reportTitle = `Omzetrapport · ${getMonthNameLong(d.getMonth())} ${d.getFullYear()}`;
   }
   if (periodType === 'year') reportTitle = `Omzetrapport · ${periodDate.slice(0, 4)}`;
 
@@ -3519,6 +3897,21 @@ function downloadRevenueStyledReport() {
   URL.revokeObjectURL(url);
 }
 
+
+function groupRevenueByCurrency(items, predicate = () => true) {
+  return items.filter(predicate).reduce((map, app) => {
+    const currency = normalizeCurrency(app.currency || getCurrentCurrency());
+    map[currency] = (map[currency] || 0) + Number(app.price || 0);
+    return map;
+  }, {});
+}
+
+function formatCurrencyTotals(totals) {
+  const entries = Object.entries(totals || {}).filter(([, value]) => Number(value || 0) !== 0);
+  if (!entries.length) return euro(0);
+  return entries.map(([currency, value]) => euro(value, currency)).join(" + ");
+}
+
 function renderRevenue() {
   renderRevenueFilters();
   syncRevenuePeriodChips();
@@ -3529,44 +3922,47 @@ function renderRevenue() {
   const anchor = document.getElementById("revenueDate").value || todayStr;
   const filtered = revenueFilteredAppointments();
 
-  let title = "Omzet";
-  if (type === "day") title = `Omzet op ${formatLongDate(anchor)}`;
+  let title = t("revenue");
+  if (type === "day") title = `${t("revenueOn")} ${formatLongDate(anchor)}`;
   if (type === "week") {
     const bounds = weekBounds(anchor);
-    title = `Omzet ${formatLongDate(bounds.start)} - ${formatLongDate(bounds.end)}`;
+    title = `${t("revenue")} ${formatLongDate(bounds.start)} - ${formatLongDate(bounds.end)}`;
   }
   if (type === "month") {
     const d = new Date(anchor + "T00:00:00");
-    title = `Omzet ${longMonthNames[d.getMonth()]} ${d.getFullYear()}`;
+    title = `${t("revenue")} ${getMonthNameLong(d.getMonth())} ${d.getFullYear()}`;
   }
-  if (type === "year") title = `Omzet ${anchor.slice(0, 4)}`;
+  if (type === "year") title = `${t("revenue")} ${anchor.slice(0, 4)}`;
 
   const titleEl = document.getElementById("revenueTitle");
   if (titleEl) titleEl.textContent = title;
 
-  const paid = filtered.filter(a => a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0);
-  const total = filtered.reduce((sum, a) => sum + Number(a.price || 0), 0);
-  const open = filtered.filter(a => !a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0);
+  const paid = groupRevenueByCurrency(filtered, a => a.paid);
+  const total = groupRevenueByCurrency(filtered);
+  const open = groupRevenueByCurrency(filtered, a => !a.paid);
+  const totalNumeric = filtered.reduce((sum, a) => sum + Number(a.price || 0), 0);
 
-  document.getElementById("plannedRevenue").textContent = euro(total);
-  document.getElementById("paidRevenue").textContent = euro(paid);
-  document.getElementById("openRevenue").textContent = euro(open);
+  document.getElementById("plannedRevenue").textContent = formatCurrencyTotals(total);
+  document.getElementById("paidRevenue").textContent = formatCurrencyTotals(paid);
+  document.getElementById("openRevenue").textContent = formatCurrencyTotals(open);
 
   const byMethod = {};
   filtered.filter(a => a.paid).forEach(a => {
-    const key = paymentMethodNameForAppointment(a, data) || "Onbekend";
-    byMethod[key] = (byMethod[key] || 0) + Number(a.price || 0);
+    const key = paymentMethodNameForAppointment(a, data) || t("unknown");
+    const currency = normalizeCurrency(a.currency || getCurrentCurrency());
+    byMethod[key] = byMethod[key] || {};
+    byMethod[key][currency] = (byMethod[key][currency] || 0) + Number(a.price || 0);
   });
 
   if (methodList) {
     const methodNames = Object.keys(byMethod).sort((a, b) => a.localeCompare(b, "nl-BE"));
-    methodList.innerHTML = total > 0 && methodNames.length
+    methodList.innerHTML = totalNumeric > 0 && methodNames.length
       ? `
-          <h3 class="revenue-method-title">Betaalwijze</h3>
+          <h3 class="revenue-method-title">${t("paymentMethodTitle")}</h3>
           ${methodNames.map(method => `
             <div class="revenue-method-row">
               <span>${method}:</span>
-              <strong>${euro(byMethod[method] || 0)}</strong>
+              <strong>${formatCurrencyTotals(byMethod[method])}</strong>
             </div>
           `).join("")}
         `
@@ -3777,49 +4173,49 @@ function renderStatistics() {
   wrap.innerHTML = `
     <section class="statistics-card statistics-kpi-grid">
       <div class="statistics-kpi">
-        <span class="statistics-kpi-label">Aantal klanten</span>
+        <span class="statistics-kpi-label">${t("customerCount")}</span>
         <strong>${summary.customerCount}</strong>
       </div>
       <div class="statistics-kpi">
-        <span class="statistics-kpi-label">Afgeronde afspraken</span>
+        <span class="statistics-kpi-label">${t("pastAppointments")}</span>
         <strong>${summary.pastAppointmentCount}</strong>
       </div>
       <div class="statistics-kpi">
-        <span class="statistics-kpi-label">Geplande afspraken</span>
+        <span class="statistics-kpi-label">${t("futureAppointments")}</span>
         <strong>${summary.futureAppointmentCount}</strong>
       </div>
       <div class="statistics-kpi">
-        <span class="statistics-kpi-label">Totale omzet tot vandaag</span>
+        <span class="statistics-kpi-label">${t("totalRevenueUntilToday")}</span>
         <strong>${euro(summary.paidRevenueUntilToday)}</strong>
       </div>
     </section>
 
     <section class="statistics-card">
       <div class="statistics-card-head">
-        <h2>Gekozen behandelingen</h2>
+        <h2>${t("chosenServices")}</h2>
       </div>
       ${buildStatisticsDonut(summary.serviceUsage)}
     </section>
 
     <section class="statistics-card">
       <div class="statistics-card-head">
-        <h2>Omzet per behandeling</h2>
+        <h2>${t("revenueByService")}</h2>
       </div>
       ${buildStatisticsDonut(summary.revenueByService, value => euro(value))}
     </section>
 
     <section class="statistics-card">
       <div class="statistics-card-head">
-        <h2>Gekozen betaalwijze</h2>
+        <h2>${t("chosenPaymentMethod")}</h2>
       </div>
       ${buildStatisticsDonut(summary.paymentUsage)}
     </section>
 
     <section class="statistics-card">
       <div class="statistics-card-head statistics-card-head-stacked">
-        <h2>Top klanten</h2>
+        <h2>${t("topCustomers")}</h2>
         <select id="topCustomersYearFilter" class="field compact-field statistics-year-filter" aria-label="Top klanten jaar filteren">
-          <option value="all"${selectedTopCustomerYear === 'all' ? ' selected' : ''}>Alle</option>
+          <option value="all"${selectedTopCustomerYear === 'all' ? ' selected' : ''}>${t("all")}</option>
           ${topCustomerYears.map(year => `<option value="${year}"${String(year) === String(selectedTopCustomerYear) ? ' selected' : ''}>${year}</option>`).join('')}
         </select>
       </div>
@@ -3830,12 +4226,12 @@ function renderStatistics() {
             <div class="statistics-top-customer-name">${customer.name}</div>
             <strong class="statistics-top-customer-amount">${euro(customer.revenue)}</strong>
           </button>
-        `).join('') : `<div class="statistics-empty">Nog geen klantgegevens beschikbaar.</div>`}
+        `).join('') : `<div class="statistics-empty">${t("noCustomerStats")}</div>`}
       </div>
       ${(hasMoreCustomers || canShowLessCustomers) ? `
         <div class="statistics-more-wrap">
-          ${hasMoreCustomers ? `<button id="statisticsMoreCustomersBtn" class="btn btn-secondary statistics-more-btn" type="button">Meer...</button>` : ''}
-          ${canShowLessCustomers ? `<button id="statisticsLessCustomersBtn" class="btn btn-secondary statistics-more-btn" type="button">Minder</button>` : ''}
+          ${hasMoreCustomers ? `<button id="statisticsMoreCustomersBtn" class="btn btn-secondary statistics-more-btn" type="button">${t("more")}</button>` : ''}
+          ${canShowLessCustomers ? `<button id="statisticsLessCustomersBtn" class="btn btn-secondary statistics-more-btn" type="button">${t("less")}</button>` : ''}
         </div>
       ` : ''}
     </section>
@@ -4037,6 +4433,11 @@ function renderSettings() {
   const overlapToggle = document.getElementById("settingsOverlapWarningsEnabled");
   const reminderWrap = document.getElementById("settingsReminderWrap");
   const saveHint = document.getElementById("settingsSaveHint");
+  const languageSelect = document.getElementById("settingsLanguage");
+  const currencySelect = document.getElementById("settingsCurrency");
+
+  if (languageSelect) languageSelect.innerHTML = buildLanguageOptions(getCurrentLanguage());
+  if (currencySelect) currencySelect.innerHTML = buildCurrencyOptions(getCurrentCurrency());
 
   if (!breakInput || !notificationsToggle || !reminderSelect || !overlapToggle || !reminderWrap || !saveHint) return;
 
@@ -4050,17 +4451,17 @@ function renderSettings() {
   reminderWrap.classList.toggle("hidden", !notificationsEnabled);
 
   if (state.settingsSavePending) {
-    saveHint.textContent = "Instellingen opslaan...";
+    saveHint.textContent = t("savePending");
   } else if (!notificationsEnabled) {
-    saveHint.textContent = "Meldingen zijn uitgeschakeld.";
+    saveHint.textContent = t("notificationsOff");
   } else if (permissionState === "granted") {
-    saveHint.textContent = "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.";
+    saveHint.textContent = t("notificationsActive");
   } else if (permissionState === "denied") {
-    saveHint.textContent = "Meldingen zijn geblokkeerd in je browserinstellingen.";
+    saveHint.textContent = t("notificationsBlocked");
   } else if (permissionState === "unsupported") {
-    saveHint.textContent = "Deze browser ondersteunt geen webmeldingen.";
+    saveHint.textContent = t("notificationsUnsupported");
   } else {
-    saveHint.textContent = "Schakel meldingen in en geef toestemming om herinneringen te tonen.";
+    saveHint.textContent = t("notificationsPermissionHint");
   }
 }
 
@@ -4071,7 +4472,7 @@ async function loadSettingsFromSupabase() {
 
   const { data, error } = await supabaseClient
     .from("user_settings")
-    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled")
+    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled, language, currency")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -4084,7 +4485,9 @@ async function loadSettingsFromSupabase() {
     defaultBreakMinutes: Number(data?.default_break_minutes ?? 10),
     notificationsEnabled: Boolean(data?.notifications_enabled ?? false),
     reminderMinutes: Number(data?.reminder_minutes ?? 30),
-    overlapWarningsEnabled: data?.overlap_warnings_enabled !== false
+    overlapWarningsEnabled: data?.overlap_warnings_enabled !== false,
+    language: normalizeLanguage(data?.language || DEFAULT_LANGUAGE),
+    currency: normalizeCurrency(data?.currency || DEFAULT_CURRENCY)
   };
 }
 
@@ -4095,7 +4498,9 @@ async function saveSettingsFromForm(event) {
     defaultBreakMinutes: Math.max(0, Number(document.getElementById("settingsDefaultBreakMinutes")?.value || 0)),
     notificationsEnabled: Boolean(document.getElementById("settingsNotificationsEnabled")?.checked),
     reminderMinutes: Number(document.getElementById("settingsReminderMinutes")?.value || 30),
-    overlapWarningsEnabled: Boolean(document.getElementById("settingsOverlapWarningsEnabled")?.checked)
+    overlapWarningsEnabled: Boolean(document.getElementById("settingsOverlapWarningsEnabled")?.checked),
+    language: normalizeLanguage(document.getElementById("settingsLanguage")?.value || getCurrentLanguage()),
+    currency: normalizeCurrency(document.getElementById("settingsCurrency")?.value || getCurrentCurrency())
   };
 
   const user = await getCurrentUser();
@@ -4103,11 +4508,12 @@ async function saveSettingsFromForm(event) {
   if (!user) {
     const data = getData();
     data.settings = settings;
+    currentProfilePreferences = { language: settings.language, currency: settings.currency };
     saveData(data);
     state.settingsSavePending = false;
     await syncNotificationState({ requestPermission: settings.notificationsEnabled });
-    renderSettings();
-    await appAlert("Instellingen opgeslagen op dit toestel.", { title: "Instellingen opgeslagen", variant: "success" });
+    rerenderAll();
+    await appAlert(t("settingsSavedDevice"), { title: t("settingsSaved"), variant: "success" });
     return;
   }
 
@@ -4120,8 +4526,17 @@ async function saveSettingsFromForm(event) {
     notifications_enabled: settings.notificationsEnabled,
     reminder_minutes: settings.reminderMinutes,
     overlap_warnings_enabled: settings.overlapWarningsEnabled,
+    language: settings.language,
+    currency: settings.currency,
     updated_at: new Date().toISOString()
   };
+
+  await upsertProfile(user.id, {
+    ...(await getCurrentProfile() || {}),
+    language: settings.language,
+    currency: settings.currency,
+    terms_accepted: true
+  });
 
   const { error } = await supabaseClient
     .from("user_settings")
@@ -4137,10 +4552,11 @@ async function saveSettingsFromForm(event) {
 
   const data = getData();
   data.settings = settings;
+  currentProfilePreferences = { language: settings.language, currency: settings.currency };
   saveData(data);
   await syncNotificationState({ requestPermission: settings.notificationsEnabled });
-  renderSettings();
-  await appAlert("Instellingen opgeslagen.", { title: "Instellingen opgeslagen", variant: "success" });
+  rerenderAll();
+  await appAlert(t("settingsSaved"), { title: t("settingsSaved"), variant: "success" });
 }
 
 // =============================
@@ -4231,48 +4647,48 @@ function openClientDetail(clientId) {
       <div class="client-detail-card">
         <div class="client-detail-table">
           <div class="client-detail-row client-detail-row-stacked">
-            <div class="client-detail-label">Klantnummer</div>
+            <div class="client-detail-label">${t("customerNumber")}</div>
             ${renderClientContactValue('text', customerNumber(client))}
           </div>
 
           <div class="client-detail-row client-detail-row-stacked">
-            <div class="client-detail-label">Voornaam</div>
+            <div class="client-detail-label">${t("firstName")}</div>
             ${renderClientContactValue('text', client.firstName || '-')}
           </div>
 
           <div class="client-detail-row client-detail-row-stacked">
-            <div class="client-detail-label">Naam</div>
+            <div class="client-detail-label">${t("lastName")}</div>
             ${renderClientContactValue('text', client.lastName || '-')}
           </div>
 
           <div class="client-detail-row client-detail-row-stacked">
-            <div class="client-detail-label">Telefoon</div>
+            <div class="client-detail-label">${t("phone")}</div>
             ${renderClientContactValue('phone', client.phone || '')}
           </div>
 
           <div class="client-detail-row client-detail-row-stacked">
-            <div class="client-detail-label">E-mail</div>
+            <div class="client-detail-label">${t("email")}</div>
             ${renderClientContactValue('email', client.email || '')}
           </div>
 
           <div class="client-detail-note-block">
-            <div class="client-detail-label">Notitie</div>
+            <div class="client-detail-label">${t("note")}</div>
             <div class="client-detail-note">${safeNote}</div>
           </div>
         </div>
 
         <div class="client-detail-footer">
-          <button class="btn client-detail-edit-btn app-action-nav-btn" id="editClientBtn" type="button" aria-label="Bewerk">
+          <button class="btn client-detail-edit-btn app-action-nav-btn" id="editClientBtn" type="button" aria-label="${t("edit")}">
             <span class="app-action-nav-ico" aria-hidden="true">${getActionButtonIconSvg('edit')}</span>
-            <span class="app-action-nav-label">Bewerk</span>
+            <span class="app-action-nav-label">${t("edit")}</span>
           </button>
         </div>
       </div>
 
       <div class="client-appointments-section">
         <div class="client-appointments-header">
-          <div class="client-appointments-title">AFSPRAKEN</div>
-          <div class="client-appointments-count">${appts.length} totaal</div>
+          <div class="client-appointments-title">${t("appointments").toUpperCase()}</div>
+          <div class="client-appointments-count">${appts.length} ${t("totalLower")}</div>
         </div>
 
         <div class="client-new-appointment-bar">
@@ -4280,8 +4696,8 @@ function openClientDetail(clientId) {
             class="client-inline-add-btn"
             id="newClientAppointmentBtn"
             type="button"
-            aria-label="Nieuwe afspraak"
-            title="Nieuwe afspraak"
+            aria-label="${t("newAppointment")}"
+            title="${t("newAppointment")}"
           >
             +
           </button>
@@ -4296,13 +4712,13 @@ function openClientDetail(clientId) {
                   if ((app.status || "").toLowerCase() === "no-show") {
                     statusParts.push("no show");
                   } else {
-                    statusParts.push(app.paid ? "betaald" : "onbetaald");
+                    statusParts.push(app.paid ? t("paid").toLowerCase() : t("unpaid").toLowerCase());
                     const method = paymentMethodNameForAppointment(app, data);
                     if (app.paid && method) statusParts.push(method);
                   }
 
                   return `
-                    <div class="appointment-row client-detail-appointment-row" data-id="${app.id}" role="button" tabindex="0" aria-label="Afspraak bewerken">
+                    <div class="appointment-row client-detail-appointment-row" data-id="${app.id}" role="button" tabindex="0" aria-label="${t("editAppointment")}">
                       <div class="time-block">
                         <div class="time">${app.time || ""}</div>
                         <div class="time-end">${formatShortDate(app.date)}</div>
@@ -4315,7 +4731,7 @@ function openClientDetail(clientId) {
                     </div>
                   `;
                 }).join("")}</div>`
-              : `<div class="client-appointment-empty">Nog geen afspraken.</div>`
+              : `<div class="client-appointment-empty">${t("noAppointmentsYet")}</div>`
           }
         </div>
 
@@ -4411,7 +4827,7 @@ function renderAppointmentCustomerResults(query = "", showAllWhenEmpty = false) 
 
   if (!customers.length) {
     resultsWrap.innerHTML = safeQuery
-      ? `<div class="appointment-customer-empty">Geen klanten gevonden.</div>`
+      ? `<div class="appointment-customer-empty">${t("noClientsFound")}</div>`
       : "";
     resultsWrap.classList.toggle("hidden", !safeQuery);
     if (searchInput) searchInput.setAttribute("aria-expanded", safeQuery ? "true" : "false");
@@ -4474,7 +4890,7 @@ function populateAppointmentForm(customerId = null) {
   const customerSelect = document.getElementById("appointmentCustomer");
   const serviceSelect = document.getElementById("appointmentService");
 
-  customerSelect.innerHTML = `<option value="">Kies een klant...</option>` +
+  customerSelect.innerHTML = `<option value="">${t("chooseCustomer")}</option>` +
     data.customers.map(c => `<option value="${c.id}">${fullName(c)}</option>`).join("");
   const activeServices = (data.services || []).filter(service => service.isActive !== false);
   serviceSelect.innerHTML = activeServices.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
@@ -4504,7 +4920,7 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
   populateAppointmentForm(prefillCustomerId);
 
   document.getElementById("appointmentForm")?.classList.remove("appointment-form-edit");
-  document.getElementById("appointmentModalTitle").textContent = "Nieuwe afspraak";
+  document.getElementById("appointmentModalTitle").textContent = t("newAppointment");
   document.getElementById("appointmentId").value = "";
   document.getElementById("appointmentDate").value = state.selectedDate;
   document.getElementById("appointmentTime").value = "10:00";
@@ -4539,7 +4955,7 @@ function openEditAppointmentDialog(id) {
   }
 
   document.getElementById("appointmentForm")?.classList.add("appointment-form-edit");
-  document.getElementById("appointmentModalTitle").textContent = "Afspraak bewerken";
+  document.getElementById("appointmentModalTitle").textContent = t("editAppointment");
   document.getElementById("appointmentId").value = app.id;
   setAppointmentCustomer(app.customerId);
   document.getElementById("appointmentDate").value = app.date;
@@ -4649,7 +5065,7 @@ function openPaymentDialog(id, anchorEl = null) {
   if (!popover) return;
 
   document.getElementById("paymentAppointmentId").value = id;
-  document.getElementById("paymentAmount").textContent = euro(app.price);
+  document.getElementById("paymentAmount").textContent = euro(app.price, app.currency);
   document.getElementById("paymentDialogCurrentMethod").textContent = app.paid
     ? (paymentMethodNameForAppointment(app, data) || "Onbekend")
     : "Nog niet betaald";
@@ -4674,7 +5090,7 @@ function renderPaymentMethods() {
 
   const methods = getPaymentMethods(data);
   if (!methods.length) {
-    list.innerHTML = `<div class="empty-state">Nog geen betaalwijzen.</div>`;
+    list.innerHTML = `<div class="empty-state">${t("noPaymentMethods")}</div>`;
     return;
   }
 
@@ -4686,7 +5102,7 @@ function renderPaymentMethods() {
     card.innerHTML = `
       <button type="button" data-id="${method.id}">
         <div class="client-name">${method.name}</div>
-        <div class="meta">${usageCount} betaling${usageCount === 1 ? "" : "en"}</div>
+        <div class="meta">${usageCount} ${usageCount === 1 ? t("paymentSingular") : t("paymentPlural")}</div>
       </button>
     `;
     card.querySelector("button").addEventListener("click", () => openEditPaymentMethodDialog(method.id));
@@ -4695,7 +5111,7 @@ function renderPaymentMethods() {
 }
 
 function openNewPaymentMethodDialog() {
-  document.getElementById("paymentMethodModalTitle").textContent = "Nieuwe betaalwijze";
+  document.getElementById("paymentMethodModalTitle").textContent = t("newPaymentMethod");
   document.getElementById("paymentMethodId").value = "";
   document.getElementById("paymentMethodName").value = "";
   document.getElementById("deletePaymentMethodBtn").style.visibility = "hidden";
@@ -4707,7 +5123,7 @@ function openEditPaymentMethodDialog(id) {
   const method = getPaymentMethods(data).find(item => String(item.id) === String(id));
   if (!method) return;
 
-  document.getElementById("paymentMethodModalTitle").textContent = "Betaalwijze bewerken";
+  document.getElementById("paymentMethodModalTitle").textContent = t("editPaymentMethod");
   document.getElementById("paymentMethodId").value = method.id;
   document.getElementById("paymentMethodName").value = method.name;
   document.getElementById("deletePaymentMethodBtn").style.visibility = "visible";
@@ -4715,7 +5131,7 @@ function openEditPaymentMethodDialog(id) {
 }
 
 function openNewClientDialog() {
-  document.getElementById("clientModalTitle").textContent = "Nieuwe klant";
+  document.getElementById("clientModalTitle").textContent = t("newClient");
   document.getElementById("clientId").value = "";
   document.getElementById("clientFirstName").value = "";
   document.getElementById("clientLastName").value = "";
@@ -4731,7 +5147,7 @@ function openEditClientDialog(id) {
   const client = customerById(data, id);
   if (!client) return;
 
-  document.getElementById("clientModalTitle").textContent = "Klant bewerken";
+  document.getElementById("clientModalTitle").textContent = t("editClient");
   document.getElementById("clientId").value = client.id;
   document.getElementById("clientFirstName").value = client.firstName || "";
   document.getElementById("clientLastName").value = client.lastName || "";
@@ -4743,7 +5159,7 @@ function openEditClientDialog(id) {
 }
 
 function openNewServiceDialog() {
-  document.getElementById("serviceModalTitle").textContent = "Nieuwe dienst";
+  document.getElementById("serviceModalTitle").textContent = t("newService");
   document.getElementById("serviceId").value = "";
   document.getElementById("serviceName").value = "";
   document.getElementById("serviceDuration").value = 60;
@@ -4765,7 +5181,7 @@ function openEditServiceDialog(id) {
 
   const isInactive = service.isActive === false;
 
-  document.getElementById("serviceModalTitle").textContent = "Dienst bewerken";
+  document.getElementById("serviceModalTitle").textContent = t("editService");
   document.getElementById("serviceId").value = service.id;
   document.getElementById("serviceName").value = service.name;
   document.getElementById("serviceDuration").value = service.duration;
@@ -4858,8 +5274,8 @@ async function deleteCurrentPaymentMethod() {
 
   const confirmed = await appConfirm("Deze betaalwijze wordt verwijderd uit de keuzelijst. Eerdere betalingen behouden hun opgeslagen naam.", {
     title: "Betaalwijze verwijderen",
-    confirmText: "Verwijderen",
-    cancelText: "Annuleren",
+    confirmText: t("delete"),
+    cancelText: t("cancel"),
     variant: "warning"
   });
   if (!confirmed) return;
@@ -4888,6 +5304,64 @@ async function deleteCurrentPaymentMethod() {
   await loadAllDataFromSupabase();
   closeDialog("paymentMethodDialog");
   rerenderAll();
+}
+
+
+function normalizeServiceNameForDuplicateCheck(name) {
+  return String(name || "").trim().replace(/\s+/g, " ").toLocaleLowerCase();
+}
+
+function getUniqueServiceNameWithCounter(data, requestedName, excludeId = null) {
+  const baseName = String(requestedName || "").trim().replace(/\s+/g, " ");
+  if (!baseName) return "";
+
+  const usedNames = new Set(
+    (data.services || [])
+      .filter(service => String(service.id) !== String(excludeId || ""))
+      .map(service => normalizeServiceNameForDuplicateCheck(service.name))
+      .filter(Boolean)
+  );
+
+  if (!usedNames.has(normalizeServiceNameForDuplicateCheck(baseName))) {
+    return baseName;
+  }
+
+  let counter = 2;
+  let candidate = `${baseName} (${counter})`;
+  while (usedNames.has(normalizeServiceNameForDuplicateCheck(candidate))) {
+    counter += 1;
+    candidate = `${baseName} (${counter})`;
+  }
+
+  return candidate;
+}
+
+async function resolveServiceNameBeforeSave(data, requestedName, excludeId = null) {
+  const cleanName = String(requestedName || "").trim().replace(/\s+/g, " ");
+  if (!cleanName) {
+    await appAlert(t("serviceNameRequired"), { title: t("service"), variant: "warning" });
+    return null;
+  }
+
+  const duplicate = (data.services || []).find(service =>
+    String(service.id) !== String(excludeId || "") &&
+    normalizeServiceNameForDuplicateCheck(service.name) === normalizeServiceNameForDuplicateCheck(cleanName)
+  );
+
+  if (!duplicate) return cleanName;
+
+  const uniqueName = getUniqueServiceNameWithCounter(data, cleanName, excludeId);
+  const confirmed = await appConfirm(
+    t("duplicateServiceMessage", { name: cleanName, uniqueName }),
+    {
+      title: t("duplicateServiceTitle"),
+      confirmText: t("saveAnyway"),
+      cancelText: t("cancel"),
+      variant: "warning"
+    }
+  );
+
+  return confirmed ? uniqueName : null;
 }
 
 async function saveClientFromForm(event) {
@@ -4966,19 +5440,22 @@ async function saveServiceFromForm(event) {
   event.preventDefault();
 
   const user = await getCurrentUser();
+  const data = getData();
   const rawId = document.getElementById("serviceId").value;
   const id = rawId ? Number(rawId) : null;
   const reactivateChecked = Boolean(document.getElementById("serviceReactivateCheckbox")?.checked);
+  const serviceName = await resolveServiceNameBeforeSave(data, document.getElementById("serviceName").value, id);
+
+  if (!serviceName) return;
 
   if (!user) {
-    const data = getData();
     const existingService = id ? serviceById(data, id) : null;
     const nextIsActive = id
       ? (existingService?.isActive === false ? reactivateChecked : true)
       : true;
 
     const payload = {
-      name: document.getElementById("serviceName").value.trim(),
+      name: serviceName,
       duration: Number(document.getElementById("serviceDuration").value),
       price: Number(document.getElementById("servicePrice").value),
       isActive: nextIsActive
@@ -4996,7 +5473,6 @@ async function saveServiceFromForm(event) {
     return;
   }
 
-  const data = getData();
   const existingService = id ? serviceById(data, id) : null;
   const nextIsActive = id
     ? (existingService?.isActive === false ? reactivateChecked : true)
@@ -5004,7 +5480,7 @@ async function saveServiceFromForm(event) {
 
   const payload = {
     user_id: user.id,
-    name: document.getElementById("serviceName").value.trim(),
+    name: serviceName,
     duration: Number(document.getElementById("serviceDuration").value),
     price: Number(document.getElementById("servicePrice").value),
     is_active: nextIsActive
@@ -5025,7 +5501,7 @@ async function saveServiceFromForm(event) {
   }
 
   if (error) {
-    await appAlert("Opslaan dienst mislukt: " + error.message, { title: "Opslaan mislukt", variant: "danger" });
+    await appAlert("Opslaan dienst mislukt: " + error.message, { title: t("saveFailed"), variant: "danger" });
     return;
   }
 
@@ -5064,8 +5540,8 @@ async function saveAppointmentFromForm(event) {
   if (isAppointmentInPast(localPayload)) {
     const confirmedPast = await appConfirm(buildPastAppointmentMessage(localPayload), {
       title: "Afspraak in het verleden",
-      confirmText: "Toch opslaan",
-      cancelText: "Annuleren",
+      confirmText: t("save"),
+      cancelText: t("cancel"),
       variant: "warning"
     });
     if (!confirmedPast) return;
@@ -5076,8 +5552,8 @@ async function saveAppointmentFromForm(event) {
     if (overlapApp) {
       const confirmed = await appConfirm(buildOverlapMessage(localPayload, overlapApp, data.appointments, settings.defaultBreakMinutes, id), {
         title: "Overlap gedetecteerd",
-        confirmText: "Toch opslaan",
-        cancelText: "Annuleren",
+        confirmText: t("save"),
+        cancelText: t("cancel"),
         variant: "warning"
       });
       if (!confirmed) return;
@@ -5087,13 +5563,14 @@ async function saveAppointmentFromForm(event) {
   if (!user) {
     if (id) {
       const existingApp = data.appointments.find(a => Number(a.id) === id);
-      Object.assign(existingApp, localPayload);
+      Object.assign(existingApp, { ...localPayload, currency: existingApp.currency || getCurrentCurrency() });
     } else {
       data.appointments.push({
         id: nextId(data.appointments),
         ...localPayload,
         paid: false,
-        paymentMethodName: null
+        paymentMethodName: null,
+        currency: getCurrentCurrency()
       });
     }
 
@@ -5112,6 +5589,7 @@ async function saveAppointmentFromForm(event) {
   const existingApp = data.appointments.find(a => String(a.id) === String(id));
   const isPaid = existingApp ? Boolean(existingApp.paid) : false;
   const existingPaymentMethodName = paymentMethodNameForAppointment(existingApp, data) || null;
+  const appointmentCurrency = normalizeCurrency(existingApp?.currency || getCurrentCurrency());
 
   const payload = {
     user_id: user.id,
@@ -5123,7 +5601,8 @@ async function saveAppointmentFromForm(event) {
     price: localPayload.price,
     status: localPayload.status,
     paid: isPaid,
-    payment_method_label: isPaid ? existingPaymentMethodName : null
+    payment_method_label: isPaid ? existingPaymentMethodName : null,
+    currency: appointmentCurrency
   };
 
   let error;
@@ -5162,8 +5641,8 @@ async function deleteCurrentAppointment() {
 
   const confirmed = await appConfirm("Deze afspraak wordt definitief verwijderd.", {
     title: "Afspraak verwijderen",
-    confirmText: "Verwijderen",
-    cancelText: "Annuleren",
+    confirmText: t("delete"),
+    cancelText: t("cancel"),
     variant: "danger"
   });
 
@@ -5203,7 +5682,7 @@ async function deleteCurrentService() {
   const confirmed = await appConfirm("Deze dienst wordt op inactief gezet en verdwijnt uit de dienstenlijst en nieuwe afspraken. Bestaande afspraken blijven behouden.", {
     title: "Dienst inactief zetten",
     confirmText: "Inactief zetten",
-    cancelText: "Annuleren",
+    cancelText: t("cancel"),
     variant: "danger"
   });
 
@@ -5325,7 +5804,7 @@ async function markUnpaid() {
 
 function openMonthPicker() {
   const monthSelect = document.getElementById("monthSelect");
-  monthSelect.innerHTML = monthNames.map((m, i) => `<option value="${i}">${m}</option>`).join("");
+  monthSelect.innerHTML = monthNames.map((m, i) => `<option value="${i}">${getMonthNameUpper(i)}</option>`).join("");
   monthSelect.value = String(state.currentMonth);
   document.getElementById("yearSelect").value = state.currentYear;
 
@@ -5357,6 +5836,7 @@ function closeDialog(id) {
 }
 
 function rerenderAll() {
+  updateStaticI18n();
   renderAlphabetFilter();
   renderCalendar();
   renderAgendaList();
@@ -5389,28 +5869,39 @@ function getActionButtonIconSvg(type) {
 
 function applyNavStyleActionButtons(root = document) {
   const actionMap = [
-    { type: "save", label: "Opslaan", match: /^(instellingen\s+)?opslaan$/i },
-    { type: "cancel", label: "Annuleren", match: /^annuleren$/i },
-    { type: "delete", label: "Verwijderen", match: /^verwijderen$/i },
-    { type: "ok", label: "OK", match: /^(ok|kies)$/i },
-    { type: "register", label: "Registreren", match: /^registreren$/i }
+    { type: "save", key: "save", match: /^(instellingen\s+)?opslaan$|^save settings$|^save$|^enregistrer( les paramètres)?$/i },
+    { type: "cancel", key: "cancel", match: /^annuleren$|^cancel$|^annuler$/i },
+    { type: "delete", key: "delete", match: /^verwijderen$|^delete$|^supprimer$/i },
+    { type: "ok", key: "ok", match: /^(ok)$/i },
+    { type: "ok", key: "chooseConfirm", match: /^kies$|^choose$|^choisir$/i },
+    { type: "register", key: "register", match: /^registreren$|^register$|^s’inscrire$|^s'inscrire$/i }
   ];
 
   root.querySelectorAll("button").forEach(button => {
     if (button.classList.contains("nav-btn") || button.classList.contains("icon-btn") || button.classList.contains("fab")) return;
 
-    const plainText = (button.dataset.actionLabel || button.textContent || "").replace(/\s+/g, " ").trim();
-    const action = actionMap.find(item => item.match.test(plainText));
+    let action = null;
+    if (button.dataset.actionType) {
+      action = actionMap.find(item => item.type === button.dataset.actionType);
+    }
+
+    if (!action) {
+      const plainText = (button.dataset.actionLabel || button.textContent || "").replace(/\s+/g, " ").trim();
+      action = actionMap.find(item => item.match.test(plainText));
+    }
+
     if (!action) return;
 
-    button.dataset.actionLabel = action.label;
+    const label = t(action.key);
+    button.dataset.actionLabel = label;
     button.dataset.actionType = action.type;
-    button.setAttribute("aria-label", action.label);
-    button.title = action.label;
+    button.dataset.actionKey = action.key;
+    button.setAttribute("aria-label", label);
+    button.title = label;
     button.classList.add("app-action-nav-btn");
     button.innerHTML = `
       <span class="app-action-nav-ico" aria-hidden="true">${getActionButtonIconSvg(action.type)}</span>
-      <span class="app-action-nav-label">${action.label}</span>
+      <span class="app-action-nav-label">${label}</span>
     `;
   });
 }
@@ -5457,10 +5948,10 @@ function registerEvents() {
       if (isAuthLocked() && btn.dataset.screen !== "accountScreen") {
         event.preventDefault();
         event.stopPropagation();
-        switchScreen("accountScreen", "Account");
+        switchScreen("accountScreen", t("account"));
         return;
       }
-      switchScreen(btn.dataset.screen, btn.dataset.title);
+      switchScreen(btn.dataset.screen, getScreenTitle(btn.dataset.screen, btn.dataset.title));
     });
   });
 
@@ -5476,12 +5967,26 @@ function registerEvents() {
       accountScreen: "Account"
     };
 
-    switchScreen(state.previousMainScreen, map[state.previousMainScreen]);
+    switchScreen(state.previousMainScreen, getScreenTitle(state.previousMainScreen, map[state.previousMainScreen]));
   });
 
   document.getElementById("clientSearch").addEventListener("input", renderClients);
   document.getElementById("appointmentService").addEventListener("change", syncServiceDefaults);
-  document.getElementById("settingsForm")?.addEventListener("submit", saveSettingsFromForm);
+  document.getElementById("settingsForm")?.addEventListener("submit", withActionLock(saveSettingsFromForm));
+  document.getElementById("settingsLanguage")?.addEventListener("change", event => {
+    currentProfilePreferences.language = normalizeLanguage(event.target.value);
+    const data = getData();
+    data.settings = { ...getSettings(), language: currentProfilePreferences.language, currency: getCurrentCurrency() };
+    saveData(data);
+    rerenderAll();
+  });
+  document.getElementById("settingsCurrency")?.addEventListener("change", event => {
+    currentProfilePreferences.currency = normalizeCurrency(event.target.value);
+    const data = getData();
+    data.settings = { ...getSettings(), language: getCurrentLanguage(), currency: currentProfilePreferences.currency };
+    saveData(data);
+    rerenderAll();
+  });
   document.getElementById("settingsNotificationsEnabled")?.addEventListener("change", async event => {
     const checked = Boolean(event.target.checked);
     const data = getData();
@@ -5509,16 +6014,16 @@ function registerEvents() {
     });
   }
 
-  document.getElementById("appointmentForm").addEventListener("submit", saveAppointmentFromForm);
-  document.getElementById("deleteAppointmentBtn").addEventListener("click", deleteCurrentAppointment);
+  document.getElementById("appointmentForm").addEventListener("submit", withActionLock(saveAppointmentFromForm));
+  document.getElementById("deleteAppointmentBtn").addEventListener("click", withActionLock(deleteCurrentAppointment));
 
-  document.getElementById("clientForm").addEventListener("submit", saveClientFromForm);
+  document.getElementById("clientForm").addEventListener("submit", withActionLock(saveClientFromForm));
 
-  document.getElementById("serviceForm").addEventListener("submit", saveServiceFromForm);
-  document.getElementById("deleteServiceBtn").addEventListener("click", deleteCurrentService);
+  document.getElementById("serviceForm").addEventListener("submit", withActionLock(saveServiceFromForm));
+  document.getElementById("deleteServiceBtn").addEventListener("click", withActionLock(deleteCurrentService));
 
-  document.getElementById("paymentMethodForm").addEventListener("submit", savePaymentMethodFromForm);
-  document.getElementById("deletePaymentMethodBtn").addEventListener("click", deleteCurrentPaymentMethod);
+  document.getElementById("paymentMethodForm").addEventListener("submit", withActionLock(savePaymentMethodFromForm));
+  document.getElementById("deletePaymentMethodBtn").addEventListener("click", withActionLock(deleteCurrentPaymentMethod));
 
   document.getElementById("paymentPopoverCloseBtn")?.addEventListener("click", closePaymentPopover);
 
@@ -5615,8 +6120,8 @@ function registerEvents() {
   const editProfileForm = document.getElementById("editProfileForm");
   const passwordForm = document.getElementById("passwordForm");
 
-  if (registerBtn) registerBtn.addEventListener("click", registerAccount);
-  if (registerForm) registerForm.addEventListener("submit", registerAccount);
+  if (registerBtn) registerBtn.addEventListener("click", withActionLock(registerAccount));
+  if (registerForm) registerForm.addEventListener("submit", withActionLock(registerAccount));
 
   if (openRegisterBtn) {
     openRegisterBtn.addEventListener("click", () => {
@@ -5625,18 +6130,18 @@ function registerEvents() {
     });
   }
 
-  if (loginBtn) loginBtn.addEventListener("click", loginAccount);
-  if (logoutBtn) logoutBtn.addEventListener("click", logoutAccount);
+  if (loginBtn) loginBtn.addEventListener("click", withActionLock(loginAccount));
+  if (logoutBtn) logoutBtn.addEventListener("click", withActionLock(logoutAccount));
   if (editProfileBtn) editProfileBtn.addEventListener("click", openEditProfileDialog);
   if (changePasswordBtn) changePasswordBtn.addEventListener("click", openPasswordDialog);
-  if (editProfileForm) editProfileForm.addEventListener("submit", saveProfileFromForm);
-  if (passwordForm) passwordForm.addEventListener("submit", savePasswordFromForm);
+  if (editProfileForm) editProfileForm.addEventListener("submit", withActionLock(saveProfileFromForm));
+  if (passwordForm) passwordForm.addEventListener("submit", withActionLock(savePasswordFromForm));
 
   setupPasswordToggleButtons();
 
   if (headerAccountBtn) {
     headerAccountBtn.addEventListener("click", () => {
-      switchScreen("accountScreen", "Account");
+      switchScreen("accountScreen", t("account"));
     });
   }
 
@@ -5800,7 +6305,8 @@ async function loadAppointmentsFromSupabase() {
     price: Number(a.price || 0),
     status: a.status,
     paid: Boolean(a.paid),
-    paymentMethodName: a.payment_method_label ?? null
+    paymentMethodName: a.payment_method_label ?? null,
+    currency: normalizeCurrency(a.currency || DEFAULT_CURRENCY)
   }));
 }
 
@@ -5826,6 +6332,46 @@ async function loadAllDataFromSupabase() {
    STARTUP
 ========================= */
 
+
+function getActionLockButton(event) {
+  if (!event?.target) return null;
+  if (event.target.matches?.('button')) return event.target;
+  return event.target.closest?.('button');
+}
+
+function setActionLocked(button, locked) {
+  if (!button) return;
+  if (locked) {
+    button.dataset.actionLocked = "true";
+    button.disabled = true;
+    button.setAttribute("aria-busy", "true");
+    button.classList.add("is-action-locked");
+  } else {
+    delete button.dataset.actionLocked;
+    button.disabled = false;
+    button.removeAttribute("aria-busy");
+    button.classList.remove("is-action-locked");
+  }
+}
+
+function withActionLock(handler) {
+  return async function actionLockWrapper(event) {
+    const button = getActionLockButton(event) || this?.querySelector?.('button[type="submit"], .btn-primary, .btn-danger, button');
+    if (button?.dataset?.actionLocked === "true") {
+      event?.preventDefault?.();
+      event?.stopPropagation?.();
+      return;
+    }
+
+    setActionLocked(button, true);
+    try {
+      return await handler.call(this, event);
+    } finally {
+      setActionLocked(button, false);
+    }
+  };
+}
+
 async function initAppData() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (user) {
@@ -5846,9 +6392,9 @@ async function startApp() {
   const user = await getCurrentUser();
 
   if (user) {
-    switchScreen("agendaScreen", "Agenda");
+    switchScreen("agendaScreen", t("agenda"));
   } else {
-    switchScreen("accountScreen", "Account");
+    switchScreen("accountScreen", t("account"));
   }
 }
 
