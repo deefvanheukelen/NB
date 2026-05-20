@@ -378,6 +378,11 @@ const paymentPopoverState = {
   anchorRect: null
 };
 
+const appointmentActionPopoverState = {
+  appointmentId: null,
+  anchorRect: null
+};
+
 
 function addDaysStr(dateStr, days) {
   const d = new Date(dateStr + "T00:00:00");
@@ -542,6 +547,75 @@ function customerNumber(customer) {
   }
 
   return value.startsWith("K") ? value : `K${value}`;
+}
+
+
+function normalizePhoneNumber(value, defaultCountryCode = "32") {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+
+  let compact = raw.replace(/[\s().\-/]/g, "");
+  compact = compact.replace(/[^+\d]/g, "");
+
+  if (compact.startsWith("00")) compact = `+${compact.slice(2)}`;
+  if (compact.startsWith("+")) {
+    const digits = compact.slice(1).replace(/\D/g, "");
+    return digits ? `+${digits}` : "";
+  }
+
+  let digits = compact.replace(/\D/g, "");
+  if (!digits) return "";
+
+  if (digits.startsWith(defaultCountryCode)) return `+${digits}`;
+  if (digits.startsWith("0")) digits = digits.slice(1);
+  return `+${defaultCountryCode}${digits}`;
+}
+
+function phoneSearchKey(value) {
+  return normalizePhoneNumber(value).replace(/\D/g, "");
+}
+
+function normalizeEmailForDuplicateCheck(value) {
+  return String(value || "").trim().toLocaleLowerCase();
+}
+
+function nextCustomerNumber(data) {
+  const numbers = (data.customers || [])
+    .map(customer => customer?.customerNumber ?? customer?.customer_number)
+    .map(value => String(value || "").replace(/\D/g, ""))
+    .map(value => Number(value))
+    .filter(value => Number.isFinite(value) && value > 0);
+  return numbers.length ? Math.max(...numbers) + 1 : 1;
+}
+
+function findDuplicateCustomer(data, payload, excludeId = null) {
+  const phoneKey = phoneSearchKey(payload.phone);
+  const emailKey = normalizeEmailForDuplicateCheck(payload.email);
+
+  if (!phoneKey && !emailKey) return null;
+
+  return (data.customers || []).find(customer => {
+    if (String(customer.id) === String(excludeId || "")) return false;
+    const samePhone = phoneKey && phoneSearchKey(customer.phone) === phoneKey;
+    const sameEmail = emailKey && normalizeEmailForDuplicateCheck(customer.email) === emailKey;
+    return samePhone || sameEmail;
+  }) || null;
+}
+
+function buildDuplicateCustomerMessage(duplicate, payload) {
+  const parts = [];
+  if (payload.phone && phoneSearchKey(payload.phone) === phoneSearchKey(duplicate.phone)) parts.push("telefoonnummer");
+  if (payload.email && normalizeEmailForDuplicateCheck(payload.email) === normalizeEmailForDuplicateCheck(duplicate.email)) parts.push("e-mail");
+
+  return [
+    `Er bestaat al een klant met hetzelfde ${parts.join(" en ") || "telefoonnummer/e-mail"}.`,
+    "",
+    `${fullName(duplicate) || "Onbekende klant"} · ${customerNumber(duplicate)}`,
+    duplicate.phone ? `Tel: ${duplicate.phone}` : "",
+    duplicate.email ? `E-mail: ${duplicate.email}` : "",
+    "",
+    "Wil je deze klant toch opslaan?"
+  ].filter(line => line !== "").join("\n");
 }
 
 function customerSearchText(customer) {
@@ -2354,12 +2428,12 @@ function renderAgendaList() {
         <div class="main-name appointment-main-name">${customer ? fullName(customer) : "Onbekend"}${String(app.remarks || "").trim() ? '<span class="appointment-remarks-star" title="Opmerking aanwezig" aria-label="Opmerking aanwezig">★</span>' : ""}</div>
         <div class="meta">${appointmentMetaParts.join(" · ")}</div>
       </div>
-      <button class="price-chip ${app.paid ? "paid" : ""}" data-id="${app.id}" type="button">${euro(app.price, app.currency)}</button>
+      <button class="price-chip ${app.paid ? "paid" : ""} ${(app.status || "").toLowerCase() === "no-show" ? "no-show" : ""}" data-id="${app.id}" type="button">${euro(app.price, app.currency)}</button>
     `;
 
     row.addEventListener("click", (e) => {
       if (e.target.closest(".price-chip")) return;
-      openEditAppointmentDialog(app.id);
+      openAppointmentActionPopover(app.id, row);
     });
 
     card.appendChild(row);
@@ -2651,15 +2725,15 @@ function syncRevenueToSelectedDateBeforePreview() {
   const dateInput = document.getElementById("revenueDate");
   if (!periodType || !dateInput) return;
 
+  // De gekozen kalenderdag blijft de ankerdatum voor Omzet,
+  // maar het laatst gekozen omzettype (dag/week/maand/jaar) blijft behouden.
   const needsSync = !state.revenueInitialized
     || state.revenueSyncSelectedDateOnOpen
     || state.revenueSelectedDateSynced !== selectedDate
-    || periodType.value !== "day"
     || dateInput.value !== selectedDate;
 
   if (!needsSync) return;
 
-  periodType.value = "day";
   dateInput.value = selectedDate;
   state.revenueInitialized = true;
   state.revenueSelectedDateSynced = selectedDate;
@@ -2774,7 +2848,10 @@ function getRevenueDataYears() {
 
 function centerRevenueWheelColumn(column, value, behavior = "auto") {
   if (!column) return;
-  const option = column.querySelector(`.revenue-wheel-option[data-value="${value}"]`);
+  const selector = column.dataset.looping === "true"
+    ? `.revenue-wheel-option[data-value="${value}"][data-loop-anchor="true"]`
+    : `.revenue-wheel-option[data-value="${value}"]`;
+  const option = column.querySelector(selector) || column.querySelector(`.revenue-wheel-option[data-value="${value}"]`);
   if (!option) return;
   const target = option.offsetTop - (column.clientHeight / 2) + (option.offsetHeight / 2);
   if (behavior === "smooth") {
@@ -2817,7 +2894,7 @@ function attachRevenueWheelColumnEvents(column, key) {
     if (value != null) {
       const pickerState = column.closest("#appointmentWheelColumns") ? appointmentPickerState : revenuePickerState;
       pickerState.selected[key] = value;
-      centerRevenueWheelColumn(column, value, behavior);
+      centerRevenueWheelColumn(column, value, column.dataset.looping === "true" ? "auto" : behavior);
     }
   };
 
@@ -2854,10 +2931,16 @@ function attachRevenueWheelColumnEvents(column, key) {
   // konden centreren op de datum die in Omzet actief is.
 }
 
-function buildRevenueWheelColumn(key, values, formatter = value => value) {
+function buildRevenueWheelColumn(key, values, formatter = value => value, options = {}) {
+  const loopCount = options.loop ? 7 : 1;
+  const middleLoopIndex = Math.floor(loopCount / 2);
+  const repeatedValues = Array.from({ length: loopCount }, (_, loopIndex) =>
+    values.map(value => ({ value, loopIndex }))
+  ).flat();
+
   return `
-    <div class="revenue-wheel-column" data-key="${key}">
-      ${values.map(value => `<div class="revenue-wheel-option" data-value="${value}">${formatter(value)}</div>`).join("")}
+    <div class="revenue-wheel-column" data-key="${key}"${options.loop ? ' data-looping="true"' : ""}>
+      ${repeatedValues.map(({ value, loopIndex }) => `<div class="revenue-wheel-option" data-value="${value}"${loopIndex === middleLoopIndex ? ' data-loop-anchor="true"' : ""}>${formatter(value)}</div>`).join("")}
     </div>
   `;
 }
@@ -2930,8 +3013,8 @@ function openAppointmentWheelPicker(mode) {
     const hours = Array.from({ length: 24 }, (_, i) => i);
     const minutes = Array.from({ length: 60 }, (_, i) => i);
     columnsWrap.innerHTML =
-      buildRevenueWheelColumn("hour", hours, value => String(value).padStart(2, "0")) +
-      buildRevenueWheelColumn("minute", minutes, value => String(value).padStart(2, "0"));
+      buildRevenueWheelColumn("hour", hours, value => String(value).padStart(2, "0"), { loop: true }) +
+      buildRevenueWheelColumn("minute", minutes, value => String(value).padStart(2, "0"), { loop: true });
     appointmentPickerState.selected.hour = String(selectedHour);
     appointmentPickerState.selected.minute = String(selectedMinute);
   } else {
@@ -3230,11 +3313,14 @@ function renderRevenueChart(filtered, type, anchor) {
     minimumFractionDigits: 0
   }).format(Math.round(Number(value || 0)));
   const axisValues = [1, 0.75, 0.5, 0.25, 0].map(step => scaleMax * step);
+  const axisLabels = axisValues.map(value => formatAxisAmount(value));
+  const longestAxisLabel = axisLabels.reduce((longest, label) => Math.max(longest, String(label).length), 1);
+  const axisWidth = Math.max(18, Math.min(64, Math.ceil(longestAxisLabel * 6.2) + 4));
 
   chartWrap.innerHTML = `
-    <div class="revenue-chart-plot" style="--revenue-chart-height:${chartHeight}px;">
+    <div class="revenue-chart-plot" style="--revenue-chart-height:${chartHeight}px;--revenue-y-axis-width:${axisWidth}px;">
       <div class="revenue-y-axis" aria-hidden="true">
-        ${axisValues.map(value => `<span>${formatAxisAmount(value)}</span>`).join("")}
+        ${axisLabels.map(label => `<span>${label}</span>`).join("")}
       </div>
       <div class="revenue-chart-area">
         <div class="revenue-y-axis-line" aria-hidden="true"></div>
@@ -4863,7 +4949,7 @@ function openClientDetail(clientId) {
                         <div class="main-name">${service ? service.name : "-"}</div>
                         <div class="meta">${statusParts.join(" · ")}</div>
                       </div>
-                      <button class="price-chip ${app.paid ? "paid" : ""}" data-id="${app.id}" type="button">${euro(app.price, app.currency)}</button>
+                      <button class="price-chip ${app.paid ? "paid" : ""} ${(app.status || "").toLowerCase() === "no-show" ? "no-show" : ""}" data-id="${app.id}" type="button">${euro(app.price, app.currency)}</button>
                     </div>
                   `;
                 }).join("")}</div>`
@@ -4891,15 +4977,15 @@ function openClientDetail(clientId) {
   }
 
   content.querySelectorAll(".client-detail-appointment-row").forEach(row => {
-    const openAppointment = () => openEditAppointmentDialog(row.dataset.id);
+    const openActions = () => openAppointmentActionPopover(row.dataset.id, row);
     row.addEventListener("click", event => {
       if (event.target.closest(".price-chip")) return;
-      openAppointment();
+      openActions();
     });
     row.addEventListener("keydown", event => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        openAppointment();
+        openActions();
       }
     });
   });
@@ -4951,6 +5037,17 @@ function setAppointmentCustomer(customerId, { updateSearch = true } = {}) {
   }
 
   renderAppointmentCustomerResults(searchInput?.value || "", false);
+}
+
+
+function hideAppointmentCustomerResults() {
+  const resultsWrap = document.getElementById("appointmentCustomerResults");
+  const searchInput = document.getElementById("appointmentCustomerSearch");
+  if (resultsWrap) resultsWrap.classList.add("hidden");
+  if (searchInput) {
+    searchInput.setAttribute("aria-expanded", "false");
+    searchInput.blur();
+  }
 }
 
 function renderAppointmentCustomerResults(query = "", showAllWhenEmpty = false) {
@@ -5072,6 +5169,7 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
   document.getElementById("appointmentTime").value = "10:00";
   document.getElementById("appointmentStatus").value = "gepland";
   document.getElementById("appointmentStatusWrap").style.display = "none";
+  document.getElementById("appointmentOpenCustomerBtn")?.classList.add("hidden");
   const remarksInput = document.getElementById("appointmentRemarks");
   if (remarksInput) remarksInput.value = "";
   syncAppointmentDateTimeDisplays();
@@ -5106,6 +5204,7 @@ function openEditAppointmentDialog(id) {
   document.getElementById("appointmentModalTitle").textContent = t("editAppointment");
   document.getElementById("appointmentId").value = app.id;
   setAppointmentCustomer(app.customerId);
+  hideAppointmentCustomerResults();
   document.getElementById("appointmentDate").value = app.date;
   document.getElementById("appointmentTime").value = app.time;
   document.getElementById("appointmentService").value = app.serviceId;
@@ -5115,10 +5214,112 @@ function openEditAppointmentDialog(id) {
   const remarksInput = document.getElementById("appointmentRemarks");
   if (remarksInput) remarksInput.value = app.remarks || "";
   document.getElementById("appointmentStatusWrap").style.display = "block";
+  document.getElementById("appointmentOpenCustomerBtn")?.classList.remove("hidden");
   syncAppointmentDateTimeDisplays();
 
   document.getElementById("deleteAppointmentBtn").style.visibility = "visible";
   document.getElementById("appointmentDialog").showModal();
+}
+
+
+function openAppointmentCustomerDetailFromDialog() {
+  const customerId = document.getElementById("appointmentCustomer")?.value;
+  if (!customerId) return;
+  closeDialog("appointmentDialog");
+  openClientDetail(customerId);
+}
+
+function positionAppointmentActionPopover() {
+  const popover = document.getElementById("appointmentActionPopover");
+  if (!popover || popover.classList.contains("hidden") || !appointmentActionPopoverState.anchorRect) return;
+
+  const card = popover.querySelector(".payment-popover-card");
+  if (!card) return;
+
+  const margin = 12;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const cardRect = card.getBoundingClientRect();
+  const anchor = appointmentActionPopoverState.anchorRect;
+
+  let left = anchor.left + (anchor.width / 2) - (cardRect.width / 2);
+  left = Math.max(margin, Math.min(left, viewportWidth - cardRect.width - margin));
+
+  let top = anchor.top - cardRect.height - 10;
+  const spaceAbove = anchor.top - margin;
+  const spaceBelow = viewportHeight - anchor.bottom - margin;
+
+  if (top < margin) {
+    if (spaceBelow >= cardRect.height || spaceBelow > spaceAbove) {
+      top = Math.min(viewportHeight - cardRect.height - margin, anchor.bottom + 10);
+      popover.dataset.placement = "bottom";
+    } else {
+      top = margin;
+      popover.dataset.placement = "top";
+    }
+  } else {
+    popover.dataset.placement = "top";
+  }
+
+  popover.style.left = `${Math.round(left)}px`;
+  popover.style.top = `${Math.round(top)}px`;
+}
+
+function closeAppointmentActionPopover() {
+  const popover = document.getElementById("appointmentActionPopover");
+  if (!popover) return;
+  popover.classList.add("hidden");
+  popover.setAttribute("aria-hidden", "true");
+  popover.style.left = "";
+  popover.style.top = "";
+  popover.removeAttribute("data-placement");
+  appointmentActionPopoverState.appointmentId = null;
+  appointmentActionPopoverState.anchorRect = null;
+}
+
+function openAppointmentActionPopover(id, anchorEl = null) {
+  const data = getData();
+  const app = data.appointments.find(a => String(a.id) === String(id));
+  if (!app) return;
+
+  closePaymentPopover();
+
+  const popover = document.getElementById("appointmentActionPopover");
+  if (!popover) {
+    openEditAppointmentDialog(id);
+    return;
+  }
+
+  const detailsBtn = document.getElementById("appointmentActionDetailsBtn");
+  const customerBtn = document.getElementById("appointmentActionCustomerBtn");
+
+  if (detailsBtn) {
+    detailsBtn.onclick = event => {
+      event.stopPropagation();
+      closeAppointmentActionPopover();
+      openEditAppointmentDialog(id);
+    };
+  }
+
+  if (customerBtn) {
+    customerBtn.disabled = !app.customerId;
+    customerBtn.onclick = event => {
+      event.stopPropagation();
+      if (!app.customerId) return;
+      closeAppointmentActionPopover();
+      openClientDetail(app.customerId);
+    };
+  }
+
+  const rect = anchorEl?.getBoundingClientRect?.();
+  appointmentActionPopoverState.appointmentId = String(id);
+  appointmentActionPopoverState.anchorRect = rect
+    ? { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width, height: rect.height }
+    : { top: window.innerHeight / 2, right: window.innerWidth / 2 + 120, bottom: window.innerHeight / 2, left: window.innerWidth / 2 - 120, width: 240, height: 0 };
+
+  popover.classList.remove("hidden");
+  popover.setAttribute("aria-hidden", "false");
+  requestAnimationFrame(positionAppointmentActionPopover);
 }
 
 function positionPaymentPopover() {
@@ -5535,23 +5736,38 @@ async function saveClientFromForm(event) {
   event.preventDefault();
 
   const user = await getCurrentUser();
+  const data = getData();
+  const rawId = document.getElementById("clientId").value;
+  const id = rawId ? Number(rawId) : null;
+
+  const payload = {
+    firstName: document.getElementById("clientFirstName").value.trim(),
+    lastName: document.getElementById("clientLastName").value.trim(),
+    phone: normalizePhoneNumber(document.getElementById("clientPhone").value),
+    email: document.getElementById("clientEmail").value.trim(),
+    note: document.getElementById("clientNote").value.trim()
+  };
+
+  const duplicate = findDuplicateCustomer(data, payload, id);
+  if (duplicate) {
+    const confirmed = await appConfirm(buildDuplicateCustomerMessage(duplicate, payload), {
+      title: "Mogelijke dubbele klant",
+      confirmText: t("saveAnyway"),
+      cancelText: t("cancel"),
+      variant: "warning"
+    });
+    if (!confirmed) return;
+  }
 
   if (!user) {
-    const data = getData();
-    const id = Number(document.getElementById("clientId").value);
-
-    const payload = {
-      firstName: document.getElementById("clientFirstName").value.trim(),
-      lastName: document.getElementById("clientLastName").value.trim(),
-      phone: document.getElementById("clientPhone").value.trim(),
-      email: document.getElementById("clientEmail").value.trim(),
-      note: document.getElementById("clientNote").value.trim()
-    };
-
     if (id) {
       Object.assign(customerById(data, id), payload);
     } else {
-      data.customers.push({ id: nextId(data.customers), ...payload });
+      data.customers.push({
+        id: nextId(data.customers),
+        customerNumber: nextCustomerNumber(data),
+        ...payload
+      });
     }
 
     saveData(data);
@@ -5562,29 +5778,31 @@ async function saveClientFromForm(event) {
     return;
   }
 
-  const id = document.getElementById("clientId").value;
-
-  const payload = {
+  const dbPayload = {
     user_id: user.id,
-    first_name: document.getElementById("clientFirstName").value.trim(),
-    last_name: document.getElementById("clientLastName").value.trim(),
-    phone: document.getElementById("clientPhone").value.trim(),
-    email: document.getElementById("clientEmail").value.trim(),
-    note: document.getElementById("clientNote").value.trim()
+    first_name: payload.firstName,
+    last_name: payload.lastName,
+    phone: payload.phone,
+    email: payload.email,
+    note: payload.note
   };
+
+  if (!id) {
+    dbPayload.customer_number = nextCustomerNumber(data);
+  }
 
   let error;
 
   if (id) {
     ({ error } = await supabaseClient
       .from("customers")
-      .update(payload)
+      .update(dbPayload)
       .eq("id", Number(id))
       .eq("user_id", user.id));
   } else {
     ({ error } = await supabaseClient
       .from("customers")
-      .insert(payload));
+      .insert(dbPayload));
   }
 
   if (error) {
@@ -6226,6 +6444,7 @@ function registerEvents() {
   }
 
   document.getElementById("appointmentForm").addEventListener("submit", withActionLock(saveAppointmentFromForm));
+  document.getElementById("appointmentOpenCustomerBtn")?.addEventListener("click", openAppointmentCustomerDetailFromDialog);
   document.getElementById("deleteAppointmentBtn").addEventListener("click", withActionLock(deleteCurrentAppointment));
 
   document.getElementById("clientForm").addEventListener("submit", withActionLock(saveClientFromForm));
@@ -6237,8 +6456,16 @@ function registerEvents() {
   document.getElementById("deletePaymentMethodBtn").addEventListener("click", withActionLock(deleteCurrentPaymentMethod));
 
   document.getElementById("paymentPopoverCloseBtn")?.addEventListener("click", closePaymentPopover);
+  document.getElementById("appointmentActionPopoverCloseBtn")?.addEventListener("click", closeAppointmentActionPopover);
 
   document.addEventListener("click", event => {
+    const actionPopover = document.getElementById("appointmentActionPopover");
+    if (actionPopover && !actionPopover.classList.contains("hidden")) {
+      if (!actionPopover.contains(event.target) && !event.target.closest(".appointment-row")) {
+        closeAppointmentActionPopover();
+      }
+    }
+
     const popover = document.getElementById("paymentPopover");
     if (!popover || popover.classList.contains("hidden")) return;
     if (popover.contains(event.target)) return;
@@ -6247,12 +6474,15 @@ function registerEvents() {
   });
 
   window.addEventListener("resize", () => {
+    const actionPopover = document.getElementById("appointmentActionPopover");
+    if (actionPopover && !actionPopover.classList.contains("hidden")) positionAppointmentActionPopover();
+
     const popover = document.getElementById("paymentPopover");
     if (popover && !popover.classList.contains("hidden")) positionPaymentPopover();
   });
 
-  document.getElementById("agendaList")?.addEventListener("scroll", closePaymentPopover, { passive: true });
-  document.querySelector(".calendar-panel")?.addEventListener("scroll", closePaymentPopover, { passive: true });
+  document.getElementById("agendaList")?.addEventListener("scroll", () => { closePaymentPopover(); closeAppointmentActionPopover(); }, { passive: true });
+  document.querySelector(".calendar-panel")?.addEventListener("scroll", () => { closePaymentPopover(); closeAppointmentActionPopover(); }, { passive: true });
 
   document.querySelectorAll("[data-close]").forEach(btn => {
     btn.addEventListener("click", () => closeDialog(btn.dataset.close));
