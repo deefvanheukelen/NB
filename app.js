@@ -49,13 +49,13 @@ const i18n = {
 
 const i18nExtra = {
   "nl-BE": {
-    planning: "Planning", notifications: "Meldingen", extras: "Interessante extra's", defaultBreak: "Standaard pauze tussen 2 afspraken (min)", overlapWarnings: "Overlapwaarschuwingen", overlapWarningsHint: "Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.", enableNotifications: "Meldingen inschakelen", enableNotificationsHint: "Voorbereid voor afspraakherinneringen in de app.", reminderBefore: "Herinnering vóór afspraak", savePending: "Instellingen opslaan...", notificationsOff: "Meldingen zijn uitgeschakeld.", notificationsActive: "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.", notificationsBlocked: "Meldingen zijn geblokkeerd in je browserinstellingen.", notificationsUnsupported: "Deze browser ondersteunt geen webmeldingen.", notificationsPermissionHint: "Schakel meldingen in en geef toestemming om herinneringen te tonen.", appointmentsOn: "Afspraken op", noAppointmentsOnDay: "Geen afspraken op deze dag.", noClientsFound: "Geen klanten gevonden.", noPhone: "Geen gsm", appointmentSingular: "afspraak", appointmentPlural: "afspraken", noActiveServices: "Nog geen actieve diensten.", inactive: "inactief", showInactiveServices: "Toon inactieve diensten", allPaymentMethods: "Alle betaalwijzen", allStatuses: "Alle statussen", day: "Dag", week: "Week", month: "Maand", year: "Jaar", today: "Vandaag", total: "Totaal", chartTitle: "Grafische weergave", perDay: "Per dag", revenueOn: "Omzet op", revenueReport: "Omzetrapport", paymentMethodTitle: "Betaalwijze", unknownCustomer: "Onbekende klant", chooseMonth: "Maand kiezen", choose: "Kies", newAppointment: "Nieuwe afspraak", editAppointment: "Afspraak bewerken", customer: "Klant", date: "Datum", time: "Tijd", service: "Dienst", duration: "Duur (min)", price: "Prijs", status: "Status", planned: "Gepland", completed: "Afgerond", newClient: "Nieuwe klant", phone: "Telefoon", note: "Notitie", appointmentRemarks: "Opmerkingen", newService: "Nieuwe dienst", serviceName: "Naam dienst", newPaymentMethod: "Nieuwe betaalwijze", paymentMethodName: "Naam betaalwijze", editProfileTitle: "Profiel bewerken", currentPassword: "Huidig wachtwoord", newPassword: "Nieuw wachtwoord", message: "Melding", registerHere: "Nog geen account? Registreer hier"
+    planning: "Planning", notifications: "Meldingen", extras: "Interessante extra's", defaultBreak: "Standaard pauze tussen 2 afspraken (min)", overlapWarnings: "Overlapwaarschuwingen", overlapWarningsHint: "Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.", enableNotifications: "Meldingen inschakelen", enableNotificationsHint: "Voorbereid voor afspraakherinneringen in de app.", reminderBefore: "Herinnering vóór afspraak", savePending: "Instellingen opslaan...", notificationsOff: "Meldingen zijn uitgeschakeld.", notificationsActive: "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.", notificationsBlocked: "Meldingen zijn geblokkeerd in je browserinstellingen.", notificationsUnsupported: "Deze browser ondersteunt geen webmeldingen.", notificationsPermissionHint: "Schakel meldingen in en geef toestemming om herinneringen te tonen.", appointmentsOn: "Afspraken op", noAppointmentsOnDay: "Geen afspraken op deze dag.", noClientsFound: "Geen klanten gevonden.", noPhone: "Geen gsm", appointmentSingular: "afspraak", appointmentPlural: "afspraken", noActiveServices: "Nog geen actieve diensten.", inactive: "inactief", showInactiveServices: "Toon inactieve diensten", allPaymentMethods: "Alle betaalwijzen", allStatuses: "Alle statussen", day: "Dag", week: "Week", month: "Maand", year: "Jaar", today: "Vandaag", total: "Totaal", revenueOn: "Omzet op", revenueReport: "Omzetrapport", paymentMethodTitle: "Betaalwijze", unknownCustomer: "Onbekende klant", chooseMonth: "Maand kiezen", choose: "Kies", newAppointment: "Nieuwe afspraak", editAppointment: "Afspraak bewerken", customer: "Klant", date: "Datum", time: "Tijd", service: "Dienst", duration: "Duur (min)", price: "Prijs", status: "Status", planned: "Gepland", completed: "Afgerond", newClient: "Nieuwe klant", phone: "Telefoon", note: "Notitie", appointmentRemarks: "Opmerkingen", newService: "Nieuwe dienst", serviceName: "Naam dienst", newPaymentMethod: "Nieuwe betaalwijze", paymentMethodName: "Naam betaalwijze", editProfileTitle: "Profiel bewerken", currentPassword: "Huidig wachtwoord", newPassword: "Nieuw wachtwoord", message: "Melding", registerHere: "Nog geen account? Registreer hier"
   },
   "en-GB": {
-    planning: "Planning", notifications: "Notifications", extras: "Useful extras", defaultBreak: "Default break between 2 appointments (min)", overlapWarnings: "Overlap warnings", overlapWarningsHint: "Warn when an appointment overlaps with an existing appointment, taking duration and break time into account.", enableNotifications: "Enable notifications", enableNotificationsHint: "Prepared for appointment reminders in the app.", reminderBefore: "Reminder before appointment", savePending: "Saving settings...", notificationsOff: "Notifications are disabled.", notificationsActive: "Notifications are active on this device while the browser or app supports notifications.", notificationsBlocked: "Notifications are blocked in your browser settings.", notificationsUnsupported: "This browser does not support web notifications.", notificationsPermissionHint: "Enable notifications and allow permission to show reminders.", appointmentsOn: "Appointments on", noAppointmentsOnDay: "No appointments on this day.", noClientsFound: "No clients found.", noPhone: "No mobile", appointmentSingular: "appointment", appointmentPlural: "appointments", noActiveServices: "No active services yet.", inactive: "inactive", showInactiveServices: "Show inactive services", allPaymentMethods: "All payment methods", allStatuses: "All statuses", day: "Day", week: "Week", month: "Month", year: "Year", today: "Today", total: "Total", chartTitle: "Chart view", perDay: "Per day", revenueOn: "Revenue on", revenueReport: "Revenue report", paymentMethodTitle: "Payment method", unknownCustomer: "Unknown client", chooseMonth: "Choose month", choose: "Choose", newAppointment: "New appointment", editAppointment: "Edit appointment", customer: "Client", date: "Date", time: "Time", service: "Service", duration: "Duration (min)", price: "Price", status: "Status", planned: "Planned", completed: "Completed", newClient: "New client", phone: "Phone", note: "Note", appointmentRemarks: "Remarks", newService: "New service", serviceName: "Service name", newPaymentMethod: "New payment method", paymentMethodName: "Payment method name", editProfileTitle: "Edit profile", currentPassword: "Current password", newPassword: "New password", message: "Message", registerHere: "No account yet? Register here"
+    planning: "Planning", notifications: "Notifications", extras: "Useful extras", defaultBreak: "Default break between 2 appointments (min)", overlapWarnings: "Overlap warnings", overlapWarningsHint: "Warn when an appointment overlaps with an existing appointment, taking duration and break time into account.", enableNotifications: "Enable notifications", enableNotificationsHint: "Prepared for appointment reminders in the app.", reminderBefore: "Reminder before appointment", savePending: "Saving settings...", notificationsOff: "Notifications are disabled.", notificationsActive: "Notifications are active on this device while the browser or app supports notifications.", notificationsBlocked: "Notifications are blocked in your browser settings.", notificationsUnsupported: "This browser does not support web notifications.", notificationsPermissionHint: "Enable notifications and allow permission to show reminders.", appointmentsOn: "Appointments on", noAppointmentsOnDay: "No appointments on this day.", noClientsFound: "No clients found.", noPhone: "No mobile", appointmentSingular: "appointment", appointmentPlural: "appointments", noActiveServices: "No active services yet.", inactive: "inactive", showInactiveServices: "Show inactive services", allPaymentMethods: "All payment methods", allStatuses: "All statuses", day: "Day", week: "Week", month: "Month", year: "Year", today: "Today", total: "Total", revenueOn: "Revenue on", revenueReport: "Revenue report", paymentMethodTitle: "Payment method", unknownCustomer: "Unknown client", chooseMonth: "Choose month", choose: "Choose", newAppointment: "New appointment", editAppointment: "Edit appointment", customer: "Client", date: "Date", time: "Time", service: "Service", duration: "Duration (min)", price: "Price", status: "Status", planned: "Planned", completed: "Completed", newClient: "New client", phone: "Phone", note: "Note", appointmentRemarks: "Remarks", newService: "New service", serviceName: "Service name", newPaymentMethod: "New payment method", paymentMethodName: "Payment method name", editProfileTitle: "Edit profile", currentPassword: "Current password", newPassword: "New password", message: "Message", registerHere: "No account yet? Register here"
   },
   "fr-FR": {
-    planning: "Planning", notifications: "Notifications", extras: "Extras utiles", defaultBreak: "Pause standard entre 2 rendez-vous (min)", overlapWarnings: "Avertissements de chevauchement", overlapWarningsHint: "Avertir lorsqu’un rendez-vous chevauche un rendez-vous existant, en tenant compte de la durée et de la pause.", enableNotifications: "Activer les notifications", enableNotificationsHint: "Prévu pour les rappels de rendez-vous dans l’application.", reminderBefore: "Rappel avant le rendez-vous", savePending: "Enregistrement des paramètres...", notificationsOff: "Les notifications sont désactivées.", notificationsActive: "Les notifications sont actives sur cet appareil tant que le navigateur ou l’application les prend en charge.", notificationsBlocked: "Les notifications sont bloquées dans les paramètres de votre navigateur.", notificationsUnsupported: "Ce navigateur ne prend pas en charge les notifications web.", notificationsPermissionHint: "Activez les notifications et autorisez-les pour afficher les rappels.", appointmentsOn: "Rendez-vous le", noAppointmentsOnDay: "Aucun rendez-vous ce jour-là.", noClientsFound: "Aucun client trouvé.", noPhone: "Pas de GSM", appointmentSingular: "rendez-vous", appointmentPlural: "rendez-vous", noActiveServices: "Aucun service actif pour le moment.", inactive: "inactif", showInactiveServices: "Afficher les services inactifs", allPaymentMethods: "Tous les modes de paiement", allStatuses: "Tous les statuts", day: "Jour", week: "Semaine", month: "Mois", year: "Année", today: "Aujourd’hui", total: "Total", chartTitle: "Vue graphique", perDay: "Par jour", revenueOn: "Chiffre d’affaires le", revenueReport: "Rapport du chiffre d’affaires", paymentMethodTitle: "Mode de paiement", unknownCustomer: "Client inconnu", chooseMonth: "Choisir le mois", choose: "Choisir", newAppointment: "Nouveau rendez-vous", editAppointment: "Modifier le rendez-vous", customer: "Client", date: "Date", time: "Heure", service: "Service", duration: "Durée (min)", price: "Prix", status: "Statut", planned: "Planifié", completed: "Terminé", newClient: "Nouveau client", phone: "Téléphone", note: "Note", appointmentRemarks: "Remarques", newService: "Nouveau service", serviceName: "Nom du service", newPaymentMethod: "Nouveau mode de paiement", paymentMethodName: "Nom du mode de paiement", editProfileTitle: "Modifier le profil", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", message: "Message", registerHere: "Pas encore de compte ? Inscrivez-vous ici"
+    planning: "Planning", notifications: "Notifications", extras: "Extras utiles", defaultBreak: "Pause standard entre 2 rendez-vous (min)", overlapWarnings: "Avertissements de chevauchement", overlapWarningsHint: "Avertir lorsqu’un rendez-vous chevauche un rendez-vous existant, en tenant compte de la durée et de la pause.", enableNotifications: "Activer les notifications", enableNotificationsHint: "Prévu pour les rappels de rendez-vous dans l’application.", reminderBefore: "Rappel avant le rendez-vous", savePending: "Enregistrement des paramètres...", notificationsOff: "Les notifications sont désactivées.", notificationsActive: "Les notifications sont actives sur cet appareil tant que le navigateur ou l’application les prend en charge.", notificationsBlocked: "Les notifications sont bloquées dans les paramètres de votre navigateur.", notificationsUnsupported: "Ce navigateur ne prend pas en charge les notifications web.", notificationsPermissionHint: "Activez les notifications et autorisez-les pour afficher les rappels.", appointmentsOn: "Rendez-vous le", noAppointmentsOnDay: "Aucun rendez-vous ce jour-là.", noClientsFound: "Aucun client trouvé.", noPhone: "Pas de GSM", appointmentSingular: "rendez-vous", appointmentPlural: "rendez-vous", noActiveServices: "Aucun service actif pour le moment.", inactive: "inactif", showInactiveServices: "Afficher les services inactifs", allPaymentMethods: "Tous les modes de paiement", allStatuses: "Tous les statuts", day: "Jour", week: "Semaine", month: "Mois", year: "Année", today: "Aujourd’hui", total: "Total", revenueOn: "Chiffre d’affaires le", revenueReport: "Rapport du chiffre d’affaires", paymentMethodTitle: "Mode de paiement", unknownCustomer: "Client inconnu", chooseMonth: "Choisir le mois", choose: "Choisir", newAppointment: "Nouveau rendez-vous", editAppointment: "Modifier le rendez-vous", customer: "Client", date: "Date", time: "Heure", service: "Service", duration: "Durée (min)", price: "Prix", status: "Statut", planned: "Planifié", completed: "Terminé", newClient: "Nouveau client", phone: "Téléphone", note: "Note", appointmentRemarks: "Remarques", newService: "Nouveau service", serviceName: "Nom du service", newPaymentMethod: "Nouveau mode de paiement", paymentMethodName: "Nom du mode de paiement", editProfileTitle: "Modifier le profil", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", message: "Message", registerHere: "Pas encore de compte ? Inscrivez-vous ici"
   }
 };
 Object.keys(i18nExtra).forEach(lang => Object.assign(i18n[lang], i18nExtra[lang]));
@@ -67,7 +67,7 @@ const i18nMore = {
     delete:"Verwijderen", edit:"Bewerk", editClient:"Klant bewerken", editService:"Dienst bewerken", editPaymentMethod:"Betaalwijze bewerken", reactivateService:"Dienst opnieuw actief zetten", reactivateServiceHint:"De dienst verschijnt opnieuw in de actieve dienstenlijst en bij nieuwe afspraken.",
     customerNumber:"Klantnummer", appointments:"Afspraken", totalLower:"totaal", noAppointmentsYet:"Nog geen afspraken.", noPaymentMethods:"Nog geen betaalwijzen.", paymentSingular:"betaling", paymentPlural:"betalingen",
     customerCount:"Aantal klanten", pastAppointments:"Afgeronde afspraken", futureAppointments:"Geplande afspraken", totalRevenueUntilToday:"Totale omzet tot vandaag", chosenServices:"Gekozen behandelingen", revenueByService:"Omzet per behandeling", chosenPaymentMethod:"Gekozen betaalwijze", topCustomers:"Top klanten", all:"Alle", noCustomerStats:"Nog geen klantgegevens beschikbaar.", more:"Meer...", less:"Minder",
-    serviceNameRequired:"Geef een naam voor de dienst in.", duplicateServiceTitle:"Dubbele dienstnaam", saveAnyway:"Toch opslaan", saveFailed:"Opslaan mislukt", duplicateServiceMessage:"Er bestaat al een dienst met de naam \"{name}\".\n\nWil je toch opslaan? Dan wordt deze dienst opgeslagen als \"{uniqueName}\".", chooseDate:"Kies datum", chooseTime:"Kies tijd", chooseCustomer:"Kies een klant...", chooseService:"Kies een dienst...", choosePaymentMethod:"Kies een betaalwijze...", chooseConfirm:"Kies", dayRevenue:"Dagomzet", weekRevenue:"Weekomzet", monthRevenue:"Maandomzet", yearRevenue:"Jaaromzet"
+    serviceNameRequired:"Geef een naam voor de dienst in.", duplicateServiceTitle:"Dubbele dienstnaam", saveAnyway:"Toch opslaan", saveFailed:"Opslaan mislukt", duplicateServiceMessage:"Er bestaat al een dienst met de naam \"{name}\".\n\nWil je toch opslaan? Dan wordt deze dienst opgeslagen als \"{uniqueName}\".", chooseDate:"Kies datum", chooseTime:"Kies tijd", chooseCustomer:"Kies een klant...", chooseService:"Kies een dienst...", choosePaymentMethod:"Kies een betaalwijze...", chooseConfirm:"Kies"
   },
   "en-GB": {
     mondayShort:"Mon", tuesdayShort:"Tue", wednesdayShort:"Wed", thursdayShort:"Thu", fridayShort:"Fri", saturdayShort:"Sat", sundayShort:"Sun",
@@ -75,7 +75,7 @@ const i18nMore = {
     delete:"Delete", edit:"Edit", editClient:"Edit client", editService:"Edit service", editPaymentMethod:"Edit payment method", reactivateService:"Reactivate service", reactivateServiceHint:"The service will appear again in the active services list and for new appointments.",
     customerNumber:"Client number", appointments:"Appointments", totalLower:"total", noAppointmentsYet:"No appointments yet.", noPaymentMethods:"No payment methods yet.", paymentSingular:"payment", paymentPlural:"payments",
     customerCount:"Number of clients", pastAppointments:"Completed appointments", futureAppointments:"Planned appointments", totalRevenueUntilToday:"Total revenue until today", chosenServices:"Selected services", revenueByService:"Revenue per service", chosenPaymentMethod:"Selected payment method", topCustomers:"Top clients", all:"All", noCustomerStats:"No client data available yet.", more:"More...", less:"Less",
-    serviceNameRequired:"Enter a service name.", duplicateServiceTitle:"Duplicate service name", saveAnyway:"Save anyway", saveFailed:"Save failed", duplicateServiceMessage:"A service named \"{name}\" already exists.\n\nDo you still want to save it? This service will be saved as \"{uniqueName}\".", chooseDate:"Choose date", chooseTime:"Choose time", chooseCustomer:"Choose a client...", chooseService:"Choose a service...", choosePaymentMethod:"Choose a payment method...", chooseConfirm:"Choose", dayRevenue:"Daily revenue", weekRevenue:"Weekly revenue", monthRevenue:"Monthly revenue", yearRevenue:"Yearly revenue"
+    serviceNameRequired:"Enter a service name.", duplicateServiceTitle:"Duplicate service name", saveAnyway:"Save anyway", saveFailed:"Save failed", duplicateServiceMessage:"A service named \"{name}\" already exists.\n\nDo you still want to save it? This service will be saved as \"{uniqueName}\".", chooseDate:"Choose date", chooseTime:"Choose time", chooseCustomer:"Choose a client...", chooseService:"Choose a service...", choosePaymentMethod:"Choose a payment method...", chooseConfirm:"Choose"
   },
   "fr-FR": {
     mondayShort:"Lu", tuesdayShort:"Ma", wednesdayShort:"Me", thursdayShort:"Je", fridayShort:"Ve", saturdayShort:"Sa", sundayShort:"Di",
@@ -83,7 +83,7 @@ const i18nMore = {
     delete:"Supprimer", edit:"Modifier", editClient:"Modifier le client", editService:"Modifier le service", editPaymentMethod:"Modifier le mode de paiement", reactivateService:"Réactiver le service", reactivateServiceHint:"Le service réapparaîtra dans la liste des services actifs et pour les nouveaux rendez-vous.",
     customerNumber:"Numéro client", appointments:"Rendez-vous", totalLower:"au total", noAppointmentsYet:"Pas encore de rendez-vous.", noPaymentMethods:"Aucun mode de paiement pour le moment.", paymentSingular:"paiement", paymentPlural:"paiements",
     customerCount:"Nombre de clients", pastAppointments:"Rendez-vous terminés", futureAppointments:"Rendez-vous planifiés", totalRevenueUntilToday:"Chiffre d’affaires total jusqu’à aujourd’hui", chosenServices:"Soins choisis", revenueByService:"Chiffre d’affaires par soin", chosenPaymentMethod:"Mode de paiement choisi", topCustomers:"Meilleurs clients", all:"Tous", noCustomerStats:"Aucune donnée client disponible pour le moment.", more:"Plus...", less:"Moins",
-    serviceNameRequired:"Indiquez un nom de service.", duplicateServiceTitle:"Nom de service en double", saveAnyway:"Enregistrer quand même", saveFailed:"Échec de l’enregistrement", duplicateServiceMessage:"Un service nommé \"{name}\" existe déjà.\n\nVoulez-vous quand même l’enregistrer ? Ce service sera enregistré sous \"{uniqueName}\".", chooseDate:"Choisir la date", chooseTime:"Choisir l’heure", chooseCustomer:"Choisir un client...", chooseService:"Choisir un service...", choosePaymentMethod:"Choisir un mode de paiement...", chooseConfirm:"Choisir", dayRevenue:"Chiffre d’affaires journalier", weekRevenue:"Chiffre d’affaires hebdomadaire", monthRevenue:"Chiffre d’affaires mensuel", yearRevenue:"Chiffre d’affaires annuel"
+    serviceNameRequired:"Indiquez un nom de service.", duplicateServiceTitle:"Nom de service en double", saveAnyway:"Enregistrer quand même", saveFailed:"Échec de l’enregistrement", duplicateServiceMessage:"Un service nommé \"{name}\" existe déjà.\n\nVoulez-vous quand même l’enregistrer ? Ce service sera enregistré sous \"{uniqueName}\".", chooseDate:"Choisir la date", chooseTime:"Choisir l’heure", chooseCustomer:"Choisir un client...", chooseService:"Choisir un service...", choosePaymentMethod:"Choisir un mode de paiement...", chooseConfirm:"Choisir"
   }
 };
 Object.keys(i18nMore).forEach(lang => Object.assign(i18n[lang], i18nMore[lang]));
@@ -148,8 +148,6 @@ function updateStaticI18n() {
   };
 
   const selectorMap = [
-    ["#revenueChartTitle", "chartTitle"],
-    ["#revenueChartSubtitle", "perDay"],
     ["#jumpToTodayBtn", "today"],
     ['label[for="settingsDefaultBreakMinutes"]', "defaultBreak"],
     ['label[for="settingsReminderMinutes"]', "reminderBefore"],
@@ -211,6 +209,8 @@ function updateStaticI18n() {
     const key = map[text];
     if (key) el.textContent = t(key);
   });
+
+  renderServiceAlphabetFilter();
 
   const revenuePeriodKeys = ["day", "week", "month", "year"];
   document.querySelectorAll(".revenue-period-title").forEach((el, index) => {
@@ -321,11 +321,13 @@ const state = {
   selectedClientId: null,
   previousMainScreen: "clientsScreen",
   clientLetter: "",
+  serviceLetter: "",
   settingsSavePending: false,
   statsTopCustomersVisible: 10,
   revenueInitialized: false,
   revenueSelectedDateSynced: null,
   revenueSyncSelectedDateOnOpen: true,
+  revenueLastRenderSignature: "",
   showInactiveServices: false
 };
 
@@ -1520,13 +1522,9 @@ function switchScreen(screenId, title) {
   updateTopbar(screenId, title);
 
   if (screenId === "revenueScreen") {
-    const selectedDate = state.selectedDate || todayStr;
-    if (!state.revenueInitialized || state.revenueSyncSelectedDateOnOpen || state.revenueSelectedDateSynced !== selectedDate) {
-      setRevenuePeriod("day", selectedDate);
-      state.revenueInitialized = true;
-      state.revenueSelectedDateSynced = selectedDate;
-      state.revenueSyncSelectedDateOnOpen = false;
-    } else {
+    const beforeSignature = state.revenueLastRenderSignature;
+    syncRevenueToSelectedDateBeforePreview();
+    if (state.revenueLastRenderSignature === beforeSignature) {
       renderRevenue();
     }
   }
@@ -2041,6 +2039,10 @@ function animateAppScreen(step) {
   const width = layout.clientWidth || window.innerWidth || 360;
   const target = screens[targetIndex];
 
+  if (target.screenId === "revenueScreen") {
+    syncRevenueToSelectedDateBeforePreview();
+  }
+
   layout.dataset.pageSwipeAnimating = "true";
   targetScreen.classList.add("swipe-preview");
   layout.classList.add("is-swiping");
@@ -2151,6 +2153,9 @@ function setupAppPageSwipeNavigation() {
     dragStep = step;
     dragTarget = screens[targetIndex];
     dragTargetScreen = targetScreen;
+    if (dragTarget.screenId === "revenueScreen") {
+      syncRevenueToSelectedDateBeforePreview();
+    }
     dragTargetScreen.classList.add("swipe-preview");
     layout.dataset.pageSwipeAnimating = "true";
     layout.classList.remove("is-swipe-animating");
@@ -2384,7 +2389,7 @@ function renderAlphabetFilter() {
 
   const allBtn = document.createElement("button");
   allBtn.className = "alphabet-btn all-btn" + (!state.clientLetter ? " active" : "");
-  allBtn.textContent = "Alle";
+  allBtn.textContent = t("all");
   allBtn.onclick = () => {
     state.clientLetter = "";
     renderAlphabetFilter();
@@ -2450,6 +2455,53 @@ function renderClients() {
   });
 }
 
+
+function renderServiceAlphabetFilter() {
+  const wrap = document.getElementById("serviceAlphabetFilter");
+  if (!wrap) return;
+
+  const data = getData();
+  const services = Array.isArray(data.services) ? data.services : [];
+  const letters = [...new Set(
+    services
+      .filter(service => state.showInactiveServices || service.isActive !== false)
+      .map(service => String(service.name || "").trim().charAt(0).toUpperCase())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, getCurrentLanguage()));
+
+  if (state.serviceLetter && !letters.includes(state.serviceLetter)) {
+    state.serviceLetter = "";
+  }
+
+  wrap.innerHTML = "";
+
+  const allBtn = document.createElement("button");
+  allBtn.className = "alphabet-btn all-btn" + (!state.serviceLetter ? " active" : "");
+  allBtn.type = "button";
+  allBtn.textContent = t("all");
+  allBtn.onclick = () => {
+    state.serviceLetter = "";
+    renderServiceAlphabetFilter();
+    renderServices();
+  };
+  wrap.appendChild(allBtn);
+
+  letters.forEach(letter => {
+    const btn = document.createElement("button");
+    btn.className = "alphabet-btn" + (state.serviceLetter === letter ? " active" : "");
+    btn.type = "button";
+    btn.textContent = letter;
+
+    btn.onclick = () => {
+      state.serviceLetter = letter;
+      renderServiceAlphabetFilter();
+      renderServices();
+    };
+
+    wrap.appendChild(btn);
+  });
+}
+
 function renderServices() {
   const data = getData();
   const list = document.getElementById("servicesList");
@@ -2462,13 +2514,19 @@ function renderServices() {
     .join(" ")
     .toLowerCase()
     .includes(q);
+  const matchesLetter = service => !state.serviceLetter || String(service.name || "").trim().toUpperCase().startsWith(state.serviceLetter);
+
+  renderServiceAlphabetFilter();
+
   const activeServices = services
     .filter(service => service.isActive !== false)
     .filter(matchesSearch)
+    .filter(matchesLetter)
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
   const inactiveServices = services
     .filter(service => service.isActive === false)
     .filter(matchesSearch)
+    .filter(matchesLetter)
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
   const visibleServices = state.showInactiveServices
     ? [...activeServices, ...inactiveServices]
@@ -2566,6 +2624,49 @@ function shiftRevenueDate(baseDateStr, mode, step) {
   return formatDateInput(d);
 }
 
+function getRevenueRenderSignature() {
+  const data = getData();
+  const type = document.getElementById("revenuePeriodType")?.value || "day";
+  const anchor = document.getElementById("revenueDate")?.value || todayStr;
+  const paymentFilter = document.getElementById("revenuePaymentFilter")?.value || "";
+  const statusFilter = document.getElementById("revenuePaymentStatusFilter")?.value || "";
+  const appointmentSignature = (data.appointments || [])
+    .map(a => [
+      a.id,
+      a.date,
+      a.time,
+      a.price,
+      a.paid ? 1 : 0,
+      a.paymentMethodName || "",
+      a.currency || ""
+    ].join(":"))
+    .join("|");
+
+  return [type, anchor, paymentFilter, statusFilter, appointmentSignature].join("||");
+}
+
+function syncRevenueToSelectedDateBeforePreview() {
+  const selectedDate = state.selectedDate || todayStr;
+  const periodType = document.getElementById("revenuePeriodType");
+  const dateInput = document.getElementById("revenueDate");
+  if (!periodType || !dateInput) return;
+
+  const needsSync = !state.revenueInitialized
+    || state.revenueSyncSelectedDateOnOpen
+    || state.revenueSelectedDateSynced !== selectedDate
+    || periodType.value !== "day"
+    || dateInput.value !== selectedDate;
+
+  if (!needsSync) return;
+
+  periodType.value = "day";
+  dateInput.value = selectedDate;
+  state.revenueInitialized = true;
+  state.revenueSelectedDateSynced = selectedDate;
+  state.revenueSyncSelectedDateOnOpen = false;
+  renderRevenue();
+}
+
 function setRevenuePeriod(type, dateStr) {
   const safeDate = dateStr || document.getElementById("revenueDate").value || todayStr;
   const periodType = document.getElementById("revenuePeriodType");
@@ -2573,6 +2674,12 @@ function setRevenuePeriod(type, dateStr) {
 
   if (periodType) periodType.value = type;
   if (dateInput) dateInput.value = safeDate;
+
+  if (type === "day") {
+    state.revenueInitialized = true;
+    state.revenueSelectedDateSynced = safeDate;
+    state.revenueSyncSelectedDateOnOpen = false;
+  }
 
   renderRevenue();
 }
@@ -3054,13 +3161,14 @@ function buildRevenueChartData(filtered, type, anchor) {
 
   if (type === "week") {
     const bounds = weekBounds(anchor);
+    const weekdayKeys = ["mondayShort", "tuesdayShort", "wednesdayShort", "thursdayShort", "fridayShort", "saturdayShort", "sundayShort"];
     return Array.from({ length: 7 }, (_, index) => {
       const d = new Date(bounds.start + "T00:00:00");
       d.setDate(d.getDate() + index);
       const key = formatDateInput(d);
       const items = filtered.filter(a => a.date === key);
       return {
-        label: formatRevenueDayChip(key),
+        label: String(t(weekdayKeys[index]) || "").toLocaleLowerCase(getCurrentLanguage()),
         paid: items.filter(a => a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0),
         unpaid: items.filter(a => !a.paid).reduce((sum, a) => sum + Number(a.price || 0), 0)
       };
@@ -3094,18 +3202,19 @@ function buildRevenueChartData(filtered, type, anchor) {
 
 function renderRevenueChart(filtered, type, anchor) {
   const chartWrap = document.getElementById("revenueChart");
-  const subtitle = document.getElementById("revenueChartSubtitle");
-
   if (!chartWrap) return;
 
   const chartData = buildRevenueChartData(filtered, type, anchor);
   const visibleData = chartData.filter(item => item.paid > 0 || item.unpaid > 0);
+  const isMonthChart = type === "month";
   const useFullPeriodWidth = ["week", "month", "year"].includes(type);
   const dataToRender = useFullPeriodWidth ? chartData : (visibleData.length ? visibleData : chartData);
   const maxValue = Math.max(...dataToRender.map(item => item.paid + item.unpaid), 0);
+  const scaleMax = maxValue > 0 ? maxValue : 1;
+  const chartHeight = 220;
   const isDayChart = type === "day";
   const renderedBarCount = Math.max(dataToRender.length, 1);
-  const chartAvailableWidth = document.getElementById("revenueChart")?.clientWidth || 320;
+  const chartAvailableWidth = chartWrap.clientWidth || 320;
   const dayGap = Math.max(6, Math.min(14, Math.round(chartAvailableWidth * 0.02)));
   const calculatedDayColumnWidth = isDayChart
     ? Math.max(32, Math.floor((chartAvailableWidth - ((renderedBarCount - 1) * dayGap) - 16) / renderedBarCount))
@@ -3116,43 +3225,50 @@ function renderRevenueChart(filtered, type, anchor) {
   const dayStackWidth = isDayChart
     ? Math.max(8, Math.min(48, Math.round(dayColumnMinWidth * 0.48)))
     : null;
-
-  if (subtitle) {
-    subtitle.textContent =
-      type === "year" ? t("yearRevenue") :
-      type === "month" ? t("monthRevenue") :
-      type === "week" ? t("weekRevenue") :
-      t("dayRevenue");
-  }
-
-  if (!dataToRender.length || maxValue === 0) {
-    chartWrap.innerHTML = `<div class="empty-state">${t("noRevenueForSelection")}</div>`;
-    return;
-  }
+  const formatAxisAmount = value => new Intl.NumberFormat(getCurrentLanguage(), {
+    maximumFractionDigits: 0,
+    minimumFractionDigits: 0
+  }).format(Math.round(Number(value || 0)));
+  const axisValues = [1, 0.75, 0.5, 0.25, 0].map(step => scaleMax * step);
 
   chartWrap.innerHTML = `
-    <div class="revenue-bars ${useFullPeriodWidth ? `revenue-bars-even revenue-bars-${type}` : (isDayChart ? "revenue-bars-day-dynamic" : "")}" style="--revenue-bar-count:${renderedBarCount};${isDayChart ? `--revenue-day-gap:${dayGap}px;--revenue-day-col-width:${dayColumnMinWidth}px;--revenue-day-stack-width:${dayStackWidth}px;` : ""}">
-      ${dataToRender.map(item => {
-        const total = item.paid + item.unpaid;
-        const totalHeight = Math.max(8, (total / maxValue) * 220);
-        const paidHeight = total > 0 ? (item.paid / total) * totalHeight : 0;
-        const unpaidHeight = totalHeight - paidHeight;
+    <div class="revenue-chart-plot" style="--revenue-chart-height:${chartHeight}px;">
+      <div class="revenue-y-axis" aria-hidden="true">
+        ${axisValues.map(value => `<span>${formatAxisAmount(value)}</span>`).join("")}
+      </div>
+      <div class="revenue-chart-area">
+        <div class="revenue-y-axis-line" aria-hidden="true"></div>
+        <div class="revenue-x-axis-line" aria-hidden="true"></div>
+        <div class="revenue-bars ${useFullPeriodWidth ? `revenue-bars-even revenue-bars-${type}` : (isDayChart ? "revenue-bars-day-dynamic" : "")}" style="--revenue-bar-count:${renderedBarCount};${isDayChart ? `--revenue-day-gap:${dayGap}px;--revenue-day-col-width:${dayColumnMinWidth}px;--revenue-day-stack-width:${dayStackWidth}px;` : ""}">
+          ${dataToRender.map(item => {
+            const total = item.paid + item.unpaid;
+            const hasRevenue = total > 0;
+            const totalHeight = hasRevenue ? Math.max(8, (total / scaleMax) * chartHeight) : 0;
+            const paidHeight = hasRevenue ? (item.paid / total) * totalHeight : 0;
+            const unpaidHeight = hasRevenue ? totalHeight - paidHeight : 0;
+            const title = hasRevenue ? `${item.label} · ${euro(total)}` : "";
 
-        return `
-          <div class="revenue-bar-col" title="${item.label} · ${euro(total)}">
-            <div class="revenue-bar-stack" style="height:${totalHeight}px">
-              ${unpaidHeight > 0 ? `<span class="revenue-bar-segment unpaid" style="height:${unpaidHeight}px"></span>` : ""}
-              ${paidHeight > 0 ? `<span class="revenue-bar-segment paid" style="height:${paidHeight}px"></span>` : ""}
-            </div>
-            <span class="revenue-bar-label">${item.label}</span>
-          </div>
-        `;
-      }).join("")}
+            return `
+              <div class="revenue-bar-col${hasRevenue ? "" : " is-empty"}" title="${title}">
+                ${hasRevenue ? `
+                  <div class="revenue-bar-stack" style="height:${totalHeight}px">
+                    ${unpaidHeight > 0 ? `<span class="revenue-bar-segment unpaid" style="height:${unpaidHeight}px"></span>` : ""}
+                    ${paidHeight > 0 ? `<span class="revenue-bar-segment paid" style="height:${paidHeight}px"></span>` : ""}
+                  </div>
+                ` : `<div class="revenue-bar-stack revenue-bar-stack-empty" aria-hidden="true"></div>`}
+                <span class="revenue-bar-label">${hasRevenue ? item.label : ""}</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
     </div>
-    <div class="revenue-chart-legend">
-      <span><i class="paid"></i> ${t("paid")}</span>
-      <span><i class="unpaid"></i> ${t("unpaid")}</span>
-    </div>
+    ${maxValue > 0 ? `
+      <div class="revenue-chart-legend">
+        <span><i class="paid"></i> ${t("paid")}</span>
+        <span><i class="unpaid"></i> ${t("unpaid")}</span>
+      </div>
+    ` : ""}
   `;
 
   const bars = chartWrap.querySelector('.revenue-bars');
@@ -3925,6 +4041,13 @@ function formatCurrencyTotals(totals) {
 function renderRevenue() {
   renderRevenueFilters();
   syncRevenuePeriodChips();
+
+  const renderSignature = getRevenueRenderSignature();
+  const chartWrapForSignature = document.getElementById("revenueChart");
+  if (renderSignature && state.revenueLastRenderSignature === renderSignature && chartWrapForSignature?.children?.length) {
+    return;
+  }
+  state.revenueLastRenderSignature = renderSignature;
 
   const data = getData();
   const methodList = document.getElementById("paymentMethodList");
