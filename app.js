@@ -5110,11 +5110,20 @@ function setupAppointmentCustomerSearch() {
     renderAppointmentCustomerResults(searchInput.value, true);
   });
 
-  resultsWrap.addEventListener("click", event => {
+  const chooseCustomerFromResults = event => {
     const btn = event.target.closest("[data-customer-id]");
     if (!btn) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
     setAppointmentCustomer(btn.dataset.customerId);
-  });
+    hideAppointmentCustomerResults();
+  };
+
+  // Pointerdown voorkomt dat focus/blur of een overlappende dropdown eerst reageert.
+  resultsWrap.addEventListener("pointerdown", chooseCustomerFromResults);
+  resultsWrap.addEventListener("click", chooseCustomerFromResults);
 
   customerSelect.addEventListener("change", () => {
     setAppointmentCustomer(customerSelect.value);
@@ -5277,6 +5286,68 @@ function closeAppointmentActionPopover() {
   appointmentActionPopoverState.anchorRect = null;
 }
 
+function getOrCreateAppointmentActionContactLinks() {
+  const titleWrap = document.querySelector('#appointmentActionPopover .payment-popover-title-wrap');
+  if (!titleWrap) return null;
+
+  let links = document.getElementById('appointmentActionContactLinks');
+  if (!links) {
+    links = document.createElement('div');
+    links.id = 'appointmentActionContactLinks';
+    links.className = 'appointment-action-contact-links hidden';
+    links.setAttribute('aria-label', 'Contactacties klant');
+    titleWrap.innerHTML = '';
+    titleWrap.appendChild(links);
+  }
+  return links;
+}
+
+function renderAppointmentActionContactLinks(customer = null) {
+  const links = getOrCreateAppointmentActionContactLinks();
+  if (!links) return;
+
+  const phoneValue = normalizePhoneHref(customer?.phone || '');
+  const emailValue = String(customer?.email || '').trim();
+  const items = [];
+
+  if (phoneValue) {
+    items.push(`
+      <a class="appointment-action-contact-btn client-action-btn-call" href="tel:${escapeHtml(phoneValue)}" aria-label="Bellen" title="Bellen">
+        <span class="client-action-icon" aria-hidden="true">
+          <svg class="client-action-svg client-action-svg-phone" viewBox="0 0 33.866663 33.866663" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" d="M 23.909996,32.434977 C 20.389461,32.094537 15.982601,30.509443 12.849544,28.456682 7.2145569,24.764556 3.0899852,17.711697 2.4473057,10.6692 2.2754657,8.7864544 2.4546714,7.6922982 3.1790805,6.2285059 4.3160008,3.9275809 6.0482706,2.8458773 8.6236913,2.8286216 c 1.2263569,-0.00736 1.3845997,0.1133321 1.6342907,1.2571049 0.334981,1.5340315 0.980983,5.295665 1.1933,6.9485955 0.282797,2.201391 0.131555,2.609886 -1.095805,2.96081 -0.9857392,0.281804 -1.1985177,0.48832 -1.1985177,1.163277 0,0.679666 0.8533197,2.470356 1.8489857,3.880049 0.903416,1.279096 3.30761,3.6896 4.704684,4.716988 1.367875,1.006006 3.942592,2.313883 4.319583,2.194232 0.186889,-0.05922 0.291149,-0.243068 0.351169,-0.618407 0.102416,-0.640666 0.47429,-1.40353 0.849582,-1.742926 0.21091,-0.190772 0.457058,-0.243092 1.075419,-0.229114 1.489809,0.03375 6.767781,0.902178 8.481024,1.395594 0.791091,0.227897 0.975255,0.525719 0.975255,1.577619 0,1.820154 -0.573679,3.179294 -1.887625,4.472123 -1.130634,1.112384 -1.84168,1.435711 -3.601183,1.637302 -0.631587,0.07232 -1.177913,0.124016 -1.214051,0.114806 -0.03617,-0.0073 -0.553558,-0.06383 -1.149806,-0.121598 z" />
+        </svg>
+        </span>
+      </a>`);
+    items.push(`
+      <a class="appointment-action-contact-btn client-action-btn-sms" href="sms:${escapeHtml(phoneValue)}" aria-label="Bericht sturen" title="Bericht sturen">
+        <span class="client-action-icon" aria-hidden="true">
+          <svg class="client-action-svg client-action-svg-sms" viewBox="0 0 33.866663 33.866663" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" d="M 17.237191,4.2157633 C 15.924104,4.208373 14.50829,4.3016804 13.618807,4.4808634 10.623333,5.084378 7.6720597,6.584915 5.6999105,8.5069743 4.3110914,9.8604712 3.0792941,11.871952 2.5869222,13.589351 c -0.9929979,3.463411 -0.2111128,6.859917 2.2732463,9.874333 0.7518947,0.912356 1.7234255,1.766311 3.0049845,2.641183 0.5103951,0.34844 1.0304512,0.743743 1.155485,0.877982 0.2160192,0.23183 0.2217486,0.266071 0.1116211,0.682129 -0.1429863,0.540796 -0.5763827,1.273266 -1.1286133,1.90686 -0.2302149,0.264146 -0.475591,0.553612 -0.5451863,0.642855 -0.113099,0.144925 -0.1013234,0.162264 0.107487,0.162264 0.3834421,0 1.4285714,-0.357752 2.7352335,-0.93586 2.058384,-0.910801 1.816009,-0.872366 5.683891,-0.877466 3.794028,-0.0042 4.358245,-0.06403 6.114872,-0.65164 1.255404,-0.419959 3.022798,-1.269399 4.006474,-1.925463 3.510566,-2.341374 5.611292,-5.987736 5.603792,-9.71517 -0.0022,-0.910394 -0.04817,-1.328779 -0.214974,-1.945617 C 30.806233,11.774784 29.800559,10.032112 28.046867,8.3488444 25.802542,6.1947064 22.83288,4.8256552 19.353857,4.3413371 18.776038,4.2608885 18.025042,4.2201977 17.237191,4.2157633 Z M 11.552783,15.481742 a 1.6370258,1.6370258 0 0 1 1.63711,1.63711 1.6370258,1.6370258 0 0 1 -1.63711,1.636592 1.6370258,1.6370258 0 0 1 -1.6371092,-1.636592 1.6370258,1.6370258 0 0 1 1.6371092,-1.63711 z m 5.425509,0 a 1.6370258,1.6370258 0 0 1 1.637109,1.63711 1.6370258,1.6370258 0 0 1 -1.637109,1.636592 1.6370258,1.6370258 0 0 1 -1.63711,-1.636592 1.6370258,1.6370258 0 0 1 1.63711,-1.63711 z m 5.425508,0 a 1.6370258,1.6370258 0 0 1 1.63711,1.63711 1.6370258,1.6370258 0 0 1 -1.63711,1.636592 1.6370258,1.6370258 0 0 1 -1.637109,-1.636592 1.6370258,1.6370258 0 0 1 1.637109,-1.63711 z" />
+        </svg>
+        </span>
+      </a>`);
+  }
+
+  if (emailValue) {
+    items.push(`
+      <a class="appointment-action-contact-btn client-action-btn-email" href="mailto:${escapeHtml(emailValue)}" aria-label="E-mail sturen" title="E-mail sturen">
+        <span class="client-action-icon" aria-hidden="true">
+          <svg class="client-action-svg client-action-svg-email" viewBox="0 0 33.866667 33.866667" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" d="M 2.0799968,28.080039 C 1.8289663,27.991005 1.5567088,27.744414 1.4169892,27.479523 L 1.2985944,27.255051 1.2856283,17.293783 C 1.2761199,9.9601709 1.2859582,7.2635094 1.3226393,7.0709184 1.3881324,6.7276111 1.546333,6.4659599 1.7896315,6.2985663 2.1880519,6.024446 1.0607028,6.0436646 16.741875,6.0436646 c 15.858803,0 14.596946,-0.023411 14.991777,0.2780721 0.123077,0.093975 0.240534,0.2408551 0.323406,0.404415 l 0.130136,0.2568437 0.01153,10.0464896 c 0.01297,11.386989 0.04718,10.347367 -0.353329,10.747879 -0.414657,0.414658 1.256321,0.373783 -15.121186,0.369879 C 4.1636997,28.144218 2.2360869,28.13543 2.079981,28.080036 Z M 29.762479,17.794045 c 0,-6.591651 -0.0098,-7.9041993 -0.05842,-7.8750832 -0.03214,0.019219 -2.804728,2.3253752 -6.16132,5.1247982 -4.455652,3.716045 -6.164518,5.116653 -6.331205,5.189127 C 16.90421,20.36651 16.495626,20.352406 16.20551,20.198167 16.093541,20.138638 13.265393,17.80932 9.9207458,15.021914 6.5760985,12.234505 3.8134267,9.9381775 3.781474,9.9189603 3.7332257,9.8899451 3.7233859,11.224635 3.7233859,17.794043 v 7.91002 H 16.742938 29.762492 Z M 22.193734,12.99034 27.572168,8.5121374 22.157546,8.5010442 c -2.978042,-0.00605 -7.849026,-0.00605 -10.824409,0 L 5.9233485,8.5121374 11.30037,12.998771 c 2.957361,2.467649 5.408051,4.48284 5.445975,4.478203 0.03792,-0.0046 2.489251,-2.023623 5.447389,-4.486634 z" />
+        </svg>
+        </span>
+      </a>`);
+  }
+
+  links.innerHTML = items.join('');
+  links.classList.toggle('hidden', items.length === 0);
+
+  links.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', event => event.stopPropagation());
+  });
+}
+
 function openAppointmentActionPopover(id, anchorEl = null) {
   const data = getData();
   const app = data.appointments.find(a => String(a.id) === String(id));
@@ -5292,6 +5363,9 @@ function openAppointmentActionPopover(id, anchorEl = null) {
 
   const detailsBtn = document.getElementById("appointmentActionDetailsBtn");
   const customerBtn = document.getElementById("appointmentActionCustomerBtn");
+  const customer = customerById(data, app.customerId);
+
+  renderAppointmentActionContactLinks(customer);
 
   if (detailsBtn) {
     detailsBtn.onclick = event => {
@@ -6579,6 +6653,7 @@ function registerEvents() {
   if (passwordForm) passwordForm.addEventListener("submit", withActionLock(savePasswordFromForm));
 
   setupPasswordToggleButtons();
+  setupAppSelectDropdowns();
 
   if (headerAccountBtn) {
     headerAccountBtn.addEventListener("click", () => {
@@ -6773,6 +6848,170 @@ async function loadAllDataFromSupabase() {
 /* =========================
    STARTUP
 ========================= */
+
+
+
+/* =========================
+   APP-STIJL DROPDOWNS
+   - Vervangt de browserweergave van <select> door een eigen app-dropdown.
+   - De originele select blijft bestaan, zodat alle bestaande change-events,
+     formulierlogica en waarden blijven werken.
+========================= */
+let appSelectsReady = false;
+let appSelectObserver = null;
+
+function closeAllAppSelectDropdowns(exceptWrap = null) {
+  document.querySelectorAll('.app-select-wrap.is-open').forEach(wrap => {
+    if (wrap !== exceptWrap) wrap.classList.remove('is-open');
+  });
+}
+
+function getSelectDisplayText(select) {
+  const option = select.options?.[select.selectedIndex];
+  return option ? option.textContent.trim() : '';
+}
+
+function syncAppSelectButton(select) {
+  const wrap = select.closest('.app-select-wrap');
+  const button = wrap?.querySelector('.app-select-button');
+  const valueEl = button?.querySelector('.app-select-value');
+  if (!button || !valueEl) return;
+
+  valueEl.textContent = getSelectDisplayText(select) || select.getAttribute('aria-label') || 'Kies';
+  button.disabled = select.disabled;
+  button.setAttribute('aria-disabled', String(select.disabled));
+}
+
+function renderAppSelectOptions(select) {
+  const wrap = select.closest('.app-select-wrap');
+  const list = wrap?.querySelector('.app-select-options');
+  if (!wrap || !list) return;
+
+  list.innerHTML = '';
+
+  Array.from(select.options || []).forEach(option => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'app-select-option';
+    item.textContent = option.textContent.trim();
+    item.dataset.value = option.value;
+    item.disabled = option.disabled;
+
+    const isSelected = option.value === select.value;
+    item.classList.toggle('is-selected', isSelected);
+    item.setAttribute('role', 'option');
+    item.setAttribute('aria-selected', String(isSelected));
+
+    item.addEventListener('click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (option.disabled) return;
+
+      select.value = option.value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      syncAppSelectButton(select);
+      renderAppSelectOptions(select);
+      wrap.classList.remove('is-open');
+      wrap.querySelector('.app-select-button')?.focus({ preventScroll: true });
+    });
+
+    list.appendChild(item);
+  });
+}
+
+function enhanceAppSelect(select) {
+  if (!select || select.dataset.appSelectReady === 'true') return;
+  if (select.multiple) return;
+
+  // Deze fallback-selects horen bij de eigen zoeklijsten in de afspraakdialoog.
+  // Ze mogen niet omgezet worden naar een app-dropdown, anders verschijnt er
+  // boven de klantenlijst nog een extra popup/keuzeknop met de gekozen klant.
+  if (select.classList.contains('appointment-customer-select-fallback') ||
+      select.classList.contains('appointment-service-select-fallback')) {
+    return;
+  }
+
+  select.dataset.appSelectReady = 'true';
+
+  const wrap = document.createElement('span');
+  wrap.className = 'app-select-wrap';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'app-select-button';
+  button.setAttribute('aria-haspopup', 'listbox');
+  button.innerHTML = '<span class="app-select-value"></span><span class="app-select-arrow" aria-hidden="true"></span>';
+
+  const list = document.createElement('div');
+  list.className = 'app-select-options';
+  list.setAttribute('role', 'listbox');
+
+  select.parentNode.insertBefore(wrap, select);
+  wrap.appendChild(select);
+  wrap.appendChild(button);
+  wrap.appendChild(list);
+
+  button.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (select.disabled) return;
+
+    const shouldOpen = !wrap.classList.contains('is-open');
+    closeAllAppSelectDropdowns(wrap);
+    renderAppSelectOptions(select);
+    wrap.classList.toggle('is-open', shouldOpen);
+  });
+
+  button.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      wrap.classList.remove('is-open');
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      renderAppSelectOptions(select);
+      closeAllAppSelectDropdowns(wrap);
+      wrap.classList.add('is-open');
+      const active = list.querySelector('.app-select-option.is-selected:not(:disabled)') || list.querySelector('.app-select-option:not(:disabled)');
+      active?.focus({ preventScroll: true });
+    }
+  });
+
+  select.addEventListener('change', () => {
+    syncAppSelectButton(select);
+    renderAppSelectOptions(select);
+  });
+
+  const selectObserver = new MutationObserver(() => {
+    syncAppSelectButton(select);
+    renderAppSelectOptions(select);
+  });
+  selectObserver.observe(select, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'selected', 'value'] });
+
+  syncAppSelectButton(select);
+  renderAppSelectOptions(select);
+}
+
+function setupAppSelectDropdowns() {
+  document.querySelectorAll('select').forEach(enhanceAppSelect);
+
+  if (appSelectsReady) return;
+  appSelectsReady = true;
+
+  document.addEventListener('click', event => {
+    if (!event.target.closest('.app-select-wrap')) closeAllAppSelectDropdowns();
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeAllAppSelectDropdowns();
+  });
+
+  appSelectObserver = new MutationObserver(() => {
+    document.querySelectorAll('select').forEach(enhanceAppSelect);
+  });
+  appSelectObserver.observe(document.body, { childList: true, subtree: true });
+}
 
 
 function getActionLockButton(event) {
