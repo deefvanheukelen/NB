@@ -9,9 +9,9 @@ const todayStr = formatDateInput(today);
 
 
 const SUPPORTED_LANGUAGES = [
-  { code: "nl-BE", label: "Nederlands" },
-  { code: "en-GB", label: "English" },
-  { code: "fr-FR", label: "Français" }
+  { code: "nl-BE", label: "Nederlands", flag: "🇧🇪" },
+  { code: "en-GB", label: "English", flag: "🇬🇧" },
+  { code: "fr-FR", label: "Français", flag: "🇫🇷" }
 ];
 
 const SUPPORTED_CURRENCIES = [
@@ -119,7 +119,7 @@ function getCurrencyLabel(code) {
 
 function buildLanguageOptions(selected = DEFAULT_LANGUAGE) {
   const safe = normalizeLanguage(selected);
-  return SUPPORTED_LANGUAGES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.label}</option>`).join("");
+  return SUPPORTED_LANGUAGES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.flag ? `${item.flag} ` : ""}${item.label}</option>`).join("");
 }
 
 function buildCurrencyOptions(selected = DEFAULT_CURRENCY) {
@@ -509,6 +509,15 @@ function euro(value, currency = getCurrentCurrency()) {
     style: "currency",
     currency: normalizeCurrency(currency)
   }).format(Number(value || 0));
+}
+
+function euroRounded(value, currency = getCurrentCurrency()) {
+  return new Intl.NumberFormat(getCurrentLanguage(), {
+    style: "currency",
+    currency: normalizeCurrency(currency),
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(Math.round(Number(value || 0)));
 }
 
 function formatLongDate(dateStr) {
@@ -4120,8 +4129,8 @@ function groupRevenueByCurrency(items, predicate = () => true) {
 
 function formatCurrencyTotals(totals) {
   const entries = Object.entries(totals || {}).filter(([, value]) => Number(value || 0) !== 0);
-  if (!entries.length) return euro(0);
-  return entries.map(([currency, value]) => euro(value, currency)).join(" + ");
+  if (!entries.length) return euroRounded(0);
+  return entries.map(([currency, value]) => euroRounded(value, currency)).join(" + ");
 }
 
 function renderRevenue() {
@@ -4406,7 +4415,7 @@ function renderStatistics() {
       </div>
       <div class="statistics-kpi">
         <span class="statistics-kpi-label">${t("totalRevenueUntilToday")}</span>
-        <strong>${euro(summary.paidRevenueUntilToday)}</strong>
+        <strong>${euroRounded(summary.paidRevenueUntilToday)}</strong>
       </div>
     </section>
 
@@ -4421,7 +4430,7 @@ function renderStatistics() {
       <div class="statistics-card-head">
         <h2>${t("revenueByService")}</h2>
       </div>
-      ${buildStatisticsDonut(summary.revenueByService, value => euro(value))}
+      ${buildStatisticsDonut(summary.revenueByService, value => euroRounded(value))}
     </section>
 
     <section class="statistics-card">
@@ -4444,7 +4453,7 @@ function renderStatistics() {
           <button class="statistics-top-customer-row" type="button" data-customer-id="${customer.id || ''}">
             <div class="statistics-top-customer-rank">${index + 1}</div>
             <div class="statistics-top-customer-name">${customer.name}</div>
-            <strong class="statistics-top-customer-amount">${euro(customer.revenue)}</strong>
+            <strong class="statistics-top-customer-amount">${euroRounded(customer.revenue)}</strong>
           </button>
         `).join('') : `<div class="statistics-empty">${t("noCustomerStats")}</div>`}
       </div>
@@ -4644,6 +4653,19 @@ async function syncNotificationState(options = {}) {
   return true;
 }
 
+
+function restoreNativeSelect(select) {
+  if (!select) return;
+  const wrap = select.closest('.app-select-wrap');
+  if (!wrap) return;
+  const parent = wrap.parentNode;
+  if (!parent) return;
+  select.dataset.appSelectReady = 'false';
+  parent.insertBefore(select, wrap);
+  wrap.remove();
+  delete select.dataset.appSelectReady;
+}
+
 function renderSettings() {
   const settings = getSettings();
 
@@ -4656,8 +4678,20 @@ function renderSettings() {
   const languageSelect = document.getElementById("settingsLanguage");
   const currencySelect = document.getElementById("settingsCurrency");
 
-  if (languageSelect) languageSelect.innerHTML = buildLanguageOptions(getCurrentLanguage());
-  if (currencySelect) currencySelect.innerHTML = buildCurrencyOptions(getCurrentCurrency());
+  if (languageSelect) {
+    restoreNativeSelect(languageSelect);
+    languageSelect.classList.add("compact-field", "native-select");
+    languageSelect.dataset.nativeSelect = "true";
+    languageSelect.innerHTML = buildLanguageOptions(getCurrentLanguage());
+    languageSelect.value = getCurrentLanguage();
+  }
+  if (currencySelect) {
+    restoreNativeSelect(currencySelect);
+    currencySelect.classList.add("compact-field", "native-select");
+    currencySelect.dataset.nativeSelect = "true";
+    currencySelect.innerHTML = buildCurrencyOptions(getCurrentCurrency());
+    currencySelect.value = getCurrentCurrency();
+  }
 
   if (!breakInput || !notificationsToggle || !reminderSelect || !overlapToggle || !reminderWrap || !saveHint) return;
 
@@ -5022,147 +5056,61 @@ function customerSearchText(customer) {
   ].join(" ").toLowerCase();
 }
 
-function setAppointmentCustomer(customerId, { updateSearch = true } = {}) {
-  const data = getData();
+function setAppointmentCustomer(customerId) {
   const customerSelect = document.getElementById("appointmentCustomer");
-  const searchInput = document.getElementById("appointmentCustomerSearch");
-  const customer = customerById(data, customerId);
-
-  if (customerSelect) {
-    customerSelect.value = customer ? String(customer.id) : "";
-  }
-
-  if (searchInput && updateSearch) {
-    searchInput.value = customer ? fullName(customer) : "";
-  }
-
-  renderAppointmentCustomerResults(searchInput?.value || "", false);
+  if (customerSelect) customerSelect.value = customerId ? String(customerId) : "";
+  syncAppSelectButton(customerSelect);
 }
-
 
 function hideAppointmentCustomerResults() {
-  const resultsWrap = document.getElementById("appointmentCustomerResults");
-  const searchInput = document.getElementById("appointmentCustomerSearch");
-  if (resultsWrap) resultsWrap.classList.add("hidden");
-  if (searchInput) {
-    searchInput.setAttribute("aria-expanded", "false");
-    searchInput.blur();
-  }
+  // Niet meer nodig: Klant is nu één native select in app-stijl.
 }
 
-function renderAppointmentCustomerResults(query = "", showAllWhenEmpty = false) {
-  const data = getData();
-  const resultsWrap = document.getElementById("appointmentCustomerResults");
-  const searchInput = document.getElementById("appointmentCustomerSearch");
-  if (!resultsWrap) return;
-
-  const safeQuery = String(query || "").trim().toLowerCase();
-  const selectedId = document.getElementById("appointmentCustomer")?.value || "";
-
-  let customers = data.customers.slice().sort((a, b) => fullName(a).localeCompare(fullName(b), "nl-BE"));
-  if (safeQuery) {
-    customers = customers.filter(customer => customerSearchText(customer).includes(safeQuery));
-  } else if (!showAllWhenEmpty) {
-    customers = [];
-  }
-
-  customers = customers.slice(0, 30);
-
-  if (!customers.length) {
-    resultsWrap.innerHTML = safeQuery
-      ? `<div class="appointment-customer-empty">${t("noClientsFound")}</div>`
-      : "";
-    resultsWrap.classList.toggle("hidden", !safeQuery);
-    if (searchInput) searchInput.setAttribute("aria-expanded", safeQuery ? "true" : "false");
-    return;
-  }
-
-  resultsWrap.innerHTML = customers.map(customer => {
-    const name = fullName(customer) || "Naamloos";
-    const meta = [customer.phone, customer.email].filter(Boolean).join(" · ");
-    const activeClass = String(customer.id) === String(selectedId) ? " active" : "";
-    return `
-      <button class="appointment-customer-result${activeClass}" type="button" role="option" data-customer-id="${customer.id}" aria-selected="${activeClass ? "true" : "false"}">
-        <span class="appointment-customer-result-name">${name}</span>
-        ${meta ? `<span class="appointment-customer-result-meta">${meta}</span>` : ""}
-      </button>
-    `;
-  }).join("");
-
-  resultsWrap.classList.remove("hidden");
-  if (searchInput) searchInput.setAttribute("aria-expanded", "true");
-}
-
-function setupAppointmentCustomerSearch() {
-  const searchInput = document.getElementById("appointmentCustomerSearch");
-  const resultsWrap = document.getElementById("appointmentCustomerResults");
-  const customerSelect = document.getElementById("appointmentCustomer");
-  if (!searchInput || !resultsWrap || !customerSelect || searchInput.dataset.ready === "true") return;
-
-  searchInput.dataset.ready = "true";
-
-  searchInput.addEventListener("input", () => {
-    customerSelect.value = "";
-    renderAppointmentCustomerResults(searchInput.value, false);
-  });
-
-  searchInput.addEventListener("focus", () => {
-    renderAppointmentCustomerResults(searchInput.value, true);
-  });
-
-  const chooseCustomerFromResults = event => {
-    const btn = event.target.closest("[data-customer-id]");
-    if (!btn) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    setAppointmentCustomer(btn.dataset.customerId);
-    hideAppointmentCustomerResults();
-  };
-
-  // Pointerdown voorkomt dat focus/blur of een overlappende dropdown eerst reageert.
-  resultsWrap.addEventListener("pointerdown", chooseCustomerFromResults);
-  resultsWrap.addEventListener("click", chooseCustomerFromResults);
-
-  customerSelect.addEventListener("change", () => {
-    setAppointmentCustomer(customerSelect.value);
-  });
-
-  document.addEventListener("click", event => {
-    const picker = event.target.closest(".appointment-customer-picker");
-    if (picker) return;
-    resultsWrap.classList.add("hidden");
-    searchInput.setAttribute("aria-expanded", "false");
-  });
-}
-
-function populateAppointmentForm(customerId = null) {
+function populateAppointmentForm(customerId = null, serviceId = null) {
   const data = getData();
   const customerSelect = document.getElementById("appointmentCustomer");
   const serviceSelect = document.getElementById("appointmentService");
+  const customerSearch = document.getElementById("appointmentCustomerSearch");
+  const serviceSearch = document.getElementById("appointmentServiceSearch");
 
-  customerSelect.innerHTML = `<option value="">${t("chooseCustomer")}</option>` +
-    data.customers.map(c => `<option value="${c.id}">${fullName(c)}</option>`).join("");
-  const activeServices = (data.services || []).filter(service => service.isActive !== false);
-  serviceSelect.innerHTML = activeServices.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+  if (customerSearch) customerSearch.value = "";
+  if (serviceSearch) serviceSearch.value = "";
 
-  setupAppointmentCustomerSearch();
+  if (customerSelect) {
+    const customers = (data.customers || [])
+      .slice()
+      .sort((a, b) => fullName(a).localeCompare(fullName(b), "nl-BE"));
 
-  if (customerId) {
-    setAppointmentCustomer(customerId);
-  } else {
-    setAppointmentCustomer("");
-    const searchInput = document.getElementById("appointmentCustomerSearch");
-    if (searchInput) searchInput.value = "";
+    customerSelect.innerHTML = `<option value="">${t("chooseCustomer")}</option>` +
+      customers.map(c => `<option value="${c.id}">${fullName(c) || "Naamloos"}</option>`).join("");
+    customerSelect.value = customerId ? String(customerId) : "";
+    syncAppSelectButton(customerSelect);
+    renderAppSelectOptions(customerSelect);
+  }
+
+  if (serviceSelect) {
+    const activeServices = (data.services || [])
+      .filter(service => service.isActive !== false)
+      .slice()
+      .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
+
+    serviceSelect.innerHTML = `<option value="">${t("chooseService")}</option>` +
+      activeServices.map(s => `<option value="${s.id}">${s.name || "Naamloze dienst"}</option>`).join("");
+    serviceSelect.value = serviceId ? String(serviceId) : "";
+    syncAppSelectButton(serviceSelect);
+    renderAppSelectOptions(serviceSelect);
   }
 }
 
 function syncServiceDefaults() {
   const data = getData();
-  const service = serviceById(data, document.getElementById("appointmentService").value);
+  const service = serviceById(data, document.getElementById("appointmentService")?.value);
 
-  if (!service) return;
+  if (!service) {
+    document.getElementById("appointmentDuration").value = "";
+    document.getElementById("appointmentPrice").value = "";
+    return;
+  }
 
   document.getElementById("appointmentDuration").value = service.duration;
   document.getElementById("appointmentPrice").value = service.price;
@@ -5184,8 +5132,9 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
   syncAppointmentDateTimeDisplays();
 
   const serviceSelect = document.getElementById("appointmentService");
-  if (serviceSelect.options.length) {
-    serviceSelect.value = serviceSelect.options[0].value;
+  if (serviceSelect) {
+    serviceSelect.value = "";
+    syncAppSelectButton(serviceSelect);
   }
 
   syncServiceDefaults();
@@ -5198,7 +5147,7 @@ function openEditAppointmentDialog(id) {
   const app = data.appointments.find(a => String(a.id) === String(id));
   if (!app) return;
 
-  populateAppointmentForm(app.customerId);
+  populateAppointmentForm(app.customerId, app.serviceId);
 
   const appointmentServiceSelect = document.getElementById("appointmentService");
   const currentService = serviceById(data, app.serviceId);
@@ -5217,6 +5166,8 @@ function openEditAppointmentDialog(id) {
   document.getElementById("appointmentDate").value = app.date;
   document.getElementById("appointmentTime").value = app.time;
   document.getElementById("appointmentService").value = app.serviceId;
+  syncAppSelectButton(document.getElementById("appointmentService"));
+  renderAppSelectOptions(document.getElementById("appointmentService"));
   document.getElementById("appointmentDuration").value = app.duration;
   document.getElementById("appointmentPrice").value = app.price;
   document.getElementById("appointmentStatus").value = app.status;
@@ -5981,8 +5932,16 @@ async function saveAppointmentFromForm(event) {
   const selectedCustomerId = document.getElementById("appointmentCustomer").value;
 
   if (!selectedCustomerId) {
-    await appAlert("Kies eerst een klant uit de zoekresultaten.", { title: "Klant kiezen", variant: "warning" });
-    document.getElementById("appointmentCustomerSearch")?.focus();
+    await appAlert("Kies eerst een klant.", { title: "Klant kiezen", variant: "warning" });
+    document.getElementById("appointmentCustomer")?.focus();
+    return;
+  }
+
+  const selectedServiceId = document.getElementById("appointmentService")?.value;
+
+  if (!selectedServiceId) {
+    await appAlert("Kies eerst een dienst.", { title: "Dienst kiezen", variant: "warning" });
+    document.getElementById("appointmentService")?.focus();
     return;
   }
 
@@ -5990,7 +5949,7 @@ async function saveAppointmentFromForm(event) {
     customerId: Number(selectedCustomerId),
     date: document.getElementById("appointmentDate").value,
     time: document.getElementById("appointmentTime").value,
-    serviceId: Number(document.getElementById("appointmentService").value),
+    serviceId: Number(selectedServiceId),
     duration: Number(document.getElementById("appointmentDuration").value),
     price: Number(document.getElementById("appointmentPrice").value),
     status: id ? document.getElementById("appointmentStatus").value : "gepland",
@@ -6889,7 +6848,17 @@ function renderAppSelectOptions(select) {
 
   list.innerHTML = '';
 
+  const filterInputId = select.dataset.filterInput || "";
+  const filterInput = filterInputId ? document.getElementById(filterInputId) : null;
+  const filterText = String(filterInput?.value || "").trim().toLocaleLowerCase(getCurrentLanguage ? getCurrentLanguage() : "nl-BE");
+  let visibleCount = 0;
+
   Array.from(select.options || []).forEach(option => {
+    const optionText = option.textContent.trim();
+    const isPlaceholder = option.value === "";
+    const matchesFilter = !filterText || isPlaceholder || optionText.toLocaleLowerCase(getCurrentLanguage ? getCurrentLanguage() : "nl-BE").includes(filterText);
+    if (!matchesFilter) return;
+    if (!isPlaceholder) visibleCount += 1;
     const item = document.createElement('button');
     item.type = 'button';
     item.className = 'app-select-option';
@@ -6909,6 +6878,9 @@ function renderAppSelectOptions(select) {
 
       select.value = option.value;
       select.dispatchEvent(new Event('change', { bubbles: true }));
+      const linkedFilterInputId = select.dataset.filterInput || "";
+      const linkedFilterInput = linkedFilterInputId ? document.getElementById(linkedFilterInputId) : null;
+      if (linkedFilterInput) linkedFilterInput.value = "";
       syncAppSelectButton(select);
       renderAppSelectOptions(select);
       wrap.classList.remove('is-open');
@@ -6917,19 +6889,24 @@ function renderAppSelectOptions(select) {
 
     list.appendChild(item);
   });
+
+  if (filterText && visibleCount === 0) {
+    const empty = document.createElement('button');
+    empty.type = 'button';
+    empty.className = 'app-select-option';
+    empty.textContent = 'Geen resultaten';
+    empty.disabled = true;
+    list.appendChild(empty);
+  }
 }
 
 function enhanceAppSelect(select) {
   if (!select || select.dataset.appSelectReady === 'true') return;
-  if (select.multiple) return;
-
-  // Deze fallback-selects horen bij de eigen zoeklijsten in de afspraakdialoog.
-  // Ze mogen niet omgezet worden naar een app-dropdown, anders verschijnt er
-  // boven de klantenlijst nog een extra popup/keuzeknop met de gekozen klant.
-  if (select.classList.contains('appointment-customer-select-fallback') ||
-      select.classList.contains('appointment-service-select-fallback')) {
+  if (select.dataset.nativeSelect === 'true') {
+    restoreNativeSelect(select);
     return;
   }
+  if (select.multiple) return;
 
   select.dataset.appSelectReady = 'true';
 
@@ -6995,6 +6972,25 @@ function enhanceAppSelect(select) {
 
 function setupAppSelectDropdowns() {
   document.querySelectorAll('select').forEach(enhanceAppSelect);
+
+  document.querySelectorAll('[data-filter-input]').forEach(select => {
+    const input = document.getElementById(select.dataset.filterInput);
+    if (!input || input.dataset.appSelectFilterReady === 'true') return;
+    input.dataset.appSelectFilterReady = 'true';
+
+    input.addEventListener('input', () => {
+      renderAppSelectOptions(select);
+      const wrap = select.closest('.app-select-wrap');
+      if (wrap && input.value.trim()) {
+        closeAllAppSelectDropdowns(wrap);
+        wrap.classList.add('is-open');
+      }
+    });
+
+    input.addEventListener('focus', () => {
+      renderAppSelectOptions(select);
+    });
+  });
 
   if (appSelectsReady) return;
   appSelectsReady = true;

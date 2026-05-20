@@ -899,6 +899,22 @@ button {
   background: #ffffff;
 }
 
+/* Native select voor instellingen: geen app-knop/OK-knop, wel dezelfde veldstijl */
+.native-select,
+#settingsScreen select.native-select {
+  position: static !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: auto !important;
+  display: block !important;
+  appearance: auto;
+  -webkit-appearance: menulist;
+  background: #ffffff;
+}
+
+
 .appointment-customer-select {
   margin-top: 10px;
   max-height: 220px;
@@ -2747,6 +2763,14 @@ button {
   padding-bottom: 0;
 }
 
+#settingsScreen .app-select-wrap {
+  margin-bottom: 2px;
+}
+
+#settingsScreen .app-select-button {
+  min-height: 48px;
+}
+
 .settings-switch-row {
   display: flex;
   align-items: center;
@@ -2948,8 +2972,8 @@ button {
 }
 
 .statistics-kpi strong {
-  font-size: 16px;
-  line-height: 1.2;
+  font-size: clamp(20px, 5.4vw, 28px);
+  line-height: 1.12;
   color: var(--text);
 }
 
@@ -6425,3 +6449,80 @@ button.is-action-locked .app-action-nav-label {
   height: 21px;
 }
 
+
+
+/* =========================================================
+   FIX: één app-stijl select voor Klant en Dienst in afspraakdialoog
+========================================================= */
+#appointmentForm .appointment-customer-select,
+#appointmentForm .appointment-service-select {
+  width: 100%;
+}
+
+#appointmentForm .appointment-form-field-wide > .appointment-customer-select,
+#appointmentForm .appointment-form-field-wide > .appointment-service-select,
+#appointmentForm .appointment-form-field-wide > .app-select-wrap {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#appointmentForm .appointment-form-field-wide > .app-select-wrap {
+  width: 100%;
+  min-width: 0;
+}
+
+#appointmentForm .app-select-wrap .appointment-customer-select,
+#appointmentForm .app-select-wrap .appointment-service-select {
+  display: none;
+}
+
+#appointmentForm .app-select-button {
+  width: 100%;
+}
+
+#appointmentForm .app-select-options {
+  max-height: min(280px, 42vh);
+}
+
+
+#appointmentForm .appointment-customer-select,
+#appointmentForm .appointment-service-select {
+  margin-top: 0;
+  max-height: none;
+}
+
+
+/* =========================================================
+   FIX: zoekveld boven klant- en dienstselect in afspraakdialoog
+========================================================= */
+#appointmentForm .appointment-select-search {
+  width: 100%;
+  min-height: 44px;
+  margin-bottom: 8px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: var(--text);
+  box-shadow: 0 2px 4px rgba(170, 120, 145, 0.08);
+}
+
+#appointmentForm .appointment-select-search:focus {
+  outline: 2px solid rgba(185, 109, 135, 0.28);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+#appointmentForm .appointment-select-search::placeholder {
+  color: var(--muted);
+}
+
+#appointmentForm .appointment-form-field-wide > .appointment-select-search {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+#appointmentForm .appointment-form-field-wide > .app-select-wrap {
+  grid-column: 1;
+  grid-row: 3;
+}
