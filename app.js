@@ -88,6 +88,13 @@ const i18nMore = {
 };
 Object.keys(i18nMore).forEach(lang => Object.assign(i18n[lang], i18nMore[lang]));
 
+const i18nTodo = {
+  "nl-BE": { todo: "To Do", newTodo: "Nieuwe taak", editTodo: "Taak bewerken", todoTitle: "Titel", todoDescription: "Omschrijving", addBullet: "Bullet toevoegen", noTodos: "Nog geen taken.", markDone: "Afvinken", markOpen: "Terug openzetten", completed: "Afgewerkt", open: "Open" },
+  "en-GB": { todo: "To Do", newTodo: "New task", editTodo: "Edit task", todoTitle: "Title", todoDescription: "Description", addBullet: "Add bullet", noTodos: "No tasks yet.", markDone: "Mark done", markOpen: "Reopen", completed: "Done", open: "Open" },
+  "fr-FR": { todo: "To Do", newTodo: "Nouvelle tâche", editTodo: "Modifier la tâche", todoTitle: "Titre", todoDescription: "Description", addBullet: "Ajouter une puce", noTodos: "Aucune tâche pour le moment.", markDone: "Terminer", markOpen: "Rouvrir", completed: "Terminée", open: "Ouverte" }
+};
+Object.keys(i18nTodo).forEach(lang => Object.assign(i18n[lang], i18nTodo[lang]));
+
 
 let currentProfilePreferences = { language: DEFAULT_LANGUAGE, currency: DEFAULT_CURRENCY };
 
@@ -328,7 +335,10 @@ const state = {
   revenueSelectedDateSynced: null,
   revenueSyncSelectedDateOnOpen: true,
   revenueLastRenderSignature: "",
-  showInactiveServices: false
+  showInactiveServices: false,
+  todoFilter: "all",
+  appNavigationReady: false,
+  appNavigationLastScreen: null
 };
 
 const monthNames = [
@@ -420,6 +430,15 @@ function normalizeData(data) {
     };
   }) : [];
 
+  const todos = Array.isArray(safe.todos) ? safe.todos.map(todo => ({
+    id: todo?.id,
+    title: String(todo?.title || "").trim(),
+    description: String(todo?.description || todo?.note || "").trim(),
+    completed: Boolean(todo?.completed ?? todo?.isCompleted ?? todo?.is_completed),
+    createdAt: todo?.createdAt || todo?.created_at || null,
+    updatedAt: todo?.updatedAt || todo?.updated_at || null
+  })).filter(todo => todo.title || todo.description) : [];
+
   return {
     customers: Array.isArray(safe.customers) ? safe.customers : [],
     services: Array.isArray(safe.services) ? safe.services.map(service => ({
@@ -427,6 +446,7 @@ function normalizeData(data) {
       isActive: service?.isActive !== false
     })) : [],
     appointments,
+    todos,
     paymentMethods,
     settings: {
       ...defaults,
@@ -1535,6 +1555,7 @@ function getScreenTitle(screenId, fallback = "") {
   const map = {
     agendaScreen: "agenda",
     revenueScreen: "revenue",
+    todoScreen: "todo",
     clientsScreen: "clients",
     servicesScreen: "services",
     paymentMethodsScreen: "paymentMethods",
@@ -1557,6 +1578,9 @@ function updateTopbar(screenId, title) {
   if (screenId === "agendaScreen") {
     fab.onclick = () => openNewAppointmentDialog();
     fab.style.display = "block";
+  } else if (screenId === "todoScreen") {
+    fab.onclick = openNewTodoDialog;
+    fab.style.display = "block";
   } else if (screenId === "clientsScreen") {
     fab.onclick = openNewClientDialog;
     fab.style.display = "block";
@@ -1571,7 +1595,9 @@ function updateTopbar(screenId, title) {
   }
 }
 
-function switchScreen(screenId, title) {
+function switchScreen(screenId, title, options = {}) {
+  const previousScreen = state.currentScreen;
+
   if (isAuthLocked() && screenId !== "accountScreen") {
     screenId = "accountScreen";
     title = "Account";
@@ -1579,7 +1605,7 @@ function switchScreen(screenId, title) {
 
   state.currentScreen = screenId;
 
-  if (["agendaScreen", "clientsScreen", "servicesScreen", "paymentMethodsScreen", "statisticsScreen", "revenueScreen", "settingsScreen", "accountScreen"].includes(screenId)) {
+  if (["agendaScreen", "revenueScreen", "todoScreen", "clientsScreen", "servicesScreen", "paymentMethodsScreen", "statisticsScreen", "settingsScreen", "accountScreen"].includes(screenId)) {
     state.previousMainScreen = screenId;
   }
 
@@ -1601,6 +1627,10 @@ function switchScreen(screenId, title) {
     if (state.revenueLastRenderSignature === beforeSignature) {
       renderRevenue();
     }
+  }
+
+  if (screenId === "todoScreen") {
+    renderTodos();
   }
 
   if (screenId === "statisticsScreen") {
@@ -1625,6 +1655,12 @@ function switchScreen(screenId, title) {
   const activeClient = state.selectedClientId ? customerById(getData(), state.selectedClientId) : null;
   updateClientActionBar(activeClient);
   updateRevenueActionBar();
+
+  syncAppBrowserHistory(screenId, title, {
+    replace: Boolean(options.replaceHistory),
+    skip: Boolean(options.skipHistory),
+    previousScreen
+  });
 }
 
 function panelIsCalendarSwiping() {
@@ -5159,7 +5195,7 @@ function setAppointmentCustomer(customerId, { updateSearch = true } = {}) {
     searchInput.value = customer ? fullName(customer) : "";
   }
 
-  renderAppointmentCustomerResults(searchInput?.value || "", false);
+  refreshAppSelect(customerSelect);
 }
 
 
@@ -5220,45 +5256,197 @@ function setupAppointmentCustomerSearch() {
   const searchInput = document.getElementById("appointmentCustomerSearch");
   const resultsWrap = document.getElementById("appointmentCustomerResults");
   const customerSelect = document.getElementById("appointmentCustomer");
-  if (!searchInput || !resultsWrap || !customerSelect || searchInput.dataset.ready === "true") return;
+  if (!searchInput || !customerSelect || searchInput.dataset.ready === "true") return;
 
   searchInput.dataset.ready = "true";
+  if (resultsWrap) resultsWrap.classList.add("hidden");
+
+  const rebuildCustomerDropdown = () => {
+    const data = getData();
+    const query = String(searchInput.value || "").trim().toLowerCase();
+    const currentValue = customerSelect.value;
+
+    let customers = data.customers.slice().sort((a, b) => fullName(a).localeCompare(fullName(b), "nl-BE"));
+    if (query) customers = customers.filter(customer => customerSearchText(customer).includes(query));
+
+    const hasCurrent = currentValue && customers.some(customer => String(customer.id) === String(currentValue));
+    if (currentValue && !hasCurrent) {
+      const currentCustomer = customerById(data, currentValue);
+      if (currentCustomer) customers.unshift(currentCustomer);
+    }
+
+    customerSelect.innerHTML = `<option value="">${t("chooseCustomer")}</option>` +
+      customers.map(customer => `<option value="${customer.id}">${htmlEscape(fullName(customer) || "Naamloos")}</option>`).join("");
+    customerSelect.value = currentValue && Array.from(customerSelect.options).some(option => option.value === String(currentValue))
+      ? String(currentValue)
+      : "";
+    refreshAppSelect(customerSelect);
+  };
 
   searchInput.addEventListener("input", () => {
     customerSelect.value = "";
-    renderAppointmentCustomerResults(searchInput.value, false);
+    rebuildCustomerDropdown();
   });
 
   searchInput.addEventListener("focus", () => {
-    renderAppointmentCustomerResults(searchInput.value, true);
+    if (resultsWrap) resultsWrap.classList.add("hidden");
   });
-
-  const chooseCustomerFromResults = event => {
-    const btn = event.target.closest("[data-customer-id]");
-    if (!btn) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    setAppointmentCustomer(btn.dataset.customerId);
-    hideAppointmentCustomerResults();
-  };
-
-  // Pointerdown voorkomt dat focus/blur of een overlappende dropdown eerst reageert.
-  resultsWrap.addEventListener("pointerdown", chooseCustomerFromResults);
-  resultsWrap.addEventListener("click", chooseCustomerFromResults);
 
   customerSelect.addEventListener("change", () => {
-    setAppointmentCustomer(customerSelect.value);
+    const customer = customerById(getData(), customerSelect.value);
+    searchInput.value = customer ? fullName(customer) : "";
+    refreshAppSelect(customerSelect);
   });
 
-  document.addEventListener("click", event => {
-    const picker = event.target.closest(".appointment-customer-picker");
-    if (picker) return;
-    resultsWrap.classList.add("hidden");
-    searchInput.setAttribute("aria-expanded", "false");
-  });
+  customerSelect.dataset.rebuildAppointmentDropdown = "true";
 }
+
+function serviceSearchText(service) {
+  return [
+    service?.name,
+    service?.duration,
+    service?.price,
+    service?.isActive === false ? t("inactive") : ""
+  ].join(" ").toLowerCase();
+}
+
+function setAppointmentService(serviceId, { updateSearch = true, updateDefaults = true } = {}) {
+  const data = getData();
+  const serviceSelect = document.getElementById("appointmentService");
+  const searchInput = document.getElementById("appointmentServiceSearch");
+  const service = serviceById(data, serviceId);
+
+  if (serviceSelect) {
+    serviceSelect.value = service ? String(service.id) : "";
+  }
+
+  if (searchInput && updateSearch) {
+    searchInput.value = service ? service.name : "";
+  }
+
+  refreshAppSelect(serviceSelect);
+
+  if (updateDefaults && service) {
+    syncServiceDefaults();
+  }
+}
+
+function hideAppointmentServiceResults() {
+  const resultsWrap = document.getElementById("appointmentServiceResults");
+  const searchInput = document.getElementById("appointmentServiceSearch");
+  if (resultsWrap) resultsWrap.classList.add("hidden");
+  if (searchInput) {
+    searchInput.setAttribute("aria-expanded", "false");
+    searchInput.blur();
+  }
+}
+
+function renderAppointmentServiceResults(query = "", showAllWhenEmpty = false) {
+  const data = getData();
+  const resultsWrap = document.getElementById("appointmentServiceResults");
+  const searchInput = document.getElementById("appointmentServiceSearch");
+  if (!resultsWrap) return;
+
+  const safeQuery = String(query || "").trim().toLowerCase();
+  const selectedId = document.getElementById("appointmentService")?.value || "";
+
+  let services = (data.services || [])
+    .filter(service => service.isActive !== false || String(service.id) === String(selectedId))
+    .slice()
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
+
+  if (safeQuery) {
+    services = services.filter(service => serviceSearchText(service).includes(safeQuery));
+  } else if (!showAllWhenEmpty) {
+    services = [];
+  }
+
+  services = services.slice(0, 30);
+
+  if (!services.length) {
+    resultsWrap.innerHTML = safeQuery
+      ? `<div class="appointment-service-empty">${t("noActiveServices")}</div>`
+      : "";
+    resultsWrap.classList.toggle("hidden", !safeQuery);
+    if (searchInput) searchInput.setAttribute("aria-expanded", safeQuery ? "true" : "false");
+    return;
+  }
+
+  resultsWrap.innerHTML = services.map(service => {
+    const name = service.name || "Naamloze dienst";
+    const metaParts = [];
+    if (Number(service.duration || 0)) metaParts.push(`${Number(service.duration)} min`);
+    if (Number(service.price || 0)) metaParts.push(euro(service.price));
+    if (service.isActive === false) metaParts.push(t("inactive"));
+    const activeClass = String(service.id) === String(selectedId) ? " active" : "";
+    return `
+      <button class="appointment-service-result${activeClass}" type="button" role="option" data-service-id="${service.id}" aria-selected="${activeClass ? "true" : "false"}">
+        <span class="appointment-service-result-name">${htmlEscape(name)}</span>
+        ${metaParts.length ? `<span class="appointment-service-result-meta">${htmlEscape(metaParts.join(" · "))}</span>` : ""}
+      </button>
+    `;
+  }).join("");
+
+  resultsWrap.classList.remove("hidden");
+  if (searchInput) searchInput.setAttribute("aria-expanded", "true");
+}
+
+function setupAppointmentServiceSearch() {
+  const searchInput = document.getElementById("appointmentServiceSearch");
+  const resultsWrap = document.getElementById("appointmentServiceResults");
+  const serviceSelect = document.getElementById("appointmentService");
+  if (!searchInput || !serviceSelect || searchInput.dataset.ready === "true") return;
+
+  searchInput.dataset.ready = "true";
+  if (resultsWrap) resultsWrap.classList.add("hidden");
+
+  const rebuildServiceDropdown = () => {
+    const data = getData();
+    const query = String(searchInput.value || "").trim().toLowerCase();
+    const currentValue = serviceSelect.value;
+
+    let services = (data.services || [])
+      .filter(service => service.isActive !== false || String(service.id) === String(currentValue))
+      .slice()
+      .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
+
+    if (query) services = services.filter(service => serviceSearchText(service).includes(query));
+
+    const hasCurrent = currentValue && services.some(service => String(service.id) === String(currentValue));
+    if (currentValue && !hasCurrent) {
+      const currentService = serviceById(data, currentValue);
+      if (currentService) services.unshift(currentService);
+    }
+
+    serviceSelect.innerHTML = services.map(service => {
+      const suffix = service.isActive === false ? ` (${t("inactive")})` : "";
+      return `<option value="${service.id}">${htmlEscape((service.name || "Naamloze dienst") + suffix)}</option>`;
+    }).join("");
+    serviceSelect.value = currentValue && Array.from(serviceSelect.options).some(option => option.value === String(currentValue))
+      ? String(currentValue)
+      : (serviceSelect.options[0]?.value || "");
+    refreshAppSelect(serviceSelect);
+  };
+
+  searchInput.addEventListener("input", () => {
+    serviceSelect.value = "";
+    rebuildServiceDropdown();
+  });
+
+  searchInput.addEventListener("focus", () => {
+    if (resultsWrap) resultsWrap.classList.add("hidden");
+  });
+
+  serviceSelect.addEventListener("change", () => {
+    const service = serviceById(getData(), serviceSelect.value);
+    searchInput.value = service ? service.name : "";
+    refreshAppSelect(serviceSelect);
+    syncServiceDefaults();
+  });
+
+  serviceSelect.dataset.rebuildAppointmentDropdown = "true";
+}
+
 
 function populateAppointmentForm(customerId = null) {
   const data = getData();
@@ -5271,6 +5459,7 @@ function populateAppointmentForm(customerId = null) {
   serviceSelect.innerHTML = activeServices.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
 
   setupAppointmentCustomerSearch();
+  setupAppointmentServiceSearch();
 
   if (customerId) {
     setAppointmentCustomer(customerId);
@@ -5279,6 +5468,10 @@ function populateAppointmentForm(customerId = null) {
     const searchInput = document.getElementById("appointmentCustomerSearch");
     if (searchInput) searchInput.value = "";
   }
+
+  const serviceSearchInput = document.getElementById("appointmentServiceSearch");
+  if (serviceSearchInput) serviceSearchInput.value = "";
+  hideAppointmentServiceResults();
 }
 
 function syncServiceDefaults() {
@@ -5308,10 +5501,13 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
 
   const serviceSelect = document.getElementById("appointmentService");
   if (serviceSelect.options.length) {
-    serviceSelect.value = serviceSelect.options[0].value;
+    setAppointmentService(serviceSelect.options[0].value, { updateSearch: true, updateDefaults: false });
+  } else {
+    setAppointmentService("", { updateSearch: true, updateDefaults: false });
   }
 
   syncServiceDefaults();
+  hideAppointmentServiceResults();
   document.getElementById("deleteAppointmentBtn").style.visibility = "hidden";
   document.getElementById("appointmentDialog").showModal();
 }
@@ -5339,7 +5535,8 @@ function openEditAppointmentDialog(id) {
   hideAppointmentCustomerResults();
   document.getElementById("appointmentDate").value = app.date;
   document.getElementById("appointmentTime").value = app.time;
-  document.getElementById("appointmentService").value = app.serviceId;
+  setAppointmentService(app.serviceId, { updateSearch: true, updateDefaults: false });
+  hideAppointmentServiceResults();
   document.getElementById("appointmentDuration").value = app.duration;
   document.getElementById("appointmentPrice").value = app.price;
   document.getElementById("appointmentStatus").value = app.status;
@@ -6470,6 +6667,7 @@ function rerenderAll() {
   renderPaymentMethods();
   renderStatistics();
   renderRevenue();
+  renderTodos();
 
   if (state.selectedClientId && state.currentScreen === "clientDetailScreen") {
     openClientDetail(state.selectedClientId);
@@ -6532,6 +6730,320 @@ function applyNavStyleActionButtons(root = document) {
 }
 
 
+
+/* =========================
+   TO DO
+========================= */
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatTodoDescription(description = "") {
+  const lines = String(description || "").split(/\r?\n/);
+  let html = "";
+  let inList = false;
+
+  lines.forEach(line => {
+    const trimmed = line.trim();
+    const bullet = trimmed.match(/^[-*•]\s+(.*)$/);
+
+    if (bullet) {
+      if (!inList) {
+        html += "<ul>";
+        inList = true;
+      }
+      html += `<li>${escapeHtml(bullet[1])}</li>`;
+      return;
+    }
+
+    if (inList) {
+      html += "</ul>";
+      inList = false;
+    }
+
+    if (trimmed) {
+      html += `<p>${escapeHtml(trimmed)}</p>`;
+    }
+  });
+
+  if (inList) html += "</ul>";
+  return html;
+}
+
+function getTodos(data = getData()) {
+  return Array.isArray(data.todos) ? data.todos : [];
+}
+
+function todoById(data, id) {
+  return getTodos(data).find(todo => String(todo.id) === String(id));
+}
+
+function getFilteredTodos(data = getData()) {
+  const todos = getTodos(data).slice().sort((a, b) => {
+    if (Boolean(a.completed) !== Boolean(b.completed)) return a.completed ? 1 : -1;
+    return String(b.updatedAt || b.createdAt || b.id || "").localeCompare(String(a.updatedAt || a.createdAt || a.id || ""));
+  });
+
+  if (state.todoFilter === "open") return todos.filter(todo => !todo.completed);
+  if (state.todoFilter === "done") return todos.filter(todo => todo.completed);
+  return todos;
+}
+
+function renderTodos() {
+  const list = document.getElementById("todoList");
+  const count = document.getElementById("todoCountBadge");
+  if (!list) return;
+
+  const data = getData();
+  const todos = getFilteredTodos(data);
+  const allTodos = getTodos(data);
+  const openCount = allTodos.filter(todo => !todo.completed).length;
+
+  document.querySelectorAll(".todo-filter-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.todoFilter === state.todoFilter);
+  });
+
+  if (count) {
+    count.textContent = `${openCount} open`;
+  }
+
+  if (!todos.length) {
+    list.innerHTML = `<div class="empty-state">${t("noTodos")}</div>`;
+    return;
+  }
+
+  list.innerHTML = todos.map(todo => `
+    <article class="todo-card${todo.completed ? " is-completed" : ""}">
+      <button class="todo-check-btn" type="button" data-todo-toggle="${todo.id}" aria-label="${todo.completed ? t("markOpen") : t("markDone")}">
+        <span>${todo.completed ? "✓" : ""}</span>
+      </button>
+      <button class="todo-main-btn" type="button" data-todo-edit="${todo.id}">
+        <div class="todo-title-row">
+          <strong class="todo-title">${escapeHtml(todo.title || t("newTodo"))}</strong>
+          <span class="todo-status-pill${todo.completed ? " done" : ""}">${todo.completed ? t("completed") : t("open")}</span>
+        </div>
+        ${todo.description ? `<div class="todo-note">${formatTodoDescription(todo.description)}</div>` : ""}
+      </button>
+    </article>
+  `).join("");
+
+  list.querySelectorAll("[data-todo-edit]").forEach(btn => {
+    btn.addEventListener("click", () => openEditTodoDialog(btn.dataset.todoEdit));
+  });
+
+  list.querySelectorAll("[data-todo-toggle]").forEach(btn => {
+    btn.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleTodoCompleted(btn.dataset.todoToggle);
+    });
+  });
+}
+
+function openNewTodoDialog() {
+  const form = document.getElementById("todoForm");
+  if (form) form.reset();
+  document.getElementById("todoId").value = "";
+  document.getElementById("todoCompleted").checked = false;
+  document.getElementById("todoModalTitle").textContent = t("newTodo");
+  document.getElementById("deleteTodoBtn")?.classList.add("hidden");
+  document.getElementById("todoDialog")?.showModal();
+}
+
+function openEditTodoDialog(id) {
+  const data = getData();
+  const todo = todoById(data, id);
+  if (!todo) return;
+
+  document.getElementById("todoId").value = todo.id;
+  document.getElementById("todoTitle").value = todo.title || "";
+  document.getElementById("todoDescription").value = todo.description || "";
+  document.getElementById("todoCompleted").checked = Boolean(todo.completed);
+  document.getElementById("todoModalTitle").textContent = t("editTodo");
+  document.getElementById("deleteTodoBtn")?.classList.remove("hidden");
+  document.getElementById("todoDialog")?.showModal();
+}
+
+function addTodoBulletLine() {
+  const textarea = document.getElementById("todoDescription");
+  if (!textarea) return;
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const end = textarea.selectionEnd ?? textarea.value.length;
+  const before = textarea.value.slice(0, start);
+  const after = textarea.value.slice(end);
+  const prefix = before && !before.endsWith("\n") ? "\n" : "";
+  const insert = `${prefix}- `;
+  textarea.value = before + insert + after;
+  const cursor = (before + insert).length;
+  textarea.focus();
+  textarea.setSelectionRange(cursor, cursor);
+}
+
+async function saveTodoFromForm(event) {
+  event.preventDefault();
+
+  const user = await getCurrentUser();
+  const data = getData();
+  const rawId = document.getElementById("todoId").value;
+  const id = rawId ? Number(rawId) || rawId : null;
+  const now = new Date().toISOString();
+
+  const payload = {
+    title: String(document.getElementById("todoTitle")?.value || "").trim(),
+    description: String(document.getElementById("todoDescription")?.value || "").trim(),
+    completed: Boolean(document.getElementById("todoCompleted")?.checked),
+    updatedAt: now
+  };
+
+  if (!payload.title) {
+    await appAlert("Geef de taak een titel.", { title: t("todo"), variant: "warning" });
+    return;
+  }
+
+  if (!user) {
+    if (id) {
+      const existing = todoById(data, id);
+      if (existing) Object.assign(existing, payload);
+    } else {
+      data.todos = getTodos(data);
+      data.todos.push({ id: nextId(data.todos), ...payload, createdAt: now });
+    }
+    saveData(data);
+    closeDialog("todoDialog");
+    renderTodos();
+    return;
+  }
+
+  const dbPayload = {
+    user_id: user.id,
+    title: payload.title,
+    description: payload.description,
+    is_completed: payload.completed,
+    updated_at: now
+  };
+
+  let error;
+  if (id) {
+    ({ error } = await supabaseClient
+      .from("todos")
+      .update(dbPayload)
+      .eq("id", id)
+      .eq("user_id", user.id));
+  } else {
+    ({ error } = await supabaseClient
+      .from("todos")
+      .insert({ ...dbPayload, created_at: now }));
+  }
+
+  if (error) {
+    await appAlert("Opslaan taak mislukt: " + error.message, { title: t("saveFailed"), variant: "danger" });
+    return;
+  }
+
+  await loadAllDataFromSupabase();
+  closeDialog("todoDialog");
+  renderTodos();
+}
+
+async function toggleTodoCompleted(id) {
+  const data = getData();
+  const todo = todoById(data, id);
+  if (!todo) return;
+  todo.completed = !todo.completed;
+  todo.updatedAt = new Date().toISOString();
+
+  const user = await getCurrentUser();
+  if (!user) {
+    saveData(data);
+    renderTodos();
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("todos")
+    .update({ is_completed: todo.completed, updated_at: todo.updatedAt })
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    await appAlert("Taak aanpassen mislukt: " + error.message, { title: t("saveFailed"), variant: "danger" });
+    return;
+  }
+
+  await loadAllDataFromSupabase();
+  renderTodos();
+}
+
+async function deleteCurrentTodo() {
+  const id = document.getElementById("todoId")?.value;
+  if (!id) return;
+
+  const confirmed = await appConfirm("Deze taak verwijderen?", {
+    title: t("delete"),
+    confirmText: t("delete"),
+    cancelText: t("cancel"),
+    variant: "warning"
+  });
+  if (!confirmed) return;
+
+  const user = await getCurrentUser();
+  const data = getData();
+
+  if (!user) {
+    data.todos = getTodos(data).filter(todo => String(todo.id) !== String(id));
+    saveData(data);
+    closeDialog("todoDialog");
+    renderTodos();
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("todos")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  if (error) {
+    await appAlert("Verwijderen taak mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
+    return;
+  }
+
+  await loadAllDataFromSupabase();
+  closeDialog("todoDialog");
+  renderTodos();
+}
+
+async function loadTodosFromSupabase() {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const { data, error } = await supabaseClient
+    .from("todos")
+    .select("id, title, description, is_completed, created_at, updated_at")
+    .eq("user_id", user.id)
+    .order("is_completed", { ascending: true })
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    console.error("Fout bij laden taken:", error.message);
+    return [];
+  }
+
+  return (data || []).map(todo => ({
+    id: todo.id,
+    title: todo.title,
+    description: todo.description || "",
+    completed: Boolean(todo.is_completed),
+    createdAt: todo.created_at,
+    updatedAt: todo.updated_at
+  }));
+}
+
 /* =========================
    EVENTS
 ========================= */
@@ -6568,6 +7080,16 @@ function registerEvents() {
 
   document.getElementById("jumpToTodayBtn")?.addEventListener("click", jumpToToday);
 
+  document.getElementById("todoForm")?.addEventListener("submit", withActionLock(saveTodoFromForm));
+  document.getElementById("deleteTodoBtn")?.addEventListener("click", withActionLock(deleteCurrentTodo));
+  document.getElementById("todoAddBulletBtn")?.addEventListener("click", addTodoBulletLine);
+  document.querySelectorAll(".todo-filter-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.todoFilter = btn.dataset.todoFilter || "all";
+      renderTodos();
+    });
+  });
+
   document.querySelectorAll(".nav-btn").forEach(btn => {
     btn.addEventListener("click", (event) => {
       if (isAuthLocked() && btn.dataset.screen !== "accountScreen") {
@@ -6588,6 +7110,7 @@ function registerEvents() {
       paymentMethodsScreen: "Betaalwijze",
       statisticsScreen: "Statistieken",
       revenueScreen: "Omzet",
+      todoScreen: "To Do",
       settingsScreen: "Instellingen",
       accountScreen: "Account"
     };
@@ -6955,6 +7478,7 @@ async function loadAllDataFromSupabase() {
   const services = await loadServicesFromSupabase();
   const paymentMethods = await loadPaymentMethodsFromSupabase();
   const appointments = await loadAppointmentsFromSupabase();
+  const todos = await loadTodosFromSupabase();
   const settings = await loadSettingsFromSupabase();
 
   saveData({
@@ -6962,6 +7486,7 @@ async function loadAllDataFromSupabase() {
     services,
     paymentMethods,
     appointments,
+    todos,
     settings
   });
 
@@ -6972,6 +7497,108 @@ async function loadAllDataFromSupabase() {
    STARTUP
 ========================= */
 
+
+
+/* =========================
+   APP NAVIGATIE VIA BROWSER / ANDROID TERUGKNOP
+========================= */
+function getAppHistoryPayload(screenId = state.currentScreen, title = "") {
+  const safeScreenId = document.getElementById(screenId) ? screenId : "agendaScreen";
+  return {
+    nailbookerApp: true,
+    screenId: safeScreenId,
+    title: getScreenTitle(safeScreenId, title || "")
+  };
+}
+
+function syncAppBrowserHistory(screenId, title = "", { replace = false, skip = false, previousScreen = null } = {}) {
+  if (skip || !state.appNavigationReady || !window.history?.pushState) return;
+
+  const payload = getAppHistoryPayload(screenId, title);
+  const isSameScreen = state.appNavigationLastScreen === payload.screenId;
+
+  try {
+    if (replace || !history.state?.nailbookerApp) {
+      history.replaceState(payload, "", window.location.href);
+      history.pushState({ ...payload, guard: true }, "", window.location.href);
+      state.appNavigationLastScreen = payload.screenId;
+      return;
+    }
+
+    if (!isSameScreen && previousScreen !== payload.screenId) {
+      history.pushState(payload, "", window.location.href);
+      state.appNavigationLastScreen = payload.screenId;
+    }
+  } catch (error) {
+    console.warn("App-navigatie kon niet aan browser history gekoppeld worden:", error?.message || error);
+  }
+}
+
+function pushCurrentAppHistoryGuard() {
+  if (!state.appNavigationReady || !window.history?.pushState) return;
+  try {
+    const payload = getAppHistoryPayload(state.currentScreen);
+    history.pushState({ ...payload, guard: true }, "", window.location.href);
+    state.appNavigationLastScreen = payload.screenId;
+  } catch (error) {
+    console.warn("App-terugknop guard kon niet geplaatst worden:", error?.message || error);
+  }
+}
+
+function closeTopAppOverlayForBackButton() {
+  const openSelect = document.querySelector('.app-select-wrap.is-open');
+  if (openSelect) {
+    closeAllAppSelectDropdowns();
+    return true;
+  }
+
+  const actionPopover = document.getElementById("appointmentActionPopover");
+  if (actionPopover && !actionPopover.classList.contains("hidden")) {
+    closeAppointmentActionPopover();
+    return true;
+  }
+
+  const paymentPopover = document.getElementById("paymentPopover");
+  if (paymentPopover && !paymentPopover.classList.contains("hidden")) {
+    closePaymentPopover();
+    return true;
+  }
+
+  const openDialogs = Array.from(document.querySelectorAll("dialog[open]"));
+  const dialog = openDialogs[openDialogs.length - 1];
+  if (dialog) {
+    if (typeof dialog.close === "function") dialog.close();
+    else dialog.removeAttribute("open");
+    return true;
+  }
+
+  return false;
+}
+
+function handleAppBrowserBack(event) {
+  if (closeTopAppOverlayForBackButton()) {
+    pushCurrentAppHistoryGuard();
+    return;
+  }
+
+  const payload = event.state?.nailbookerApp ? event.state : null;
+
+  if (!payload || !payload.screenId || payload.screenId === state.currentScreen) {
+    pushCurrentAppHistoryGuard();
+    return;
+  }
+
+  switchScreen(payload.screenId, getScreenTitle(payload.screenId, payload.title || ""), { skipHistory: true });
+  state.appNavigationLastScreen = payload.screenId;
+}
+
+function setupAppBrowserBackNavigation() {
+  if (state.appNavigationReady) return;
+  if (!window.history?.pushState) return;
+
+  state.appNavigationReady = true;
+  window.addEventListener("popstate", handleAppBrowserBack);
+}
 
 
 /* =========================
@@ -7067,14 +7694,6 @@ function refreshAppSelect(select) {
 function enhanceAppSelect(select) {
   if (!select || select.dataset.appSelectReady === 'true') return;
   if (select.multiple) return;
-
-  // Deze fallback-selects horen bij de eigen zoeklijsten in de afspraakdialoog.
-  // Ze mogen niet omgezet worden naar een app-dropdown, anders verschijnt er
-  // boven de klantenlijst nog een extra popup/keuzeknop met de gekozen klant.
-  if (select.classList.contains('appointment-customer-select-fallback') ||
-      select.classList.contains('appointment-service-select-fallback')) {
-    return;
-  }
 
   select.dataset.appSelectReady = 'true';
 
@@ -7242,10 +7861,12 @@ async function startApp() {
 
   const user = await getCurrentUser();
 
+  setupAppBrowserBackNavigation();
+
   if (user) {
-    switchScreen("agendaScreen", t("agenda"));
+    switchScreen("agendaScreen", t("agenda"), { replaceHistory: true });
   } else {
-    switchScreen("accountScreen", t("account"));
+    switchScreen("accountScreen", t("account"), { replaceHistory: true });
   }
 }
 
