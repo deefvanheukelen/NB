@@ -9,9 +9,9 @@ const todayStr = formatDateInput(today);
 
 
 const SUPPORTED_LANGUAGES = [
-  { code: "nl-BE", label: "Nederlands", flag: "🇧🇪" },
-  { code: "en-GB", label: "English", flag: "🇬🇧" },
-  { code: "fr-FR", label: "Français", flag: "🇫🇷" }
+  { code: "nl-BE", label: "Nederlands" },
+  { code: "en-GB", label: "English" },
+  { code: "fr-FR", label: "Français" }
 ];
 
 const SUPPORTED_CURRENCIES = [
@@ -119,7 +119,7 @@ function getCurrencyLabel(code) {
 
 function buildLanguageOptions(selected = DEFAULT_LANGUAGE) {
   const safe = normalizeLanguage(selected);
-  return SUPPORTED_LANGUAGES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.flag ? `${item.flag} ` : ""}${item.label}</option>`).join("");
+  return SUPPORTED_LANGUAGES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.label}</option>`).join("");
 }
 
 function buildCurrencyOptions(selected = DEFAULT_CURRENCY) {
@@ -509,15 +509,6 @@ function euro(value, currency = getCurrentCurrency()) {
     style: "currency",
     currency: normalizeCurrency(currency)
   }).format(Number(value || 0));
-}
-
-function euroRounded(value, currency = getCurrentCurrency()) {
-  return new Intl.NumberFormat(getCurrentLanguage(), {
-    style: "currency",
-    currency: normalizeCurrency(currency),
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(Math.round(Number(value || 0)));
 }
 
 function formatLongDate(dateStr) {
@@ -3079,88 +3070,212 @@ function applyAppointmentWheelPickerSelection() {
   syncAppointmentDateTimeDisplays();
 }
 
+function getRevenueMonthWeekStart(year, monthIndex) {
+  const firstOfMonth = new Date(year, monthIndex, 1);
+  const mondayIndex = (firstOfMonth.getDay() + 6) % 7;
+  const start = new Date(firstOfMonth);
+  start.setDate(firstOfMonth.getDate() - mondayIndex);
+  return start;
+}
+
+function getRevenueWeeksInMonth(year, monthIndex) {
+  const firstOfMonth = new Date(year, monthIndex, 1);
+  const lastOfMonth = new Date(year, monthIndex + 1, 0);
+  const start = getRevenueMonthWeekStart(year, monthIndex);
+  const mondayIndexLast = (lastOfMonth.getDay() + 6) % 7;
+  const end = new Date(lastOfMonth);
+  end.setDate(lastOfMonth.getDate() + (6 - mondayIndexLast));
+  return Math.max(4, Math.round((end - start) / (7 * 24 * 60 * 60 * 1000)) + 1);
+}
+
 function getRevenueWeekOfMonth(date) {
-  const day = date.getDate();
-  return Math.min(4, Math.max(1, Math.ceil(day / 7)));
+  const year = date.getFullYear();
+  const monthIndex = date.getMonth();
+  const start = getRevenueMonthWeekStart(year, monthIndex);
+  const diffDays = Math.floor((new Date(year, monthIndex, date.getDate()) - start) / (24 * 60 * 60 * 1000));
+  const maxWeeks = getRevenueWeeksInMonth(year, monthIndex);
+  return Math.min(maxWeeks, Math.max(1, Math.floor(diffDays / 7) + 1));
 }
 
 function dateFromRevenueWeekOfMonth(year, monthIndex, weekNumber) {
-  const safeWeek = Math.min(4, Math.max(1, Number(weekNumber) || 1));
-  const day = clampRevenueDay(year, monthIndex, ((safeWeek - 1) * 7) + 1);
-  return new Date(year, monthIndex, day);
+  const maxWeeks = getRevenueWeeksInMonth(year, monthIndex);
+  const safeWeek = Math.min(maxWeeks, Math.max(1, Number(weekNumber) || 1));
+  const start = getRevenueMonthWeekStart(year, monthIndex);
+  const date = new Date(start);
+  date.setDate(start.getDate() + ((safeWeek - 1) * 7));
+  return date;
+}
+
+function revenuePickerDateValue(year, monthIndex, day) {
+  return formatDateInput(new Date(year, monthIndex, day));
+}
+
+function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr) {
+  const columnsWrap = document.getElementById("revenueWheelColumns");
+  if (!columnsWrap) return;
+
+  const first = new Date(year, monthIndex, 1);
+  const last = new Date(year, monthIndex + 1, 0);
+  const firstWeekdayIndex = (first.getDay() + 6) % 7; // maandag = 0
+  const gridStart = new Date(first);
+  gridStart.setDate(first.getDate() - firstWeekdayIndex);
+  const lastWeekdayIndex = (last.getDay() + 6) % 7;
+  const gridEnd = new Date(last);
+  gridEnd.setDate(last.getDate() + (6 - lastWeekdayIndex));
+
+  const selectedBounds = mode === "week" ? weekBounds(selectedDateStr) : null;
+  const monthLabel = `${capitalizeFirst(getMonthNameLong(monthIndex))} ${year}`;
+  const weekdayKeys = ["mondayShort", "tuesdayShort", "wednesdayShort", "thursdayShort", "fridayShort", "saturdayShort", "sundayShort"];
+
+  let html = `
+    <div class="revenue-calendar-picker" data-mode="${mode}" data-year="${year}" data-month="${monthIndex}">
+      <div class="revenue-calendar-picker-head">
+        <button class="icon-btn revenue-calendar-nav" type="button" data-revenue-picker-prev aria-label="Vorige maand">‹</button>
+        <strong>${monthLabel}</strong>
+        <button class="icon-btn revenue-calendar-nav" type="button" data-revenue-picker-next aria-label="Volgende maand">›</button>
+      </div>
+      <div class="revenue-calendar-weekdays">
+        ${weekdayKeys.map(key => `<span>${t(key)}</span>`).join("")}
+      </div>
+      <div class="revenue-calendar-grid">
+  `;
+
+  const cursor = new Date(gridStart);
+  while (cursor <= gridEnd) {
+    const value = formatDateInput(cursor);
+    const isOtherMonth = cursor.getMonth() !== monthIndex;
+    const isSelectedDay = mode === "day" && value === selectedDateStr;
+    const isSelectedWeek = mode === "week" && selectedBounds && value >= selectedBounds.start && value <= selectedBounds.end;
+    html += `<button class="revenue-calendar-day${isOtherMonth ? " is-other-month" : ""}${isSelectedDay ? " selected" : ""}${isSelectedWeek ? " selected-week" : ""}" type="button" data-revenue-picker-day="${value}">${cursor.getDate()}</button>`;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+
+  columnsWrap.className = "revenue-wheel-columns revenue-calendar-mode";
+  columnsWrap.innerHTML = html;
+
+  const picker = columnsWrap.querySelector(".revenue-calendar-picker");
+  const goToMonth = (delta) => {
+    const next = new Date(year, monthIndex + delta, 1);
+    renderRevenueCalendarPicker(mode, next.getFullYear(), next.getMonth(), revenuePickerState.selected.date || selectedDateStr);
+  };
+
+  picker?.querySelector("[data-revenue-picker-prev]")?.addEventListener("click", () => goToMonth(-1));
+  picker?.querySelector("[data-revenue-picker-next]")?.addEventListener("click", () => goToMonth(1));
+
+  picker?.querySelectorAll("[data-revenue-picker-day]").forEach(button => {
+    button.addEventListener("click", () => {
+      const value = button.dataset.revenuePickerDay;
+      if (!value) return;
+
+      revenuePickerState.selected.date = value;
+
+      if (mode === "week") {
+        const bounds = weekBounds(value);
+        picker.querySelectorAll(".revenue-calendar-day").forEach(dayButton => {
+          const dayValue = dayButton.dataset.revenuePickerDay || "";
+          dayButton.classList.toggle("selected-week", dayValue >= bounds.start && dayValue <= bounds.end);
+          dayButton.classList.remove("selected");
+        });
+        return;
+      }
+
+      picker.querySelectorAll(".revenue-calendar-day").forEach(dayButton => {
+        dayButton.classList.toggle("selected", dayButton.dataset.revenuePickerDay === value);
+        dayButton.classList.remove("selected-week");
+      });
+    });
+  });
+}
+
+function renderRevenueMonthPicker(year, selectedMonthIndex = new Date((revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr) + "T00:00:00").getMonth()) {
+  const columnsWrap = document.getElementById("revenueWheelColumns");
+  if (!columnsWrap) return;
+
+  const selectedDateStr = revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr;
+  const selectedDate = new Date(selectedDateStr + "T00:00:00");
+  const selectedYear = selectedDate.getFullYear();
+  const currentMonthIndex = selectedDate.getMonth();
+
+  columnsWrap.className = "revenue-wheel-columns revenue-calendar-mode";
+  columnsWrap.innerHTML = `
+    <div class="revenue-month-picker" data-year="${year}">
+      <div class="revenue-calendar-picker-head">
+        <button class="icon-btn revenue-calendar-nav" type="button" data-revenue-month-prev aria-label="Vorig jaar">‹</button>
+        <strong>${year}</strong>
+        <button class="icon-btn revenue-calendar-nav" type="button" data-revenue-month-next aria-label="Volgend jaar">›</button>
+      </div>
+      <div class="revenue-month-grid">
+        ${Array.from({ length: 12 }, (_, index) => `
+          <button class="revenue-month-option${year === selectedYear && index === currentMonthIndex ? " selected" : ""}" type="button" data-revenue-picker-month="${index}">
+            ${capitalizeFirst(getMonthNameLong(index))}
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `;
+
+  const picker = columnsWrap.querySelector(".revenue-month-picker");
+  picker?.querySelector("[data-revenue-month-prev]")?.addEventListener("click", () => renderRevenueMonthPicker(year - 1, selectedMonthIndex));
+  picker?.querySelector("[data-revenue-month-next]")?.addEventListener("click", () => renderRevenueMonthPicker(year + 1, selectedMonthIndex));
+
+  picker?.querySelectorAll("[data-revenue-picker-month]").forEach(button => {
+    button.addEventListener("click", () => {
+      const monthIndex = Number(button.dataset.revenuePickerMonth || 0);
+      const currentDay = selectedDate.getDate();
+      const day = clampRevenueDay(year, monthIndex, currentDay);
+      revenuePickerState.selected.date = formatDateInput(new Date(year, monthIndex, day));
+      picker.querySelectorAll(".revenue-month-option").forEach(monthButton => {
+        monthButton.classList.toggle("selected", monthButton === button);
+      });
+    });
+  });
 }
 
 function openRevenueWheelPicker(mode) {
   const dialog = document.getElementById("revenueWheelPickerDialog");
   const title = document.getElementById("revenueWheelPickerTitle");
   const columnsWrap = document.getElementById("revenueWheelColumns");
+  const shell = dialog?.querySelector(".revenue-wheel-shell");
+  const confirmBtn = document.getElementById("revenueWheelConfirmBtn");
   const anchor = document.getElementById("revenueDate").value || todayStr;
   const anchorDate = new Date(anchor + "T00:00:00");
   const selectedYear = anchorDate.getFullYear();
   const selectedMonthIndex = anchorDate.getMonth();
-  const selectedDay = anchorDate.getDate();
-  const selectedWeek = getRevenueWeekOfMonth(anchorDate);
+
+  if (!dialog || !title || !columnsWrap) return;
 
   revenuePickerState.mode = mode;
   revenuePickerState.columns = [];
-  revenuePickerState.selected = {};
+  revenuePickerState.selected = { date: anchor };
 
-  const years = getRevenueDataYears();
-  const months = Array.from({ length: 12 }, (_, i) => i);
+  if (shell) shell.classList.toggle("revenue-calendar-shell", mode !== "year");
+  if (confirmBtn) confirmBtn.classList.remove("hidden");
 
-  if (mode === "year") {
-    title.textContent = "Kies jaar";
-    columnsWrap.className = "revenue-wheel-columns";
-    columnsWrap.innerHTML = buildRevenueWheelColumn("year", years, value => value);
-  } else if (mode === "month") {
-    title.textContent = "Kies maand";
-    columnsWrap.className = "revenue-wheel-columns two-cols";
-    columnsWrap.innerHTML =
-      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
-      buildRevenueWheelColumn("year", years, value => value);
+  if (mode === "day") {
+    title.textContent = "Kies dag";
+    renderRevenueCalendarPicker("day", selectedYear, selectedMonthIndex, anchor);
   } else if (mode === "week") {
     title.textContent = "Kies week";
-    columnsWrap.className = "revenue-wheel-columns three-cols";
-    const weeks = [1, 2, 3, 4];
-    columnsWrap.innerHTML =
-      buildRevenueWheelColumn("week", weeks, value => `Week ${value}`) +
-      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
-      buildRevenueWheelColumn("year", years, value => value);
-  } else {
-    title.textContent = "Kies dag";
-    columnsWrap.className = "revenue-wheel-columns three-cols";
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
-    columnsWrap.innerHTML =
-      buildRevenueWheelColumn("day", days, value => String(value).padStart(2, "0")) +
-      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
-      buildRevenueWheelColumn("year", years, value => value);
-  }
-
-  const columns = Array.from(columnsWrap.querySelectorAll(".revenue-wheel-column"));
-  revenuePickerState.columns = columns;
-
-  if (mode === "year") {
-    revenuePickerState.selected.year = String(selectedYear);
+    renderRevenueCalendarPicker("week", selectedYear, selectedMonthIndex, anchor);
   } else if (mode === "month") {
-    revenuePickerState.selected.monthIndex = String(selectedMonthIndex);
-    revenuePickerState.selected.year = String(selectedYear);
-  } else if (mode === "week") {
-    revenuePickerState.selected.week = String(selectedWeek);
-    revenuePickerState.selected.monthIndex = String(selectedMonthIndex);
-    revenuePickerState.selected.year = String(selectedYear);
+    title.textContent = "Kies maand";
+    renderRevenueMonthPicker(selectedYear, selectedMonthIndex);
   } else {
-    revenuePickerState.selected.day = String(selectedDay);
-    revenuePickerState.selected.monthIndex = String(selectedMonthIndex);
+    if (shell) shell.classList.remove("revenue-calendar-shell");
+    title.textContent = "Kies jaar";
+    columnsWrap.className = "revenue-wheel-columns";
+    const years = getRevenueDataYears();
+    columnsWrap.innerHTML = buildRevenueWheelColumn("year", years, value => value);
     revenuePickerState.selected.year = String(selectedYear);
+    const columns = Array.from(columnsWrap.querySelectorAll(".revenue-wheel-column"));
+    revenuePickerState.columns = columns;
+    columns.forEach(column => attachRevenueWheelColumnEvents(column, column.dataset.key));
   }
-
-  columns.forEach(column => attachRevenueWheelColumnEvents(column, column.dataset.key));
-
-  const centerActiveRevenuePickerValues = (behavior = "auto") => {
-    Object.entries(revenuePickerState.selected).forEach(([key, value]) => {
-      centerRevenueWheelColumn(columnsWrap.querySelector(`[data-key="${key}"]`), value, behavior);
-    });
-  };
 
   if (typeof dialog.showModal === "function") {
     dialog.showModal();
@@ -3168,13 +3283,18 @@ function openRevenueWheelPicker(mode) {
     dialog.setAttribute("open", "open");
   }
 
-  // Dialoginhoud heeft pas na openen betrouwbare hoogtes. Daarom pas na
-  // showModal centreren, zodat de actieve dag/week/maand/jaar zichtbaar
-  // geselecteerd staat i.p.v. de eerste optie in de lijst.
-  requestAnimationFrame(() => {
-    centerActiveRevenuePickerValues("auto");
-    requestAnimationFrame(() => centerActiveRevenuePickerValues("auto"));
-  });
+  if (mode === "year") {
+    const centerActiveRevenuePickerValues = (behavior = "auto") => {
+      Object.entries(revenuePickerState.selected).forEach(([key, value]) => {
+        centerRevenueWheelColumn(columnsWrap.querySelector(`[data-key="${key}"]`), value, behavior);
+      });
+    };
+
+    requestAnimationFrame(() => {
+      centerActiveRevenuePickerValues("auto");
+      requestAnimationFrame(() => centerActiveRevenuePickerValues("auto"));
+    });
+  }
 }
 
 function applyRevenueWheelPickerSelection() {
@@ -3191,26 +3311,17 @@ function applyRevenueWheelPickerSelection() {
   }
 
   if (revenuePickerState.mode === "month") {
-    const year = Number(revenuePickerState.selected.year || anchorDate.getFullYear());
-    const monthIndex = Number(revenuePickerState.selected.monthIndex || anchorDate.getMonth());
-    const day = clampRevenueDay(year, monthIndex, currentDay);
-    setRevenuePeriod("month", formatDateInput(new Date(year, monthIndex, day)));
+    const selectedDate = new Date((revenuePickerState.selected.date || anchor) + "T00:00:00");
+    setRevenuePeriod("month", formatDateInput(selectedDate));
     return;
   }
 
   if (revenuePickerState.mode === "week") {
-    const year = Number(revenuePickerState.selected.year || anchorDate.getFullYear());
-    const monthIndex = Number(revenuePickerState.selected.monthIndex || anchorDate.getMonth());
-    const week = Number(revenuePickerState.selected.week || getRevenueWeekOfMonth(anchorDate));
-    setRevenuePeriod("week", formatDateInput(dateFromRevenueWeekOfMonth(year, monthIndex, week)));
+    setRevenuePeriod("week", revenuePickerState.selected.date || anchor);
     return;
   }
 
-  const year = Number(revenuePickerState.selected.year || anchorDate.getFullYear());
-  const monthIndex = Number(revenuePickerState.selected.monthIndex || anchorDate.getMonth());
-  const rawDay = Number(revenuePickerState.selected.day || currentDay);
-  const day = clampRevenueDay(year, monthIndex, rawDay);
-  setRevenuePeriod("day", formatDateInput(new Date(year, monthIndex, day)));
+  setRevenuePeriod("day", revenuePickerState.selected.date || anchor);
 }
 
 function openRevenueDatePicker(mode = "day") {
@@ -4129,8 +4240,8 @@ function groupRevenueByCurrency(items, predicate = () => true) {
 
 function formatCurrencyTotals(totals) {
   const entries = Object.entries(totals || {}).filter(([, value]) => Number(value || 0) !== 0);
-  if (!entries.length) return euroRounded(0);
-  return entries.map(([currency, value]) => euroRounded(value, currency)).join(" + ");
+  if (!entries.length) return euro(0);
+  return entries.map(([currency, value]) => euro(value, currency)).join(" + ");
 }
 
 function renderRevenue() {
@@ -4415,7 +4526,7 @@ function renderStatistics() {
       </div>
       <div class="statistics-kpi">
         <span class="statistics-kpi-label">${t("totalRevenueUntilToday")}</span>
-        <strong>${euroRounded(summary.paidRevenueUntilToday)}</strong>
+        <strong>${euro(summary.paidRevenueUntilToday)}</strong>
       </div>
     </section>
 
@@ -4430,7 +4541,7 @@ function renderStatistics() {
       <div class="statistics-card-head">
         <h2>${t("revenueByService")}</h2>
       </div>
-      ${buildStatisticsDonut(summary.revenueByService, value => euroRounded(value))}
+      ${buildStatisticsDonut(summary.revenueByService, value => euro(value))}
     </section>
 
     <section class="statistics-card">
@@ -4453,7 +4564,7 @@ function renderStatistics() {
           <button class="statistics-top-customer-row" type="button" data-customer-id="${customer.id || ''}">
             <div class="statistics-top-customer-rank">${index + 1}</div>
             <div class="statistics-top-customer-name">${customer.name}</div>
-            <strong class="statistics-top-customer-amount">${euroRounded(customer.revenue)}</strong>
+            <strong class="statistics-top-customer-amount">${euro(customer.revenue)}</strong>
           </button>
         `).join('') : `<div class="statistics-empty">${t("noCustomerStats")}</div>`}
       </div>
@@ -4653,19 +4764,6 @@ async function syncNotificationState(options = {}) {
   return true;
 }
 
-
-function restoreNativeSelect(select) {
-  if (!select) return;
-  const wrap = select.closest('.app-select-wrap');
-  if (!wrap) return;
-  const parent = wrap.parentNode;
-  if (!parent) return;
-  select.dataset.appSelectReady = 'false';
-  parent.insertBefore(select, wrap);
-  wrap.remove();
-  delete select.dataset.appSelectReady;
-}
-
 function renderSettings() {
   const settings = getSettings();
 
@@ -4678,20 +4776,7 @@ function renderSettings() {
   const languageSelect = document.getElementById("settingsLanguage");
   const currencySelect = document.getElementById("settingsCurrency");
 
-  if (languageSelect) {
-    restoreNativeSelect(languageSelect);
-    languageSelect.classList.add("compact-field", "native-select");
-    languageSelect.dataset.nativeSelect = "true";
-    languageSelect.innerHTML = buildLanguageOptions(getCurrentLanguage());
-    languageSelect.value = getCurrentLanguage();
-  }
-  if (currencySelect) {
-    restoreNativeSelect(currencySelect);
-    currencySelect.classList.add("compact-field", "native-select");
-    currencySelect.dataset.nativeSelect = "true";
-    currencySelect.innerHTML = buildCurrencyOptions(getCurrentCurrency());
-    currencySelect.value = getCurrentCurrency();
-  }
+  rebuildSettingsSelectOptions();
 
   if (!breakInput || !notificationsToggle || !reminderSelect || !overlapToggle || !reminderWrap || !saveHint) return;
 
@@ -4699,6 +4784,10 @@ function renderSettings() {
   notificationsToggle.checked = Boolean(settings.notificationsEnabled);
   reminderSelect.value = String(settings.reminderMinutes || 30);
   overlapToggle.checked = settings.overlapWarningsEnabled !== false;
+
+  refreshAppSelect(reminderSelect);
+  refreshAppSelect(languageSelect);
+  refreshAppSelect(currencySelect);
   const notificationsEnabled = Boolean(settings.notificationsEnabled);
   const permissionState = notificationsPermissionState();
 
@@ -5056,61 +5145,147 @@ function customerSearchText(customer) {
   ].join(" ").toLowerCase();
 }
 
-function setAppointmentCustomer(customerId) {
+function setAppointmentCustomer(customerId, { updateSearch = true } = {}) {
+  const data = getData();
   const customerSelect = document.getElementById("appointmentCustomer");
-  if (customerSelect) customerSelect.value = customerId ? String(customerId) : "";
-  syncAppSelectButton(customerSelect);
+  const searchInput = document.getElementById("appointmentCustomerSearch");
+  const customer = customerById(data, customerId);
+
+  if (customerSelect) {
+    customerSelect.value = customer ? String(customer.id) : "";
+  }
+
+  if (searchInput && updateSearch) {
+    searchInput.value = customer ? fullName(customer) : "";
+  }
+
+  renderAppointmentCustomerResults(searchInput?.value || "", false);
 }
+
 
 function hideAppointmentCustomerResults() {
-  // Niet meer nodig: Klant is nu één native select in app-stijl.
+  const resultsWrap = document.getElementById("appointmentCustomerResults");
+  const searchInput = document.getElementById("appointmentCustomerSearch");
+  if (resultsWrap) resultsWrap.classList.add("hidden");
+  if (searchInput) {
+    searchInput.setAttribute("aria-expanded", "false");
+    searchInput.blur();
+  }
 }
 
-function populateAppointmentForm(customerId = null, serviceId = null) {
+function renderAppointmentCustomerResults(query = "", showAllWhenEmpty = false) {
+  const data = getData();
+  const resultsWrap = document.getElementById("appointmentCustomerResults");
+  const searchInput = document.getElementById("appointmentCustomerSearch");
+  if (!resultsWrap) return;
+
+  const safeQuery = String(query || "").trim().toLowerCase();
+  const selectedId = document.getElementById("appointmentCustomer")?.value || "";
+
+  let customers = data.customers.slice().sort((a, b) => fullName(a).localeCompare(fullName(b), "nl-BE"));
+  if (safeQuery) {
+    customers = customers.filter(customer => customerSearchText(customer).includes(safeQuery));
+  } else if (!showAllWhenEmpty) {
+    customers = [];
+  }
+
+  customers = customers.slice(0, 30);
+
+  if (!customers.length) {
+    resultsWrap.innerHTML = safeQuery
+      ? `<div class="appointment-customer-empty">${t("noClientsFound")}</div>`
+      : "";
+    resultsWrap.classList.toggle("hidden", !safeQuery);
+    if (searchInput) searchInput.setAttribute("aria-expanded", safeQuery ? "true" : "false");
+    return;
+  }
+
+  resultsWrap.innerHTML = customers.map(customer => {
+    const name = fullName(customer) || "Naamloos";
+    const meta = [customer.phone, customer.email].filter(Boolean).join(" · ");
+    const activeClass = String(customer.id) === String(selectedId) ? " active" : "";
+    return `
+      <button class="appointment-customer-result${activeClass}" type="button" role="option" data-customer-id="${customer.id}" aria-selected="${activeClass ? "true" : "false"}">
+        <span class="appointment-customer-result-name">${name}</span>
+        ${meta ? `<span class="appointment-customer-result-meta">${meta}</span>` : ""}
+      </button>
+    `;
+  }).join("");
+
+  resultsWrap.classList.remove("hidden");
+  if (searchInput) searchInput.setAttribute("aria-expanded", "true");
+}
+
+function setupAppointmentCustomerSearch() {
+  const searchInput = document.getElementById("appointmentCustomerSearch");
+  const resultsWrap = document.getElementById("appointmentCustomerResults");
+  const customerSelect = document.getElementById("appointmentCustomer");
+  if (!searchInput || !resultsWrap || !customerSelect || searchInput.dataset.ready === "true") return;
+
+  searchInput.dataset.ready = "true";
+
+  searchInput.addEventListener("input", () => {
+    customerSelect.value = "";
+    renderAppointmentCustomerResults(searchInput.value, false);
+  });
+
+  searchInput.addEventListener("focus", () => {
+    renderAppointmentCustomerResults(searchInput.value, true);
+  });
+
+  const chooseCustomerFromResults = event => {
+    const btn = event.target.closest("[data-customer-id]");
+    if (!btn) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    setAppointmentCustomer(btn.dataset.customerId);
+    hideAppointmentCustomerResults();
+  };
+
+  // Pointerdown voorkomt dat focus/blur of een overlappende dropdown eerst reageert.
+  resultsWrap.addEventListener("pointerdown", chooseCustomerFromResults);
+  resultsWrap.addEventListener("click", chooseCustomerFromResults);
+
+  customerSelect.addEventListener("change", () => {
+    setAppointmentCustomer(customerSelect.value);
+  });
+
+  document.addEventListener("click", event => {
+    const picker = event.target.closest(".appointment-customer-picker");
+    if (picker) return;
+    resultsWrap.classList.add("hidden");
+    searchInput.setAttribute("aria-expanded", "false");
+  });
+}
+
+function populateAppointmentForm(customerId = null) {
   const data = getData();
   const customerSelect = document.getElementById("appointmentCustomer");
   const serviceSelect = document.getElementById("appointmentService");
-  const customerSearch = document.getElementById("appointmentCustomerSearch");
-  const serviceSearch = document.getElementById("appointmentServiceSearch");
 
-  if (customerSearch) customerSearch.value = "";
-  if (serviceSearch) serviceSearch.value = "";
+  customerSelect.innerHTML = `<option value="">${t("chooseCustomer")}</option>` +
+    data.customers.map(c => `<option value="${c.id}">${fullName(c)}</option>`).join("");
+  const activeServices = (data.services || []).filter(service => service.isActive !== false);
+  serviceSelect.innerHTML = activeServices.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
 
-  if (customerSelect) {
-    const customers = (data.customers || [])
-      .slice()
-      .sort((a, b) => fullName(a).localeCompare(fullName(b), "nl-BE"));
+  setupAppointmentCustomerSearch();
 
-    customerSelect.innerHTML = `<option value="">${t("chooseCustomer")}</option>` +
-      customers.map(c => `<option value="${c.id}">${fullName(c) || "Naamloos"}</option>`).join("");
-    customerSelect.value = customerId ? String(customerId) : "";
-    syncAppSelectButton(customerSelect);
-    renderAppSelectOptions(customerSelect);
-  }
-
-  if (serviceSelect) {
-    const activeServices = (data.services || [])
-      .filter(service => service.isActive !== false)
-      .slice()
-      .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "nl-BE"));
-
-    serviceSelect.innerHTML = `<option value="">${t("chooseService")}</option>` +
-      activeServices.map(s => `<option value="${s.id}">${s.name || "Naamloze dienst"}</option>`).join("");
-    serviceSelect.value = serviceId ? String(serviceId) : "";
-    syncAppSelectButton(serviceSelect);
-    renderAppSelectOptions(serviceSelect);
+  if (customerId) {
+    setAppointmentCustomer(customerId);
+  } else {
+    setAppointmentCustomer("");
+    const searchInput = document.getElementById("appointmentCustomerSearch");
+    if (searchInput) searchInput.value = "";
   }
 }
 
 function syncServiceDefaults() {
   const data = getData();
-  const service = serviceById(data, document.getElementById("appointmentService")?.value);
+  const service = serviceById(data, document.getElementById("appointmentService").value);
 
-  if (!service) {
-    document.getElementById("appointmentDuration").value = "";
-    document.getElementById("appointmentPrice").value = "";
-    return;
-  }
+  if (!service) return;
 
   document.getElementById("appointmentDuration").value = service.duration;
   document.getElementById("appointmentPrice").value = service.price;
@@ -5132,9 +5307,8 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
   syncAppointmentDateTimeDisplays();
 
   const serviceSelect = document.getElementById("appointmentService");
-  if (serviceSelect) {
-    serviceSelect.value = "";
-    syncAppSelectButton(serviceSelect);
+  if (serviceSelect.options.length) {
+    serviceSelect.value = serviceSelect.options[0].value;
   }
 
   syncServiceDefaults();
@@ -5147,7 +5321,7 @@ function openEditAppointmentDialog(id) {
   const app = data.appointments.find(a => String(a.id) === String(id));
   if (!app) return;
 
-  populateAppointmentForm(app.customerId, app.serviceId);
+  populateAppointmentForm(app.customerId);
 
   const appointmentServiceSelect = document.getElementById("appointmentService");
   const currentService = serviceById(data, app.serviceId);
@@ -5166,8 +5340,6 @@ function openEditAppointmentDialog(id) {
   document.getElementById("appointmentDate").value = app.date;
   document.getElementById("appointmentTime").value = app.time;
   document.getElementById("appointmentService").value = app.serviceId;
-  syncAppSelectButton(document.getElementById("appointmentService"));
-  renderAppSelectOptions(document.getElementById("appointmentService"));
   document.getElementById("appointmentDuration").value = app.duration;
   document.getElementById("appointmentPrice").value = app.price;
   document.getElementById("appointmentStatus").value = app.status;
@@ -5932,16 +6104,8 @@ async function saveAppointmentFromForm(event) {
   const selectedCustomerId = document.getElementById("appointmentCustomer").value;
 
   if (!selectedCustomerId) {
-    await appAlert("Kies eerst een klant.", { title: "Klant kiezen", variant: "warning" });
-    document.getElementById("appointmentCustomer")?.focus();
-    return;
-  }
-
-  const selectedServiceId = document.getElementById("appointmentService")?.value;
-
-  if (!selectedServiceId) {
-    await appAlert("Kies eerst een dienst.", { title: "Dienst kiezen", variant: "warning" });
-    document.getElementById("appointmentService")?.focus();
+    await appAlert("Kies eerst een klant uit de zoekresultaten.", { title: "Klant kiezen", variant: "warning" });
+    document.getElementById("appointmentCustomerSearch")?.focus();
     return;
   }
 
@@ -5949,7 +6113,7 @@ async function saveAppointmentFromForm(event) {
     customerId: Number(selectedCustomerId),
     date: document.getElementById("appointmentDate").value,
     time: document.getElementById("appointmentTime").value,
-    serviceId: Number(selectedServiceId),
+    serviceId: Number(document.getElementById("appointmentService").value),
     duration: Number(document.getElementById("appointmentDuration").value),
     price: Number(document.getElementById("appointmentPrice").value),
     status: id ? document.getElementById("appointmentStatus").value : "gepland",
@@ -6848,17 +7012,7 @@ function renderAppSelectOptions(select) {
 
   list.innerHTML = '';
 
-  const filterInputId = select.dataset.filterInput || "";
-  const filterInput = filterInputId ? document.getElementById(filterInputId) : null;
-  const filterText = String(filterInput?.value || "").trim().toLocaleLowerCase(getCurrentLanguage ? getCurrentLanguage() : "nl-BE");
-  let visibleCount = 0;
-
   Array.from(select.options || []).forEach(option => {
-    const optionText = option.textContent.trim();
-    const isPlaceholder = option.value === "";
-    const matchesFilter = !filterText || isPlaceholder || optionText.toLocaleLowerCase(getCurrentLanguage ? getCurrentLanguage() : "nl-BE").includes(filterText);
-    if (!matchesFilter) return;
-    if (!isPlaceholder) visibleCount += 1;
     const item = document.createElement('button');
     item.type = 'button';
     item.className = 'app-select-option';
@@ -6878,9 +7032,6 @@ function renderAppSelectOptions(select) {
 
       select.value = option.value;
       select.dispatchEvent(new Event('change', { bubbles: true }));
-      const linkedFilterInputId = select.dataset.filterInput || "";
-      const linkedFilterInput = linkedFilterInputId ? document.getElementById(linkedFilterInputId) : null;
-      if (linkedFilterInput) linkedFilterInput.value = "";
       syncAppSelectButton(select);
       renderAppSelectOptions(select);
       wrap.classList.remove('is-open');
@@ -6889,24 +7040,41 @@ function renderAppSelectOptions(select) {
 
     list.appendChild(item);
   });
+}
 
-  if (filterText && visibleCount === 0) {
-    const empty = document.createElement('button');
-    empty.type = 'button';
-    empty.className = 'app-select-option';
-    empty.textContent = 'Geen resultaten';
-    empty.disabled = true;
-    list.appendChild(empty);
+function refreshAppSelect(select) {
+  if (!select) return;
+
+  const wrap = select.closest('.app-select-wrap');
+  const hasValidWrap = Boolean(wrap && wrap.querySelector('.app-select-button') && wrap.querySelector('.app-select-options'));
+
+  if (select.dataset.appSelectReady !== 'true' || !hasValidWrap) {
+    if (!hasValidWrap) {
+      delete select.dataset.appSelectReady;
+      if (wrap) {
+        wrap.parentNode.insertBefore(select, wrap);
+        wrap.remove();
+      }
+    }
+    enhanceAppSelect(select);
+    return;
   }
+
+  syncAppSelectButton(select);
+  renderAppSelectOptions(select);
 }
 
 function enhanceAppSelect(select) {
   if (!select || select.dataset.appSelectReady === 'true') return;
-  if (select.dataset.nativeSelect === 'true') {
-    restoreNativeSelect(select);
+  if (select.multiple) return;
+
+  // Deze fallback-selects horen bij de eigen zoeklijsten in de afspraakdialoog.
+  // Ze mogen niet omgezet worden naar een app-dropdown, anders verschijnt er
+  // boven de klantenlijst nog een extra popup/keuzeknop met de gekozen klant.
+  if (select.classList.contains('appointment-customer-select-fallback') ||
+      select.classList.contains('appointment-service-select-fallback')) {
     return;
   }
-  if (select.multiple) return;
 
   select.dataset.appSelectReady = 'true';
 
@@ -6970,26 +7138,29 @@ function enhanceAppSelect(select) {
   renderAppSelectOptions(select);
 }
 
+function rebuildSettingsSelectOptions() {
+  const languageSelect = document.getElementById('settingsLanguage');
+  const currencySelect = document.getElementById('settingsCurrency');
+
+  if (languageSelect) {
+    const selectedLanguage = normalizeLanguage(languageSelect.value || getCurrentLanguage());
+    languageSelect.innerHTML = buildLanguageOptions(selectedLanguage);
+    languageSelect.value = selectedLanguage;
+  }
+
+  if (currencySelect) {
+    const selectedCurrency = normalizeCurrency(currencySelect.value || getCurrentCurrency());
+    currencySelect.innerHTML = buildCurrencyOptions(selectedCurrency);
+    currencySelect.value = selectedCurrency;
+  }
+}
+
 function setupAppSelectDropdowns() {
-  document.querySelectorAll('select').forEach(enhanceAppSelect);
+  rebuildSettingsSelectOptions();
 
-  document.querySelectorAll('[data-filter-input]').forEach(select => {
-    const input = document.getElementById(select.dataset.filterInput);
-    if (!input || input.dataset.appSelectFilterReady === 'true') return;
-    input.dataset.appSelectFilterReady = 'true';
-
-    input.addEventListener('input', () => {
-      renderAppSelectOptions(select);
-      const wrap = select.closest('.app-select-wrap');
-      if (wrap && input.value.trim()) {
-        closeAllAppSelectDropdowns(wrap);
-        wrap.classList.add('is-open');
-      }
-    });
-
-    input.addEventListener('focus', () => {
-      renderAppSelectOptions(select);
-    });
+  document.querySelectorAll('select').forEach(select => {
+    select.removeAttribute('size');
+    enhanceAppSelect(select);
   });
 
   if (appSelectsReady) return;
@@ -7004,7 +7175,10 @@ function setupAppSelectDropdowns() {
   });
 
   appSelectObserver = new MutationObserver(() => {
-    document.querySelectorAll('select').forEach(enhanceAppSelect);
+    document.querySelectorAll('select').forEach(select => {
+      select.removeAttribute('size');
+      enhanceAppSelect(select);
+    });
   });
   appSelectObserver.observe(document.body, { childList: true, subtree: true });
 }

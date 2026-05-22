@@ -344,10 +344,10 @@
                 <div class="detail-label" data-i18n="appPreferences">App-voorkeuren</div>
 
                 <label class="field-label" for="settingsLanguage" data-i18n="language">Taal</label>
-                <select id="settingsLanguage" class="field compact-field native-select" data-native-select="true"></select>
+                <select id="settingsLanguage" class="field"></select>
 
                 <label class="field-label" for="settingsCurrency" data-i18n="currency">Valuta</label>
-                <select id="settingsCurrency" class="field compact-field native-select" data-native-select="true"></select>
+                <select id="settingsCurrency" class="field"></select>
                 <p class="settings-info-text" data-i18n="currencyChangeWarning">Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.</p>
               </div>
               <div class="settings-actions">
@@ -611,8 +611,19 @@
       <div class="appointment-form-grid">
         <div class="appointment-form-field appointment-form-field-wide">
           <label class="field-label" for="appointmentCustomerSearch">Klant</label>
-          <input id="appointmentCustomerSearch" class="field appointment-select-search" type="text" autocomplete="off" placeholder="Zoek klant..." />
-          <select id="appointmentCustomer" class="field compact-field appointment-customer-select" required aria-label="Klant kiezen" data-filter-input="appointmentCustomerSearch"></select>
+          <div class="appointment-customer-picker">
+            <input
+              id="appointmentCustomerSearch"
+              class="field appointment-customer-search"
+              type="search"
+              placeholder="Zoek op naam, telefoon of e-mail..." data-i18n-placeholder="searchAppointmentCustomerPlaceholder"
+              autocomplete="off"
+              aria-controls="appointmentCustomerResults"
+              aria-expanded="false"
+            />
+            <div id="appointmentCustomerResults" class="appointment-customer-results hidden" role="listbox"></div>
+            <select id="appointmentCustomer" class="field appointment-customer-select-fallback" required aria-label="Klant kiezen"></select>
+          </div>
           <button id="appointmentOpenCustomerBtn" class="appointment-open-customer-btn hidden" type="button" aria-label="Klantfiche openen" title="Klantfiche openen">
               <svg class="appointment-open-customer-icon" viewBox="0 0 34 28" aria-hidden="true" focusable="false">
                 <path class="file-icon-sheet" d="M5.5 3.5h10.8L21 8.2v16.3H5.5z" />
@@ -637,8 +648,19 @@
 
         <div class="appointment-form-field appointment-form-field-wide">
           <label class="field-label" for="appointmentServiceSearch">Dienst</label>
-          <input id="appointmentServiceSearch" class="field appointment-select-search" type="text" autocomplete="off" placeholder="Zoek dienst..." />
-          <select id="appointmentService" class="field compact-field appointment-service-select" required aria-label="Dienst kiezen" data-filter-input="appointmentServiceSearch"></select>
+          <div class="appointment-service-picker">
+            <input
+              id="appointmentServiceSearch"
+              class="field appointment-service-search"
+              type="search"
+              placeholder="Zoek dienst..." data-i18n-placeholder="searchServicePlaceholder"
+              autocomplete="off"
+              aria-controls="appointmentServiceResults"
+              aria-expanded="false"
+            />
+            <div id="appointmentServiceResults" class="appointment-service-results hidden" role="listbox"></div>
+            <select id="appointmentService" class="field appointment-service-select-fallback" required aria-label="Dienst kiezen"></select>
+          </div>
         </div>
 
         <div class="appointment-form-field">

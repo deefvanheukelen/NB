@@ -899,22 +899,6 @@ button {
   background: #ffffff;
 }
 
-/* Native select voor instellingen: geen app-knop/OK-knop, wel dezelfde veldstijl */
-.native-select,
-#settingsScreen select.native-select {
-  position: static !important;
-  width: 100% !important;
-  min-height: 48px !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  z-index: auto !important;
-  display: block !important;
-  appearance: auto;
-  -webkit-appearance: menulist;
-  background: #ffffff;
-}
-
-
 .appointment-customer-select {
   margin-top: 10px;
   max-height: 220px;
@@ -2763,14 +2747,6 @@ button {
   padding-bottom: 0;
 }
 
-#settingsScreen .app-select-wrap {
-  margin-bottom: 2px;
-}
-
-#settingsScreen .app-select-button {
-  min-height: 48px;
-}
-
 .settings-switch-row {
   display: flex;
   align-items: center;
@@ -2972,8 +2948,8 @@ button {
 }
 
 .statistics-kpi strong {
-  font-size: clamp(20px, 5.4vw, 28px);
-  line-height: 1.12;
+  font-size: 16px;
+  line-height: 1.2;
   color: var(--text);
 }
 
@@ -6450,79 +6426,270 @@ button.is-action-locked .app-action-nav-label {
 }
 
 
+/* =========================================================
+   FIX: instellingen Taal/Valuta als gewone app-dropdowns
+   Zelfde component en gedrag als "Herinnering vóór afspraak".
+========================================================= */
+#settingsForm .app-select-wrap:has(#settingsLanguage),
+#settingsForm .app-select-wrap:has(#settingsCurrency),
+#settingsForm .app-select-wrap:has(#settingsReminderMinutes) {
+  display: block;
+  width: 100%;
+}
+
+#settingsForm .app-select-wrap:has(#settingsLanguage) .app-select-button,
+#settingsForm .app-select-wrap:has(#settingsCurrency) .app-select-button,
+#settingsForm .app-select-wrap:has(#settingsReminderMinutes) .app-select-button {
+  min-height: 48px;
+  border-radius: 14px;
+}
+
+#settingsForm .app-select-wrap:has(#settingsLanguage) .app-select-option,
+#settingsForm .app-select-wrap:has(#settingsCurrency) .app-select-option,
+#settingsForm .app-select-wrap:has(#settingsReminderMinutes) .app-select-option {
+  font-weight: 400;
+}
 
 /* =========================================================
-   FIX: één app-stijl select voor Klant en Dienst in afspraakdialoog
+   UPDATE: Omzet periodeknoppen groter, veilig binnen knop
 ========================================================= */
-#appointmentForm .appointment-customer-select,
-#appointmentForm .appointment-service-select {
-  width: 100%;
+.revenue-screen-shell .revenue-period-tile {
+  min-height: clamp(88px, 21cqw, 124px) !important;
+  padding: clamp(10px, 2.7cqw, 20px) clamp(4px, 1.45cqw, 12px) !important;
+  column-gap: clamp(5px, 1.25cqw, 9px) !important;
+  row-gap: clamp(6px, 1.55cqw, 11px) !important;
 }
 
-#appointmentForm .appointment-form-field-wide > .appointment-customer-select,
-#appointmentForm .appointment-form-field-wide > .appointment-service-select,
-#appointmentForm .appointment-form-field-wide > .app-select-wrap {
-  grid-column: 1;
-  grid-row: 2;
+.revenue-screen-shell .revenue-period-icon {
+  width: clamp(12px, 2.9cqw, 18px) !important;
+  height: clamp(12px, 2.9cqw, 18px) !important;
 }
 
-#appointmentForm .appointment-form-field-wide > .app-select-wrap {
-  width: 100%;
-  min-width: 0;
+.revenue-screen-shell .revenue-period-title {
+  font-size: clamp(12px, 3.05cqw, 19px) !important;
+  line-height: 1.02 !important;
 }
 
-#appointmentForm .app-select-wrap .appointment-customer-select,
-#appointmentForm .app-select-wrap .appointment-service-select {
+.revenue-screen-shell .revenue-period-sub {
+  font-size: clamp(10px, 2.35cqw, 14px) !important;
+  line-height: 1.08 !important;
+}
+
+.revenue-screen-shell .revenue-period-year {
+  font-size: clamp(18px, 4.55cqw, 27px) !important;
+}
+
+@media (max-width: 390px) {
+  .revenue-screen-shell .revenue-period-tile {
+    min-height: 86px !important;
+    padding: 10px 3px 9px !important;
+    column-gap: 4px !important;
+    row-gap: 5px !important;
+  }
+
+  .revenue-screen-shell .revenue-period-icon {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .revenue-screen-shell .revenue-period-title {
+    font-size: 12px !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  .revenue-screen-shell .revenue-period-sub {
+    font-size: 10px !important;
+    line-height: 1.05 !important;
+  }
+
+  .revenue-screen-shell .revenue-period-year {
+    font-size: 18px !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .revenue-screen-shell .revenue-period-tile {
+    min-height: 82px !important;
+    padding: 9px 2px 8px !important;
+  }
+
+  .revenue-screen-shell .revenue-period-icon {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .revenue-screen-shell .revenue-period-title {
+    font-size: 11px !important;
+  }
+
+  .revenue-screen-shell .revenue-period-sub {
+    font-size: 9px !important;
+  }
+
+  .revenue-screen-shell .revenue-period-year {
+    font-size: 17px !important;
+  }
+}
+
+/* =========================================================
+   OMZET: KALENDER-STYLE PICKERS VOOR DAG/WEEK/MAAND
+========================================================= */
+.revenue-wheel-shell.revenue-calendar-shell {
+  margin: 4px 0 12px;
+  padding: 0;
+}
+
+.revenue-wheel-shell.revenue-calendar-shell .revenue-wheel-highlight {
   display: none;
 }
 
-#appointmentForm .app-select-button {
+.revenue-calendar-mode {
+  display: block;
+}
+
+.revenue-calendar-picker,
+.revenue-month-picker {
   width: 100%;
+  display: grid;
+  gap: 10px;
 }
 
-#appointmentForm .app-select-options {
-  max-height: min(280px, 42vh);
+.revenue-calendar-picker-head {
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0 4px;
 }
 
-
-#appointmentForm .appointment-customer-select,
-#appointmentForm .appointment-service-select {
-  margin-top: 0;
-  max-height: none;
+.revenue-calendar-picker-head strong {
+  text-align: center;
+  color: var(--primary-dark);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
+.revenue-calendar-nav {
+  min-height: 38px;
+  border-radius: 12px;
+  background: var(--primary-soft);
+  font-size: 25px;
+}
 
-/* =========================================================
-   FIX: zoekveld boven klant- en dienstselect in afspraakdialoog
-========================================================= */
-#appointmentForm .appointment-select-search {
-  width: 100%;
-  min-height: 44px;
-  margin-bottom: 8px;
+.revenue-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.revenue-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.revenue-calendar-empty,
+.revenue-calendar-day {
+  aspect-ratio: 1 / 0.82;
+  border-radius: 13px;
+}
+
+.revenue-calendar-day {
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 10px 14px;
   background: #ffffff;
   color: var(--text);
-  box-shadow: 0 2px 4px rgba(170, 120, 145, 0.08);
+  display: grid;
+  place-items: center;
+  padding: 0;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
+  -webkit-tap-highlight-color: transparent;
 }
 
-#appointmentForm .appointment-select-search:focus {
-  outline: 2px solid rgba(185, 109, 135, 0.28);
-  outline-offset: 2px;
+.revenue-calendar-day.is-other-month {
+  background: #fbf7f9;
+  color: #b2a8b1;
+  border-color: #f2e8ed;
+  box-shadow: none;
+}
+
+.revenue-calendar-day:hover,
+.revenue-calendar-day:active,
+.revenue-calendar-day.selected,
+.revenue-calendar-day.selected-week {
+  background: var(--primary-soft);
   border-color: var(--primary);
+  color: var(--primary-dark);
 }
 
-#appointmentForm .appointment-select-search::placeholder {
-  color: var(--muted);
+.revenue-calendar-day.selected-week {
+  box-shadow: inset 0 0 0 1px rgba(185, 109, 135, 0.18);
 }
 
-#appointmentForm .appointment-form-field-wide > .appointment-select-search {
-  grid-column: 1;
-  grid-row: 2;
+.revenue-calendar-day.is-other-month.selected,
+.revenue-calendar-day.is-other-month.selected-week {
+  background: #f8e8ee;
+  color: var(--primary-dark);
+  border-color: #e6b1c3;
 }
 
-#appointmentForm .appointment-form-field-wide > .app-select-wrap {
-  grid-column: 1;
-  grid-row: 3;
+.revenue-month-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.revenue-month-option {
+  min-height: 54px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: #ffffff;
+  color: var(--text);
+  padding: 10px 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.1;
+  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.revenue-month-option:hover,
+.revenue-month-option:active,
+.revenue-month-option.selected {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+}
+
+@media (max-width: 420px) {
+  .revenue-calendar-picker-head strong {
+    font-size: 16px;
+  }
+
+  .revenue-calendar-weekdays,
+  .revenue-calendar-grid {
+    gap: 4px;
+  }
+
+  .revenue-calendar-empty,
+  .revenue-calendar-day {
+    border-radius: 11px;
+  }
+
+  .revenue-month-grid {
+    gap: 7px;
+  }
+
+  .revenue-month-option {
+    min-height: 50px;
+    font-size: 13px;
+  }
 }
