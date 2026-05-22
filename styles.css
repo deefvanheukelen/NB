@@ -1272,6 +1272,99 @@ button {
   color: var(--text);
 }
 
+.payment-qr-tooltip {
+  margin-top: 8px;
+}
+
+.payment-qr-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  border: 1px solid #f0dce5;
+  border-radius: 12px;
+  padding: 6px 10px;
+  background: #fff8fb;
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(165, 116, 140, 0.08);
+}
+
+.payment-qr-toggle:hover,
+.payment-qr-toggle:active {
+  background: var(--primary-soft);
+  transform: none;
+}
+
+.payment-qr-mini {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 2px;
+  padding: 2px;
+  border-radius: 4px;
+  background: #ffffff;
+  border: 1px solid rgba(184, 109, 135, 0.28);
+}
+
+.payment-qr-mini span {
+  display: block;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.payment-qr-mini span:nth-child(4) {
+  opacity: 0.45;
+}
+
+.payment-qr-panel {
+  width: 150px;
+  margin-top: 8px;
+  padding: 10px;
+  border: 1px solid #f1dfe7;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 12px 24px rgba(84, 48, 65, 0.14);
+}
+
+.payment-qr-code-wrap {
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #f4e8ee;
+}
+
+.payment-qr-image {
+  display: block;
+  width: 118px;
+  height: 118px;
+  object-fit: contain;
+}
+
+.payment-qr-text {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.payment-qr-open-btn {
+  width: 100%;
+  min-height: 34px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .payment-popover-close {
   flex: 0 0 auto;
 }
@@ -6948,5 +7041,240 @@ button.is-action-locked .app-action-nav-label {
 
   .todo-main-btn {
     padding: 13px 12px;
+  }
+}
+
+
+/* =========================================================
+   BANK QR TOOLTIP (SEPA) - betaling popover
+========================================================= */
+.payment-qr-tooltip.hidden {
+  display: none !important;
+}
+
+.payment-popover-title-wrap .payment-qr-tooltip {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.payment-qr-toggle {
+  width: auto;
+  max-width: 100%;
+}
+
+.payment-qr-panel {
+  margin-top: 8px;
+}
+
+.settings-info-text {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.optional-label {
+  color: var(--muted);
+  font-weight: 500;
+  text-transform: none;
+}
+
+/* =========================================================
+   BANK QR - aparte tooltip naast/onder betaling registreren
+========================================================= */
+.payment-qr-popover {
+  position: fixed;
+  z-index: 1195;
+  width: min(210px, calc(100vw - 24px));
+}
+
+.payment-qr-popover.hidden {
+  display: none !important;
+}
+
+.payment-qr-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 16px 32px rgba(84, 48, 65, 0.18);
+  padding: 12px;
+}
+
+.payment-qr-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary-dark);
+  font-size: 13px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.payment-qr-card .payment-qr-code-wrap {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  border-radius: 14px;
+  background: #fff8fb;
+  border: 1px solid #f4e8ee;
+}
+
+.payment-qr-card .payment-qr-image {
+  display: block;
+  width: 154px;
+  height: 154px;
+  object-fit: contain;
+}
+
+.payment-qr-card .payment-qr-text {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.payment-qr-popover[data-placement="bottom"] .payment-qr-card::before,
+.payment-qr-popover[data-placement="top"] .payment-qr-card::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-left: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+
+.payment-qr-popover[data-placement="bottom"] .payment-qr-card::before {
+  top: -8px;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.payment-qr-popover[data-placement="top"] .payment-qr-card::before {
+  bottom: -8px;
+  transform: translateX(-50%) rotate(225deg);
+}
+
+@media (max-width: 420px) {
+  .payment-qr-popover {
+    width: min(190px, calc(100vw - 24px));
+  }
+
+  .payment-qr-card .payment-qr-image {
+    width: 136px;
+    height: 136px;
+  }
+}
+
+/* =========================================================
+   BANK QR - knoptooltip + volledig QR-venster
+========================================================= */
+.payment-qr-popover {
+  width: min(174px, calc(100vw - 24px));
+}
+
+.payment-qr-card {
+  padding: 10px;
+}
+
+.payment-qr-open-trigger {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(170, 120, 145, 0.10);
+}
+
+.payment-qr-open-trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.payment-qr-button-hint {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.payment-qr-dialog::backdrop {
+  background: rgba(255, 248, 251, 0.94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.payment-qr-dialog {
+  width: min(92vw, 390px);
+}
+
+.payment-qr-dialog-card {
+  text-align: center;
+  border: 1px solid var(--line);
+  box-shadow: 0 28px 58px rgba(84, 48, 65, 0.22);
+}
+
+.payment-qr-dialog-card .modal-head {
+  text-align: left;
+}
+
+.payment-qr-dialog-amount {
+  font-size: 30px;
+  line-height: 1.05;
+  font-weight: 700;
+  color: var(--text);
+  margin: 8px 0 14px;
+}
+
+.payment-qr-dialog-code-wrap {
+  display: grid;
+  place-items: center;
+  width: min(280px, 100%);
+  margin: 0 auto;
+  padding: 12px;
+  border: 1px solid #f0e3ea;
+  border-radius: 22px;
+  background: #fff8fb;
+}
+
+.payment-qr-dialog-image {
+  display: block;
+  width: min(250px, 70vw);
+  height: min(250px, 70vw);
+  object-fit: contain;
+}
+
+.payment-qr-dialog-text {
+  margin: 14px auto 0;
+  max-width: 280px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.payment-qr-dialog .modal-actions {
+  justify-content: center;
+}
+
+.payment-qr-dialog .modal-actions .btn {
+  min-width: 120px;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .payment-qr-popover {
+    width: min(164px, calc(100vw - 24px));
+  }
+
+  .payment-qr-dialog-amount {
+    font-size: 28px;
   }
 }

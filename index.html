@@ -368,6 +368,24 @@
                 <select id="settingsCurrency" class="field"></select>
                 <p class="settings-info-text" data-i18n="currencyChangeWarning">Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.</p>
               </div>
+
+              <div class="settings-group">
+                <div class="detail-label">Betaalgegevens QR-code</div>
+
+                <label class="field-label" for="settingsPaymentBeneficiaryName">Naam begunstigde</label>
+                <input id="settingsPaymentBeneficiaryName" class="field" type="text" autocomplete="organization" placeholder="Bijv. Salonnaam" />
+
+                <label class="field-label" for="settingsPaymentIban">IBAN</label>
+                <input id="settingsPaymentIban" class="field" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="BE00 0000 0000 0000" />
+
+                <label class="field-label" for="settingsPaymentBic">BIC <span class="optional-label">optioneel</span></label>
+                <input id="settingsPaymentBic" class="field" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="Bijv. GEBABEBB" />
+
+                <label class="field-label" for="settingsPaymentReferencePrefix">Mededeling/prefix</label>
+                <input id="settingsPaymentReferencePrefix" class="field" type="text" autocomplete="off" placeholder="Idle & Ease" />
+
+                <p class="settings-info-text">Deze gegevens worden gebruikt om een SEPA/bank-QR-code te maken. Klanten scannen de QR met hun bankapp.</p>
+              </div>
               <div class="settings-actions">
                 <span id="settingsSaveHint" class="settings-save-hint">Instellingen worden per gebruiker bewaard.</span>
                 <button class="btn btn-primary action-btn" type="submit" data-i18n="saveSettings">Instellingen opslaan</button>
@@ -536,6 +554,17 @@
 		<span data-i18n="todo">To Do</span>
 	  </button>
 
+	  <button class="nav-btn" data-screen="statisticsScreen" data-title="Statistieken" type="button">
+		<span class="nav-ico">
+		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-statistieken">
+			<g>
+			  <path d="m 3.7695418,1.4464233 7.29e-5,2.384677 2.3845316,-0.007 -2.919e-4,-0.100655 C 6.1501925,2.4660113 5.1275658,1.4465693 3.8701238,1.4465693 Z m 0.2012377,0.211442 c 1.0670389,0.05176 1.9166733,0.898832 1.9714878,1.965729 l -1.971342,0.0058 z m -0.6621674,0.173249 a 2.1830753,2.1830753 0 0 0 -2.0085139,1.499188 2.1830753,2.1830753 0 0 0 0.7245576,2.399327 2.1830753,2.1830753 0 0 0 2.5025338,0.137026 L 3.3736263,4.0132423 Z m 0.6154476,2.350057 1.1438696,1.859389 a 2.1830753,2.1830753 0 0 0 1.038987,-1.828267 z" id="path-statistieken" />
+			</g>
+		  </svg>
+		</span>
+		<span data-i18n="statistics">Statistieken</span>
+	  </button>
+	  
 
 	  <button class="nav-btn" data-screen="clientsScreen" data-title="Klanten" type="button">
 		<span class="nav-ico">
@@ -570,17 +599,6 @@
 		<span data-i18n="paymentMethods">Betaalwijze</span>
 	  </button>
 
-	  <button class="nav-btn" data-screen="statisticsScreen" data-title="Statistieken" type="button">
-		<span class="nav-ico">
-		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-statistieken">
-			<g>
-			  <path d="m 3.7695418,1.4464233 7.29e-5,2.384677 2.3845316,-0.007 -2.919e-4,-0.100655 C 6.1501925,2.4660113 5.1275658,1.4465693 3.8701238,1.4465693 Z m 0.2012377,0.211442 c 1.0670389,0.05176 1.9166733,0.898832 1.9714878,1.965729 l -1.971342,0.0058 z m -0.6621674,0.173249 a 2.1830753,2.1830753 0 0 0 -2.0085139,1.499188 2.1830753,2.1830753 0 0 0 0.7245576,2.399327 2.1830753,2.1830753 0 0 0 2.5025338,0.137026 L 3.3736263,4.0132423 Z m 0.6154476,2.350057 1.1438696,1.859389 a 2.1830753,2.1830753 0 0 0 1.038987,-1.828267 z" id="path-statistieken" />
-			</g>
-		  </svg>
-		</span>
-		<span data-i18n="statistics">Statistieken</span>
-	  </button>
-	  
 	  <button class="nav-btn" data-screen="settingsScreen" data-title="Instellingen" type="button">
 		<span class="nav-ico">
 		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-instellingen">
@@ -937,6 +955,38 @@
       <div id="paymentMethodListPopup" class="payment-method-popup-list" role="menu" aria-label="Kies betaalwijze"></div>
     </div>
   </div>
+
+
+  <div id="paymentQrPopover" class="payment-qr-popover hidden" aria-hidden="true">
+    <div class="payment-qr-card">
+      <button id="paymentQrOpenBtn" class="payment-qr-open-trigger" type="button">
+        <span class="payment-qr-mini" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span>QR-code</span>
+      </button>
+      <div id="paymentQrButtonHint" class="payment-qr-button-hint">Toon bank-QR</div>
+    </div>
+  </div>
+
+  <dialog id="paymentQrDialog" class="modal payment-qr-dialog">
+    <div class="modal-card payment-qr-dialog-card">
+      <div class="modal-head">
+        <h3>Bank QR-code</h3>
+        <button class="icon-btn" type="button" data-close="paymentQrDialog" aria-label="Sluiten">✕</button>
+      </div>
+
+      <div class="payment-qr-dialog-amount" id="paymentQrDialogAmount">€ 0,00</div>
+      <div class="payment-qr-dialog-code-wrap">
+        <img id="paymentQrDialogImage" class="payment-qr-dialog-image" alt="QR-code voor betaling" />
+      </div>
+      <div id="paymentQrDialogText" class="payment-qr-dialog-text">Laat de klant deze code scannen met zijn/haar bankapp.</div>
+
+      <div class="modal-actions end-only">
+        <button class="btn btn-primary action-btn" type="button" data-close="paymentQrDialog">OK</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- ===================== REGISTREREN ==================== -->
   <dialog id="registerDialog" class="modal">

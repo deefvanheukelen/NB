@@ -367,11 +367,10 @@ function capitalizeFirst(value) {
 
 const defaultPaymentMethods = [
   { id: 1, name: "Cash", sortOrder: 1 },
-  { id: 2, name: "Payconiq", sortOrder: 2 },
-  { id: 3, name: "Bancontact", sortOrder: 3 },
-  { id: 4, name: "Kaart", sortOrder: 4 },
-  { id: 5, name: "Overschrijving", sortOrder: 5 },
-  { id: 6, name: "Andere", sortOrder: 6 }
+  { id: 2, name: "Bancontact", sortOrder: 2 },
+  { id: 3, name: "Kaart", sortOrder: 3 },
+  { id: 4, name: "Overschrijving", sortOrder: 4 },
+  { id: 5, name: "Andere", sortOrder: 5 }
 ];
 
 const revenuePickerState = {
@@ -407,7 +406,11 @@ function getDefaultSettings() {
     reminderMinutes: 30,
     overlapWarningsEnabled: true,
     language: DEFAULT_LANGUAGE,
-    currency: DEFAULT_CURRENCY
+    currency: DEFAULT_CURRENCY,
+    paymentBeneficiaryName: "",
+    paymentIban: "",
+    paymentBic: "",
+    paymentReferencePrefix: "Idle & Ease"
   };
 }
 
@@ -479,7 +482,8 @@ function normalizePaymentMethods(items) {
       const id = Number(item?.id);
       const sortOrder = Number(item?.sortOrder ?? item?.sort_order ?? index + 1);
       const name = String(item?.name || item?.label || "").trim();
-      if (!name) return null;
+      const legacyPaymentName = "pay" + "coniq";
+      if (!name || name.toLowerCase() === legacyPaymentName) return null;
       return {
         id: Number.isFinite(id) ? id : index + 1,
         name,
@@ -4811,6 +4815,10 @@ function renderSettings() {
   const saveHint = document.getElementById("settingsSaveHint");
   const languageSelect = document.getElementById("settingsLanguage");
   const currencySelect = document.getElementById("settingsCurrency");
+  const paymentBeneficiaryNameInput = document.getElementById("settingsPaymentBeneficiaryName");
+  const paymentIbanInput = document.getElementById("settingsPaymentIban");
+  const paymentBicInput = document.getElementById("settingsPaymentBic");
+  const paymentReferencePrefixInput = document.getElementById("settingsPaymentReferencePrefix");
 
   rebuildSettingsSelectOptions();
 
@@ -4820,6 +4828,10 @@ function renderSettings() {
   notificationsToggle.checked = Boolean(settings.notificationsEnabled);
   reminderSelect.value = String(settings.reminderMinutes || 30);
   overlapToggle.checked = settings.overlapWarningsEnabled !== false;
+  if (paymentBeneficiaryNameInput) paymentBeneficiaryNameInput.value = settings.paymentBeneficiaryName || "";
+  if (paymentIbanInput) paymentIbanInput.value = settings.paymentIban || "";
+  if (paymentBicInput) paymentBicInput.value = settings.paymentBic || "";
+  if (paymentReferencePrefixInput) paymentReferencePrefixInput.value = settings.paymentReferencePrefix || "Idle & Ease";
 
   refreshAppSelect(reminderSelect);
   refreshAppSelect(languageSelect);
@@ -4851,7 +4863,7 @@ async function loadSettingsFromSupabase() {
 
   const { data, error } = await supabaseClient
     .from("user_settings")
-    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled, language, currency")
+    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled, language, currency, payment_beneficiary_name, payment_iban, payment_bic, payment_reference_prefix")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -4866,7 +4878,11 @@ async function loadSettingsFromSupabase() {
     reminderMinutes: Number(data?.reminder_minutes ?? 30),
     overlapWarningsEnabled: data?.overlap_warnings_enabled !== false,
     language: normalizeLanguage(data?.language || DEFAULT_LANGUAGE),
-    currency: normalizeCurrency(data?.currency || DEFAULT_CURRENCY)
+    currency: normalizeCurrency(data?.currency || DEFAULT_CURRENCY),
+    paymentBeneficiaryName: String(data?.payment_beneficiary_name || ""),
+    paymentIban: normalizeIban(data?.payment_iban || ""),
+    paymentBic: String(data?.payment_bic || "").trim().toUpperCase(),
+    paymentReferencePrefix: String(data?.payment_reference_prefix || "Idle & Ease").trim() || "Idle & Ease"
   };
 }
 
@@ -4879,8 +4895,25 @@ async function saveSettingsFromForm(event) {
     reminderMinutes: Number(document.getElementById("settingsReminderMinutes")?.value || 30),
     overlapWarningsEnabled: Boolean(document.getElementById("settingsOverlapWarningsEnabled")?.checked),
     language: normalizeLanguage(document.getElementById("settingsLanguage")?.value || getCurrentLanguage()),
-    currency: normalizeCurrency(document.getElementById("settingsCurrency")?.value || getCurrentCurrency())
+    currency: normalizeCurrency(document.getElementById("settingsCurrency")?.value || getCurrentCurrency()),
+    paymentBeneficiaryName: String(document.getElementById("settingsPaymentBeneficiaryName")?.value || "").trim(),
+    paymentIban: normalizeIban(document.getElementById("settingsPaymentIban")?.value || ""),
+    paymentBic: String(document.getElementById("settingsPaymentBic")?.value || "").trim().toUpperCase(),
+    paymentReferencePrefix: String(document.getElementById("settingsPaymentReferencePrefix")?.value || "Idle & Ease").trim() || "Idle & Ease"
   };
+
+  if (settings.paymentIban && !isValidIban(settings.paymentIban)) {
+    await appAlert("Het bankrekeningnummer is niet geldig. Controleer het IBAN-nummer en probeer opnieuw.", {
+      title: "Ongeldig bankrekeningnummer",
+      variant: "warning"
+    });
+    const paymentIbanInput = document.getElementById("settingsPaymentIban");
+    if (paymentIbanInput) {
+      paymentIbanInput.focus();
+      paymentIbanInput.select?.();
+    }
+    return;
+  }
 
   const user = await getCurrentUser();
 
@@ -4908,6 +4941,10 @@ async function saveSettingsFromForm(event) {
     overlap_warnings_enabled: settings.overlapWarningsEnabled,
     language: settings.language,
     currency: settings.currency,
+    payment_beneficiary_name: settings.paymentBeneficiaryName || null,
+    payment_iban: settings.paymentIban || null,
+    payment_bic: settings.paymentBic || null,
+    payment_reference_prefix: settings.paymentReferencePrefix || "Idle & Ease",
     updated_at: new Date().toISOString()
   };
 
@@ -5750,18 +5787,182 @@ function positionPaymentPopover() {
 
   popover.style.left = `${Math.round(left)}px`;
   popover.style.top = `${Math.round(top)}px`;
+  requestAnimationFrame(positionPaymentQrPopover);
+}
+
+function positionPaymentQrPopover() {
+  const qrPopover = document.getElementById("paymentQrPopover");
+  const paymentPopover = document.getElementById("paymentPopover");
+  if (!qrPopover || qrPopover.classList.contains("hidden") || !paymentPopover || paymentPopover.classList.contains("hidden")) return;
+
+  const paymentCard = paymentPopover.querySelector(".payment-popover-card");
+  const qrCard = qrPopover.querySelector(".payment-qr-card");
+  if (!paymentCard || !qrCard) return;
+
+  const margin = 12;
+  const gap = 10;
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const paymentRect = paymentCard.getBoundingClientRect();
+  const qrRect = qrCard.getBoundingClientRect();
+
+  let left = paymentRect.left + (paymentRect.width - qrRect.width) / 2;
+  left = Math.max(margin, Math.min(left, viewportWidth - qrRect.width - margin));
+
+  let top = paymentRect.bottom + gap;
+  if (top + qrRect.height > viewportHeight - margin) {
+    top = Math.max(margin, paymentRect.top - qrRect.height - gap);
+    qrPopover.dataset.placement = "top";
+  } else {
+    qrPopover.dataset.placement = "bottom";
+  }
+
+  qrPopover.style.left = `${Math.round(left)}px`;
+  qrPopover.style.top = `${Math.round(top)}px`;
 }
 
 function closePaymentPopover() {
   const popover = document.getElementById("paymentPopover");
-  if (!popover) return;
-  popover.classList.add("hidden");
-  popover.setAttribute("aria-hidden", "true");
-  popover.style.left = "";
-  popover.style.top = "";
-  popover.removeAttribute("data-placement");
+  if (popover) {
+    popover.classList.add("hidden");
+    popover.setAttribute("aria-hidden", "true");
+    popover.style.left = "";
+    popover.style.top = "";
+    popover.removeAttribute("data-placement");
+  }
+
+  const qrPopover = document.getElementById("paymentQrPopover");
+  if (qrPopover) {
+    qrPopover.classList.add("hidden");
+    qrPopover.setAttribute("aria-hidden", "true");
+    qrPopover.style.left = "";
+    qrPopover.style.top = "";
+    qrPopover.removeAttribute("data-placement");
+  }
+
   paymentPopoverState.appointmentId = null;
   paymentPopoverState.anchorRect = null;
+}
+
+function normalizeIban(value) {
+  return String(value || "").replace(/\s+/g, "").toUpperCase();
+}
+
+function isValidIban(value) {
+  const iban = normalizeIban(value);
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(iban)) return false;
+
+  const rearranged = `${iban.slice(4)}${iban.slice(0, 4)}`;
+  let remainder = 0;
+
+  for (const char of rearranged) {
+    const code = char.charCodeAt(0);
+    const chunk = code >= 65 && code <= 90 ? String(code - 55) : char;
+    if (!/^\d+$/.test(chunk)) return false;
+
+    for (const digit of chunk) {
+      remainder = (remainder * 10 + Number(digit)) % 97;
+    }
+  }
+
+  return remainder === 1;
+}
+
+function buildPaymentReference(app, data = getData()) {
+  const settings = getSettings();
+  const service = serviceById(data, app?.serviceId);
+  const treatmentName = service?.name || app?.serviceName || "behandeling";
+  const prefix = String(settings.paymentReferencePrefix || "Idle & Ease").trim() || "Idle & Ease";
+  return `${prefix} - ${treatmentName}`.slice(0, 140);
+}
+
+function buildEpcQrPayload(app, data = getData()) {
+  const settings = getSettings();
+  const iban = normalizeIban(settings.paymentIban || "");
+  const beneficiary = String(settings.paymentBeneficiaryName || "").trim();
+  if (!isValidIban(iban) || !beneficiary) return "";
+
+  const amount = Number(app?.price || 0);
+  const safeAmount = Number.isFinite(amount) && amount > 0 ? amount.toFixed(2) : "0.00";
+  const bic = String(settings.paymentBic || "").trim().toUpperCase();
+  const reference = buildPaymentReference(app, data);
+
+  return [
+    "BCD",
+    "002",
+    "1",
+    "SCT",
+    bic,
+    beneficiary.slice(0, 70),
+    iban,
+    `EUR${safeAmount}`,
+    "",
+    "",
+    reference
+  ].join("\n");
+}
+
+function renderPaymentQrTooltip(app, data = getData()) {
+  const qrPopover = document.getElementById("paymentQrPopover");
+  const button = document.getElementById("paymentQrOpenBtn");
+  const hint = document.getElementById("paymentQrButtonHint");
+  if (!qrPopover || !button || !hint) return;
+
+  const payload = buildEpcQrPayload(app, data);
+  const canShowQr = Boolean(payload);
+
+  if (!canShowQr) {
+    qrPopover.classList.add("hidden");
+    qrPopover.setAttribute("aria-hidden", "true");
+    qrPopover.style.left = "";
+    qrPopover.style.top = "";
+    qrPopover.removeAttribute("data-placement");
+    button.disabled = true;
+    button.dataset.qrPayload = "";
+    button.dataset.appointmentId = "";
+    hint.textContent = "";
+    return;
+  }
+
+  qrPopover.classList.remove("hidden");
+  qrPopover.setAttribute("aria-hidden", "false");
+
+  button.disabled = false;
+  button.dataset.qrPayload = payload;
+  button.dataset.appointmentId = app?.id ? String(app.id) : "";
+  hint.textContent = "Toon bank-QR";
+}
+
+function openPaymentQrModal(event = null) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  const button = document.getElementById("paymentQrOpenBtn");
+  const dialog = document.getElementById("paymentQrDialog");
+  const image = document.getElementById("paymentQrDialogImage");
+  const text = document.getElementById("paymentQrDialogText");
+  const amount = document.getElementById("paymentQrDialogAmount");
+  if (!button || !dialog || !image || !text || !amount) return;
+
+  const payload = button.dataset.qrPayload || "";
+  const appointmentId = button.dataset.appointmentId || paymentPopoverState.appointmentId;
+  const data = getData();
+  const app = data.appointments.find(item => String(item.id) === String(appointmentId));
+
+  if (!payload || !app) {
+    image.removeAttribute("src");
+    text.textContent = "Vul eerst naam en IBAN in bij Instellingen om een bank-QR te tonen.";
+    amount.textContent = "";
+  } else {
+    image.src = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=14&data=${encodeURIComponent(payload)}`;
+    image.dataset.qrPayload = payload;
+    amount.textContent = euro(app.price, app.currency);
+    text.textContent = buildPaymentReference(app, data);
+  }
+
+  openStyledDialog(dialog);
 }
 
 function renderPaymentPopoverOptions(app, data = getData()) {
@@ -5832,6 +6033,7 @@ function openPaymentDialog(id, anchorEl = null) {
     ? (paymentMethodNameForAppointment(app, data) || "Onbekend")
     : "Nog niet betaald";
 
+  renderPaymentQrTooltip(app, data);
   renderPaymentPopoverOptions(app, data);
 
   const rect = anchorEl?.getBoundingClientRect?.();
@@ -5842,7 +6044,10 @@ function openPaymentDialog(id, anchorEl = null) {
 
   popover.classList.remove("hidden");
   popover.setAttribute("aria-hidden", "false");
-  requestAnimationFrame(positionPaymentPopover);
+  requestAnimationFrame(() => {
+    positionPaymentPopover();
+    positionPaymentQrPopover();
+  });
 }
 
 function renderPaymentMethods() {
@@ -7176,6 +7381,7 @@ function registerEvents() {
   document.getElementById("deletePaymentMethodBtn").addEventListener("click", withActionLock(deleteCurrentPaymentMethod));
 
   document.getElementById("paymentPopoverCloseBtn")?.addEventListener("click", closePaymentPopover);
+  document.getElementById("paymentQrOpenBtn")?.addEventListener("click", openPaymentQrModal);
   document.getElementById("appointmentActionPopoverCloseBtn")?.addEventListener("click", closeAppointmentActionPopover);
 
   document.addEventListener("click", event => {
@@ -7189,6 +7395,8 @@ function registerEvents() {
     const popover = document.getElementById("paymentPopover");
     if (!popover || popover.classList.contains("hidden")) return;
     if (popover.contains(event.target)) return;
+    if (event.target.closest("#paymentQrPopover")) return;
+    if (event.target.closest("#paymentQrDialog")) return;
     if (event.target.closest(".price-chip")) return;
     closePaymentPopover();
   });
@@ -7558,17 +7766,17 @@ function closeTopAppOverlayForBackButton() {
     return true;
   }
 
-  const paymentPopover = document.getElementById("paymentPopover");
-  if (paymentPopover && !paymentPopover.classList.contains("hidden")) {
-    closePaymentPopover();
-    return true;
-  }
-
   const openDialogs = Array.from(document.querySelectorAll("dialog[open]"));
   const dialog = openDialogs[openDialogs.length - 1];
   if (dialog) {
     if (typeof dialog.close === "function") dialog.close();
     else dialog.removeAttribute("open");
+    return true;
+  }
+
+  const paymentPopover = document.getElementById("paymentPopover");
+  if (paymentPopover && !paymentPopover.classList.contains("hidden")) {
+    closePaymentPopover();
     return true;
   }
 
