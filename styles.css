@@ -7290,3 +7290,74 @@ button.is-action-locked .app-action-nav-label {
     font-size: 28px;
   }
 }
+
+/* =========================================================
+   FIX: datumkiezers afspraak/omzet met afspraak-bolletjes + swipe
+========================================================= */
+.revenue-calendar-picker {
+  touch-action: pan-y;
+  transition: transform 180ms ease;
+}
+
+.revenue-calendar-picker.is-swiping {
+  transform: translate3d(var(--picker-swipe-x, 0px), 0, 0);
+}
+
+.revenue-calendar-day {
+  position: relative;
+  overflow: hidden;
+}
+
+.revenue-calendar-day-number {
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+
+.revenue-calendar-dots {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.revenue-calendar-dots i {
+  display: block;
+  width: 4px;
+  height: 4px;
+  flex: 0 0 4px;
+  border-radius: 999px;
+  background: var(--primary);
+}
+
+.revenue-calendar-dots em {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5px;
+  font-size: 8px;
+  line-height: 1;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+@media (max-width: 420px) {
+  .revenue-calendar-dots {
+    left: 3px;
+    right: 3px;
+    bottom: 3px;
+    gap: 1.5px;
+  }
+
+  .revenue-calendar-dots i {
+    width: 3.5px;
+    height: 3.5px;
+    flex-basis: 3.5px;
+  }
+}

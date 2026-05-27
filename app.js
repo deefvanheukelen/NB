@@ -3047,8 +3047,11 @@ function openAppointmentWheelPicker(mode) {
   appointmentPickerState.mode = mode;
   appointmentPickerState.selected = {};
 
+  const shell = dialog.querySelector(".revenue-wheel-shell");
+
   if (mode === "time") {
     title.textContent = t("chooseTime");
+    if (shell) shell.classList.remove("revenue-calendar-shell");
     columnsWrap.className = "revenue-wheel-columns two-cols";
     const hours = Array.from({ length: 24 }, (_, i) => i);
     const minutes = Array.from({ length: 60 }, (_, i) => i);
@@ -3058,18 +3061,10 @@ function openAppointmentWheelPicker(mode) {
     appointmentPickerState.selected.hour = String(selectedHour);
     appointmentPickerState.selected.minute = String(selectedMinute);
   } else {
-    title.textContent = t("chooseDate");
-    columnsWrap.className = "revenue-wheel-columns three-cols";
-    const years = getAppointmentPickerYears(selectedYear);
-    const months = Array.from({ length: 12 }, (_, i) => i);
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
-    columnsWrap.innerHTML =
-      buildRevenueWheelColumn("day", days, value => String(value).padStart(2, "0")) +
-      buildRevenueWheelColumn("monthIndex", months, value => capitalizeFirst(getMonthNameLong(value))) +
-      buildRevenueWheelColumn("year", years, value => value);
-    appointmentPickerState.selected.day = String(selectedDay);
-    appointmentPickerState.selected.monthIndex = String(selectedMonthIndex);
-    appointmentPickerState.selected.year = String(selectedYear);
+    title.textContent = "Kies dag";
+    if (shell) shell.classList.add("revenue-calendar-shell");
+    appointmentPickerState.selected.date = dateValue;
+    renderAppointmentCalendarPicker(selectedYear, selectedMonthIndex, dateValue);
   }
 
   const columns = Array.from(columnsWrap.querySelectorAll(".revenue-wheel-column"));
@@ -3084,10 +3079,12 @@ function openAppointmentWheelPicker(mode) {
   if (typeof dialog.showModal === "function") dialog.showModal();
   else dialog.setAttribute("open", "open");
 
-  requestAnimationFrame(() => {
-    centerActiveValues("auto");
-    requestAnimationFrame(() => centerActiveValues("auto"));
-  });
+  if (mode === "time") {
+    requestAnimationFrame(() => {
+      centerActiveValues("auto");
+      requestAnimationFrame(() => centerActiveValues("auto"));
+    });
+  }
 }
 
 function applyAppointmentWheelPickerSelection() {
@@ -3100,13 +3097,8 @@ function applyAppointmentWheelPickerSelection() {
     return;
   }
 
-  const currentDate = new Date((document.getElementById("appointmentDate")?.value || state.selectedDate || todayStr) + "T00:00:00");
-  const year = Number(appointmentPickerState.selected.year || currentDate.getFullYear());
-  const monthIndex = Number(appointmentPickerState.selected.monthIndex || currentDate.getMonth());
-  const rawDay = Number(appointmentPickerState.selected.day || currentDate.getDate());
-  const day = clampRevenueDay(year, monthIndex, rawDay);
   const dateInput = document.getElementById("appointmentDate");
-  if (dateInput) dateInput.value = formatDateInput(new Date(year, monthIndex, day));
+  if (dateInput) dateInput.value = appointmentPickerState.selected.date || dateInput.value || state.selectedDate || todayStr;
   syncAppointmentDateTimeDisplays();
 }
 
@@ -3150,13 +3142,117 @@ function revenuePickerDateValue(year, monthIndex, day) {
   return formatDateInput(new Date(year, monthIndex, day));
 }
 
-function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr) {
-  const columnsWrap = document.getElementById("revenueWheelColumns");
+function buildCalendarPickerDayButton({ date, visibleMonthIndex, selectedDateStr, selectedBounds = null, mode = "day", datasetName = "revenuePickerDay" }) {
+  const value = formatDateInput(date);
+  const isOtherMonth = date.getMonth() !== visibleMonthIndex;
+  const isSelectedDay = mode === "day" && value === selectedDateStr;
+  const isSelectedWeek = mode === "week" && selectedBounds && value >= selectedBounds.start && value <= selectedBounds.end;
+  const appointmentCount = (getData().appointments || []).filter(appointment => appointment.date === value).length;
+  const maxDots = 4;
+  const dots = appointmentCount
+    ? `<span class="revenue-calendar-dots" aria-hidden="true">${Array.from({ length: Math.min(appointmentCount, maxDots) }, () => "<i></i>").join("")}${appointmentCount > maxDots ? '<em>+</em>' : ''}</span>`
+    : "";
+
+  return `<button class="revenue-calendar-day${isOtherMonth ? " is-other-month" : ""}${isSelectedDay ? " selected" : ""}${isSelectedWeek ? " selected-week" : ""}" type="button" data-${datasetName}="${value}"><span class="revenue-calendar-day-number">${date.getDate()}</span>${dots}</button>`;
+}
+
+function attachCalendarPickerSwipe(picker, goToMonth) {
+  if (!picker || picker.dataset.calendarPickerSwipeReady === "true") return;
+  picker.dataset.calendarPickerSwipeReady = "true";
+
+  let startX = 0;
+  let startY = 0;
+  let lastX = 0;
+  let tracking = false;
+  let horizontal = false;
+  let swiped = false;
+  const threshold = 44;
+  const intentThreshold = 10;
+
+  picker.addEventListener("touchstart", event => {
+    if (event.touches.length !== 1) return;
+    tracking = true;
+    horizontal = false;
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+    lastX = startX;
+  }, { passive: true });
+
+  picker.addEventListener("touchmove", event => {
+    if (!tracking || event.touches.length !== 1) return;
+    const x = event.touches[0].clientX;
+    const y = event.touches[0].clientY;
+    const dx = x - startX;
+    const dy = y - startY;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    if (!horizontal) {
+      if (absX < intentThreshold && absY < intentThreshold) return;
+      if (absY > absX) {
+        tracking = false;
+        return;
+      }
+      horizontal = true;
+      swiped = true;
+      picker.classList.add("is-swiping");
+    }
+
+    const limitedDx = Math.max(-90, Math.min(90, dx));
+    picker.style.setProperty("--picker-swipe-x", `${limitedDx}px`);
+    event.preventDefault();
+    lastX = x;
+  }, { passive: false });
+
+  const finish = () => {
+    if (!tracking || !horizontal) {
+      tracking = false;
+      horizontal = false;
+      picker.classList.remove("is-swiping");
+      picker.style.removeProperty("--picker-swipe-x");
+      return;
+    }
+
+    const dx = lastX - startX;
+    tracking = false;
+    horizontal = false;
+    picker.classList.remove("is-swiping");
+    picker.style.removeProperty("--picker-swipe-x");
+
+    if (Math.abs(dx) >= threshold) {
+      goToMonth(dx < 0 ? 1 : -1);
+    }
+  };
+
+  picker.addEventListener("touchend", finish, { passive: true });
+  picker.addEventListener("touchcancel", finish, { passive: true });
+  picker.addEventListener("click", event => {
+    if (!swiped) return;
+    swiped = false;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+}
+
+function renderSharedCalendarPicker({
+  columnsWrapId,
+  pickerState,
+  mode,
+  year,
+  monthIndex,
+  selectedDateStr,
+  datasetName,
+  prevAttr,
+  nextAttr,
+  onMonthChange,
+  onDaySelect
+}) {
+  const columnsWrap = document.getElementById(columnsWrapId);
   if (!columnsWrap) return;
 
   const first = new Date(year, monthIndex, 1);
   const last = new Date(year, monthIndex + 1, 0);
-  const firstWeekdayIndex = (first.getDay() + 6) % 7; // maandag = 0
+  const firstWeekdayIndex = (first.getDay() + 6) % 7;
   const gridStart = new Date(first);
   gridStart.setDate(first.getDate() - firstWeekdayIndex);
   const lastWeekdayIndex = (last.getDay() + 6) % 7;
@@ -3170,9 +3266,9 @@ function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = r
   let html = `
     <div class="revenue-calendar-picker" data-mode="${mode}" data-year="${year}" data-month="${monthIndex}">
       <div class="revenue-calendar-picker-head">
-        <button class="icon-btn revenue-calendar-nav" type="button" data-revenue-picker-prev aria-label="Vorige maand">‹</button>
+        <button class="icon-btn revenue-calendar-nav" type="button" ${prevAttr} aria-label="Vorige maand">‹</button>
         <strong>${monthLabel}</strong>
-        <button class="icon-btn revenue-calendar-nav" type="button" data-revenue-picker-next aria-label="Volgende maand">›</button>
+        <button class="icon-btn revenue-calendar-nav" type="button" ${nextAttr} aria-label="Volgende maand">›</button>
       </div>
       <div class="revenue-calendar-weekdays">
         ${weekdayKeys.map(key => `<span>${t(key)}</span>`).join("")}
@@ -3182,11 +3278,14 @@ function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = r
 
   const cursor = new Date(gridStart);
   while (cursor <= gridEnd) {
-    const value = formatDateInput(cursor);
-    const isOtherMonth = cursor.getMonth() !== monthIndex;
-    const isSelectedDay = mode === "day" && value === selectedDateStr;
-    const isSelectedWeek = mode === "week" && selectedBounds && value >= selectedBounds.start && value <= selectedBounds.end;
-    html += `<button class="revenue-calendar-day${isOtherMonth ? " is-other-month" : ""}${isSelectedDay ? " selected" : ""}${isSelectedWeek ? " selected-week" : ""}" type="button" data-revenue-picker-day="${value}">${cursor.getDate()}</button>`;
+    html += buildCalendarPickerDayButton({
+      date: cursor,
+      visibleMonthIndex: monthIndex,
+      selectedDateStr,
+      selectedBounds,
+      mode,
+      datasetName
+    });
     cursor.setDate(cursor.getDate() + 1);
   }
 
@@ -3201,23 +3300,25 @@ function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = r
   const picker = columnsWrap.querySelector(".revenue-calendar-picker");
   const goToMonth = (delta) => {
     const next = new Date(year, monthIndex + delta, 1);
-    renderRevenueCalendarPicker(mode, next.getFullYear(), next.getMonth(), revenuePickerState.selected.date || selectedDateStr);
+    onMonthChange(next.getFullYear(), next.getMonth(), pickerState.selected.date || selectedDateStr);
   };
 
-  picker?.querySelector("[data-revenue-picker-prev]")?.addEventListener("click", () => goToMonth(-1));
-  picker?.querySelector("[data-revenue-picker-next]")?.addEventListener("click", () => goToMonth(1));
+  picker?.querySelector(`[${prevAttr}]`)?.addEventListener("click", () => goToMonth(-1));
+  picker?.querySelector(`[${nextAttr}]`)?.addEventListener("click", () => goToMonth(1));
+  attachCalendarPickerSwipe(picker, goToMonth);
 
-  picker?.querySelectorAll("[data-revenue-picker-day]").forEach(button => {
+  picker?.querySelectorAll(`[data-${datasetName}]`).forEach(button => {
     button.addEventListener("click", () => {
-      const value = button.dataset.revenuePickerDay;
+      const value = button.getAttribute(`data-${datasetName}`);
       if (!value) return;
 
-      revenuePickerState.selected.date = value;
+      pickerState.selected.date = value;
+      if (typeof onDaySelect === "function") onDaySelect(value);
 
       if (mode === "week") {
         const bounds = weekBounds(value);
         picker.querySelectorAll(".revenue-calendar-day").forEach(dayButton => {
-          const dayValue = dayButton.dataset.revenuePickerDay || "";
+          const dayValue = dayButton.getAttribute(`data-${datasetName}`) || "";
           dayButton.classList.toggle("selected-week", dayValue >= bounds.start && dayValue <= bounds.end);
           dayButton.classList.remove("selected");
         });
@@ -3225,10 +3326,40 @@ function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = r
       }
 
       picker.querySelectorAll(".revenue-calendar-day").forEach(dayButton => {
-        dayButton.classList.toggle("selected", dayButton.dataset.revenuePickerDay === value);
+        dayButton.classList.toggle("selected", dayButton.getAttribute(`data-${datasetName}`) === value);
         dayButton.classList.remove("selected-week");
       });
     });
+  });
+}
+
+function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr) {
+  renderSharedCalendarPicker({
+    columnsWrapId: "revenueWheelColumns",
+    pickerState: revenuePickerState,
+    mode,
+    year,
+    monthIndex,
+    selectedDateStr,
+    datasetName: "revenuePickerDay",
+    prevAttr: "data-revenue-picker-prev",
+    nextAttr: "data-revenue-picker-next",
+    onMonthChange: (nextYear, nextMonth, selectedDate) => renderRevenueCalendarPicker(mode, nextYear, nextMonth, selectedDate)
+  });
+}
+
+function renderAppointmentCalendarPicker(year, monthIndex, selectedDateStr = appointmentPickerState.selected.date || document.getElementById("appointmentDate")?.value || state.selectedDate || todayStr) {
+  renderSharedCalendarPicker({
+    columnsWrapId: "appointmentWheelColumns",
+    pickerState: appointmentPickerState,
+    mode: "day",
+    year,
+    monthIndex,
+    selectedDateStr,
+    datasetName: "appointmentPickerDay",
+    prevAttr: "data-appointment-picker-prev",
+    nextAttr: "data-appointment-picker-next",
+    onMonthChange: (nextYear, nextMonth, selectedDate) => renderAppointmentCalendarPicker(nextYear, nextMonth, selectedDate)
   });
 }
 
