@@ -1,4 +1,5 @@
 const STORAGE_KEY = "nailbooker_v1";
+const AGENDA_FAB_MENU_SETTING_KEY = "nailbooker_agenda_fab_menu_enabled";
 const today = new Date();
 
 function formatDateInput(d) {
@@ -22,24 +23,59 @@ const SUPPORTED_CURRENCIES = [
 
 const DEFAULT_LANGUAGE = "nl-BE";
 const DEFAULT_CURRENCY = "EUR";
+const LEGAL_TERMS_VERSION = "1.0";
+const LEGAL_PRIVACY_VERSION = "1.0";
+
+// App-variant: wijzig alleen deze constante om dezelfde codebase voor beide versies te gebruiken.
+// true  = normale versie, betaalwijze "Andere" is zichtbaar
+// false = tweede versie, alles met betaalwijze "Andere" is volledig onzichtbaar
+const SHOW_ANDERE = false;
+
+const HIDDEN_PAYMENT_METHOD_NAMES = ["Andere"];
+
+function shouldHidePaymentMethodVariantData() {
+  return !SHOW_ANDERE;
+}
+
+function normalizeHiddenPaymentMethodName(value) {
+  return String(value || "").trim().toLocaleLowerCase("nl-BE");
+}
+
+function isHiddenPaymentMethodName(value) {
+  if (!shouldHidePaymentMethodVariantData()) return false;
+  const normalized = normalizeHiddenPaymentMethodName(value);
+  return HIDDEN_PAYMENT_METHOD_NAMES.some(name => normalizeHiddenPaymentMethodName(name) === normalized);
+}
+
+function appointmentHasHiddenPaymentMethod(appointment) {
+  if (!shouldHidePaymentMethodVariantData() || !appointment) return false;
+  const names = [
+    appointment.paymentMethodName,
+    appointment.paymentMethodLabel,
+    appointment.payment_method_label,
+    appointment.paymentMethod,
+    appointment.payment_method
+  ];
+  return names.some(isHiddenPaymentMethodName);
+}
 
 const i18n = {
   "nl-BE": {
-    agenda: "Agenda", revenue: "Omzet", clients: "Klanten", services: "Diensten", paymentMethods: "Betaalwijze", statistics: "Statistieken", settings: "Instellingen", account: "Account",
+    agenda: "Agenda", revenue: "Omzet", clients: "Klanten", services: "Diensten", paymentMethods: "Betaalwijze", statistics: "Statistieken", settings: "Instellingen", support: "Support", account: "Account",
     save: "Opslaan", cancel: "Annuleren", register: "Registreren", login: "Inloggen", logout: "Uitloggen", editProfile: "Gegevens wijzigen", changePassword: "Wachtwoord wijzigen",
     language: "Taal", currency: "Valuta", appPreferences: "App-voorkeuren", currencyChangeWarning: "Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.",
     firstName: "Voornaam", lastName: "Naam", salonName: "Salonnaam", vatNumber: "BTW-nummer", email: "E-mail", password: "Wachtwoord", confirmPassword: "Bevestig wachtwoord", optional: "optioneel",
     noRevenueForSelection: "Geen omzetgegevens voor deze selectie.", paid: "Betaald", unpaid: "Onbetaald", paymentMethod: "Betaalwijze", unknown: "Onbekend", settingsSaved: "Instellingen opgeslagen.", settingsSavedDevice: "Instellingen opgeslagen op dit toestel.", saveSettings: "Instellingen opslaan", ok: "OK", confirmTitle: "Bevestiging", confirm: "Bevestigen"
   },
   "en-GB": {
-    agenda: "Agenda", revenue: "Revenue", clients: "Clients", services: "Services", paymentMethods: "Payment methods", statistics: "Statistics", settings: "Settings", account: "Account",
+    agenda: "Agenda", revenue: "Revenue", clients: "Clients", services: "Services", paymentMethods: "Payment methods", statistics: "Statistics", settings: "Settings", support: "Support", account: "Account",
     save: "Save", cancel: "Cancel", register: "Register", login: "Log in", logout: "Log out", editProfile: "Edit details", changePassword: "Change password",
     language: "Language", currency: "Currency", appPreferences: "App preferences", currencyChangeWarning: "New appointments will use this currency from now on. Existing appointments and revenue remain in their original currency and are not converted.",
     firstName: "First name", lastName: "Last name", salonName: "Salon name", vatNumber: "VAT number", email: "Email", password: "Password", confirmPassword: "Confirm password", optional: "optional",
     noRevenueForSelection: "No revenue data for this selection.", paid: "Paid", unpaid: "Unpaid", paymentMethod: "Payment method", unknown: "Unknown", settingsSaved: "Settings saved.", settingsSavedDevice: "Settings saved on this device.", saveSettings: "Save settings", ok: "OK", confirmTitle: "Confirmation", confirm: "Confirm"
   },
   "fr-FR": {
-    agenda: "Agenda", revenue: "Chiffre d’affaires", clients: "Clients", services: "Services", paymentMethods: "Modes de paiement", statistics: "Statistiques", settings: "Paramètres", account: "Compte",
+    agenda: "Agenda", revenue: "Chiffre d’affaires", clients: "Clients", services: "Services", paymentMethods: "Modes de paiement", statistics: "Statistiques", settings: "Paramètres", support: "Support", account: "Compte",
     save: "Enregistrer", cancel: "Annuler", register: "S’inscrire", login: "Connexion", logout: "Déconnexion", editProfile: "Modifier les données", changePassword: "Modifier le mot de passe",
     language: "Langue", currency: "Devise", appPreferences: "Préférences de l’application", currencyChangeWarning: "Les nouveaux rendez-vous utiliseront désormais cette devise. Les rendez-vous et revenus existants restent dans leur devise d’origine et ne sont pas convertis.",
     firstName: "Prénom", lastName: "Nom", salonName: "Nom du salon", vatNumber: "Numéro de TVA", email: "E-mail", password: "Mot de passe", confirmPassword: "Confirmer le mot de passe", optional: "optionnel",
@@ -49,13 +85,13 @@ const i18n = {
 
 const i18nExtra = {
   "nl-BE": {
-    planning: "Planning", notifications: "Meldingen", extras: "Interessante extra's", defaultBreak: "Standaard pauze tussen 2 afspraken (min)", overlapWarnings: "Overlapwaarschuwingen", overlapWarningsHint: "Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.", enableNotifications: "Meldingen inschakelen", enableNotificationsHint: "Voorbereid voor afspraakherinneringen in de app.", reminderBefore: "Herinnering vóór afspraak", savePending: "Instellingen opslaan...", notificationsOff: "Meldingen zijn uitgeschakeld.", notificationsActive: "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.", notificationsBlocked: "Meldingen zijn geblokkeerd in je browserinstellingen.", notificationsUnsupported: "Deze browser ondersteunt geen webmeldingen.", notificationsPermissionHint: "Schakel meldingen in en geef toestemming om herinneringen te tonen.", appointmentsOn: "Afspraken op", noAppointmentsOnDay: "Geen afspraken op deze dag.", noClientsFound: "Geen klanten gevonden.", noPhone: "Geen gsm", appointmentSingular: "afspraak", appointmentPlural: "afspraken", noActiveServices: "Nog geen actieve diensten.", inactive: "inactief", showInactiveServices: "Toon inactieve diensten", allPaymentMethods: "Alle betaalwijzen", allStatuses: "Alle statussen", day: "Dag", week: "Week", month: "Maand", year: "Jaar", today: "Vandaag", total: "Totaal", revenueOn: "Omzet op", revenueReport: "Omzetrapport", paymentMethodTitle: "Betaalwijze", unknownCustomer: "Onbekende klant", chooseMonth: "Maand kiezen", choose: "Kies", newAppointment: "Nieuwe afspraak", editAppointment: "Afspraak bewerken", customer: "Klant", date: "Datum", time: "Tijd", service: "Dienst", duration: "Duur (min)", price: "Prijs", status: "Status", planned: "Gepland", completed: "Afgerond", newClient: "Nieuwe klant", phone: "Telefoon", note: "Notitie", appointmentRemarks: "Opmerkingen", newService: "Nieuwe dienst", serviceName: "Naam dienst", newPaymentMethod: "Nieuwe betaalwijze", paymentMethodName: "Naam betaalwijze", editProfileTitle: "Profiel bewerken", currentPassword: "Huidig wachtwoord", newPassword: "Nieuw wachtwoord", message: "Melding", registerHere: "Nog geen account? Registreer hier"
+    planning: "Planning", notifications: "Meldingen", extras: "Interessante extra's", defaultBreak: "Standaard pauze tussen 2 afspraken (min)", overlapWarnings: "Overlapwaarschuwingen", overlapWarningsHint: "Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.", enableNotifications: "Meldingen inschakelen", enableNotificationsHint: "Voorbereid voor afspraakherinneringen in de app.", enableAgendaFabMenu: "Tab-menu activeren", enableAgendaFabMenuHint: "Toon rond de + knop snelle knoppen voor afspraak, kost, taak, klant, dienst en betaalwijze.", reminderBefore: "Herinnering vóór afspraak", savePending: "Instellingen opslaan...", notificationsOff: "Meldingen zijn uitgeschakeld.", notificationsActive: "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.", notificationsBlocked: "Meldingen zijn geblokkeerd in je browserinstellingen.", notificationsUnsupported: "Deze browser ondersteunt geen webmeldingen.", notificationsPermissionHint: "Schakel meldingen in en geef toestemming om herinneringen te tonen.", appointmentsOn: "Afspraken op", noAppointmentsOnDay: "Geen afspraken op deze dag.", noClientsFound: "Geen klanten gevonden.", noPhone: "Geen gsm", appointmentSingular: "afspraak", appointmentPlural: "afspraken", noActiveServices: "Nog geen actieve diensten.", inactive: "inactief", showInactiveServices: "Toon inactieve diensten", allPaymentMethods: "Alle betaalwijzen", allStatuses: "Alle statussen", day: "Dag", week: "Week", month: "Maand", year: "Jaar", today: "Vandaag", total: "Totaal", revenueOn: "Omzet op", revenueReport: "Omzetrapport", paymentMethodTitle: "Betaalwijze", unknownCustomer: "Onbekende klant", chooseMonth: "Maand kiezen", choose: "Kies", newAppointment: "Nieuwe afspraak", editAppointment: "Afspraak bewerken", customer: "Klant", date: "Datum", time: "Tijd", service: "Dienst", duration: "Duur (min)", price: "Prijs", status: "Status", planned: "Gepland", completed: "Afgerond", newClient: "Nieuwe klant", phone: "Telefoon", note: "Notitie", appointmentRemarks: "Opmerkingen", newService: "Nieuwe dienst", serviceName: "Naam dienst", newPaymentMethod: "Nieuwe betaalwijze", paymentMethodName: "Naam betaalwijze", editProfileTitle: "Profiel bewerken", currentPassword: "Huidig wachtwoord", newPassword: "Nieuw wachtwoord", message: "Melding", registerHere: "Nog geen account? Registreer hier"
   },
   "en-GB": {
-    planning: "Planning", notifications: "Notifications", extras: "Useful extras", defaultBreak: "Default break between 2 appointments (min)", overlapWarnings: "Overlap warnings", overlapWarningsHint: "Warn when an appointment overlaps with an existing appointment, taking duration and break time into account.", enableNotifications: "Enable notifications", enableNotificationsHint: "Prepared for appointment reminders in the app.", reminderBefore: "Reminder before appointment", savePending: "Saving settings...", notificationsOff: "Notifications are disabled.", notificationsActive: "Notifications are active on this device while the browser or app supports notifications.", notificationsBlocked: "Notifications are blocked in your browser settings.", notificationsUnsupported: "This browser does not support web notifications.", notificationsPermissionHint: "Enable notifications and allow permission to show reminders.", appointmentsOn: "Appointments on", noAppointmentsOnDay: "No appointments on this day.", noClientsFound: "No clients found.", noPhone: "No mobile", appointmentSingular: "appointment", appointmentPlural: "appointments", noActiveServices: "No active services yet.", inactive: "inactive", showInactiveServices: "Show inactive services", allPaymentMethods: "All payment methods", allStatuses: "All statuses", day: "Day", week: "Week", month: "Month", year: "Year", today: "Today", total: "Total", revenueOn: "Revenue on", revenueReport: "Revenue report", paymentMethodTitle: "Payment method", unknownCustomer: "Unknown client", chooseMonth: "Choose month", choose: "Choose", newAppointment: "New appointment", editAppointment: "Edit appointment", customer: "Client", date: "Date", time: "Time", service: "Service", duration: "Duration (min)", price: "Price", status: "Status", planned: "Planned", completed: "Completed", newClient: "New client", phone: "Phone", note: "Note", appointmentRemarks: "Remarks", newService: "New service", serviceName: "Service name", newPaymentMethod: "New payment method", paymentMethodName: "Payment method name", editProfileTitle: "Edit profile", currentPassword: "Current password", newPassword: "New password", message: "Message", registerHere: "No account yet? Register here"
+    planning: "Planning", notifications: "Notifications", extras: "Useful extras", defaultBreak: "Default break between 2 appointments (min)", overlapWarnings: "Overlap warnings", overlapWarningsHint: "Warn when an appointment overlaps with an existing appointment, taking duration and break time into account.", enableNotifications: "Enable notifications", enableNotificationsHint: "Prepared for appointment reminders in the app.", enableAgendaFabMenu: "Enable tab menu", enableAgendaFabMenuHint: "Show quick buttons around the + button for appointment, cost, task, client, service and payment method.", reminderBefore: "Reminder before appointment", savePending: "Saving settings...", notificationsOff: "Notifications are disabled.", notificationsActive: "Notifications are active on this device while the browser or app supports notifications.", notificationsBlocked: "Notifications are blocked in your browser settings.", notificationsUnsupported: "This browser does not support web notifications.", notificationsPermissionHint: "Enable notifications and allow permission to show reminders.", appointmentsOn: "Appointments on", noAppointmentsOnDay: "No appointments on this day.", noClientsFound: "No clients found.", noPhone: "No mobile", appointmentSingular: "appointment", appointmentPlural: "appointments", noActiveServices: "No active services yet.", inactive: "inactive", showInactiveServices: "Show inactive services", allPaymentMethods: "All payment methods", allStatuses: "All statuses", day: "Day", week: "Week", month: "Month", year: "Year", today: "Today", total: "Total", revenueOn: "Revenue on", revenueReport: "Revenue report", paymentMethodTitle: "Payment method", unknownCustomer: "Unknown client", chooseMonth: "Choose month", choose: "Choose", newAppointment: "New appointment", editAppointment: "Edit appointment", customer: "Client", date: "Date", time: "Time", service: "Service", duration: "Duration (min)", price: "Price", status: "Status", planned: "Planned", completed: "Completed", newClient: "New client", phone: "Phone", note: "Note", appointmentRemarks: "Remarks", newService: "New service", serviceName: "Service name", newPaymentMethod: "New payment method", paymentMethodName: "Payment method name", editProfileTitle: "Edit profile", currentPassword: "Current password", newPassword: "New password", message: "Message", registerHere: "No account yet? Register here"
   },
   "fr-FR": {
-    planning: "Planning", notifications: "Notifications", extras: "Extras utiles", defaultBreak: "Pause standard entre 2 rendez-vous (min)", overlapWarnings: "Avertissements de chevauchement", overlapWarningsHint: "Avertir lorsqu’un rendez-vous chevauche un rendez-vous existant, en tenant compte de la durée et de la pause.", enableNotifications: "Activer les notifications", enableNotificationsHint: "Prévu pour les rappels de rendez-vous dans l’application.", reminderBefore: "Rappel avant le rendez-vous", savePending: "Enregistrement des paramètres...", notificationsOff: "Les notifications sont désactivées.", notificationsActive: "Les notifications sont actives sur cet appareil tant que le navigateur ou l’application les prend en charge.", notificationsBlocked: "Les notifications sont bloquées dans les paramètres de votre navigateur.", notificationsUnsupported: "Ce navigateur ne prend pas en charge les notifications web.", notificationsPermissionHint: "Activez les notifications et autorisez-les pour afficher les rappels.", appointmentsOn: "Rendez-vous le", noAppointmentsOnDay: "Aucun rendez-vous ce jour-là.", noClientsFound: "Aucun client trouvé.", noPhone: "Pas de GSM", appointmentSingular: "rendez-vous", appointmentPlural: "rendez-vous", noActiveServices: "Aucun service actif pour le moment.", inactive: "inactif", showInactiveServices: "Afficher les services inactifs", allPaymentMethods: "Tous les modes de paiement", allStatuses: "Tous les statuts", day: "Jour", week: "Semaine", month: "Mois", year: "Année", today: "Aujourd’hui", total: "Total", revenueOn: "Chiffre d’affaires le", revenueReport: "Rapport du chiffre d’affaires", paymentMethodTitle: "Mode de paiement", unknownCustomer: "Client inconnu", chooseMonth: "Choisir le mois", choose: "Choisir", newAppointment: "Nouveau rendez-vous", editAppointment: "Modifier le rendez-vous", customer: "Client", date: "Date", time: "Heure", service: "Service", duration: "Durée (min)", price: "Prix", status: "Statut", planned: "Planifié", completed: "Terminé", newClient: "Nouveau client", phone: "Téléphone", note: "Note", appointmentRemarks: "Remarques", newService: "Nouveau service", serviceName: "Nom du service", newPaymentMethod: "Nouveau mode de paiement", paymentMethodName: "Nom du mode de paiement", editProfileTitle: "Modifier le profil", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", message: "Message", registerHere: "Pas encore de compte ? Inscrivez-vous ici"
+    planning: "Planning", notifications: "Notifications", extras: "Extras utiles", defaultBreak: "Pause standard entre 2 rendez-vous (min)", overlapWarnings: "Avertissements de chevauchement", overlapWarningsHint: "Avertir lorsqu’un rendez-vous chevauche un rendez-vous existant, en tenant compte de la durée et de la pause.", enableNotifications: "Activer les notifications", enableNotificationsHint: "Prévu pour les rappels de rendez-vous dans l’application.", enableAgendaFabMenu: "Activer le menu d’onglets", enableAgendaFabMenuHint: "Afficher autour du bouton + des raccourcis pour rendez-vous, frais, tâche, client, service et mode de paiement.", reminderBefore: "Rappel avant le rendez-vous", savePending: "Enregistrement des paramètres...", notificationsOff: "Les notifications sont désactivées.", notificationsActive: "Les notifications sont actives sur cet appareil tant que le navigateur ou l’application les prend en charge.", notificationsBlocked: "Les notifications sont bloquées dans les paramètres de votre navigateur.", notificationsUnsupported: "Ce navigateur ne prend pas en charge les notifications web.", notificationsPermissionHint: "Activez les notifications et autorisez-les pour afficher les rappels.", appointmentsOn: "Rendez-vous le", noAppointmentsOnDay: "Aucun rendez-vous ce jour-là.", noClientsFound: "Aucun client trouvé.", noPhone: "Pas de GSM", appointmentSingular: "rendez-vous", appointmentPlural: "rendez-vous", noActiveServices: "Aucun service actif pour le moment.", inactive: "inactif", showInactiveServices: "Afficher les services inactifs", allPaymentMethods: "Tous les modes de paiement", allStatuses: "Tous les statuts", day: "Jour", week: "Semaine", month: "Mois", year: "Année", today: "Aujourd’hui", total: "Total", revenueOn: "Chiffre d’affaires le", revenueReport: "Rapport du chiffre d’affaires", paymentMethodTitle: "Mode de paiement", unknownCustomer: "Client inconnu", chooseMonth: "Choisir le mois", choose: "Choisir", newAppointment: "Nouveau rendez-vous", editAppointment: "Modifier le rendez-vous", customer: "Client", date: "Date", time: "Heure", service: "Service", duration: "Durée (min)", price: "Prix", status: "Statut", planned: "Planifié", completed: "Terminé", newClient: "Nouveau client", phone: "Téléphone", note: "Note", appointmentRemarks: "Remarques", newService: "Nouveau service", serviceName: "Nom du service", newPaymentMethod: "Nouveau mode de paiement", paymentMethodName: "Nom du mode de paiement", editProfileTitle: "Modifier le profil", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", message: "Message", registerHere: "Pas encore de compte ? Inscrivez-vous ici"
   }
 };
 Object.keys(i18nExtra).forEach(lang => Object.assign(i18n[lang], i18nExtra[lang]));
@@ -63,7 +99,7 @@ Object.keys(i18nExtra).forEach(lang => Object.assign(i18n[lang], i18nExtra[lang]
 const i18nMore = {
   "nl-BE": {
     mondayShort:"Ma", tuesdayShort:"Di", wednesdayShort:"Wo", thursdayShort:"Do", fridayShort:"Vr", saturdayShort:"Za", sundayShort:"Zo",
-    searchClientPlaceholder:"Zoek klant...", searchAppointmentCustomerPlaceholder:"Zoek op naam, telefoon of e-mail...", searchServicePlaceholder:"Zoek dienst...",
+    searchClientPlaceholder:"Zoek klant...", searchAppointmentCustomerPlaceholder:"Zoek op naam, telefoon of e-mail...", searchServicePlaceholder:"Zoek op beschrijving of kernwoord",
     delete:"Verwijderen", edit:"Bewerk", editClient:"Klant bewerken", editService:"Dienst bewerken", editPaymentMethod:"Betaalwijze bewerken", reactivateService:"Dienst opnieuw actief zetten", reactivateServiceHint:"De dienst verschijnt opnieuw in de actieve dienstenlijst en bij nieuwe afspraken.",
     customerNumber:"Klantnummer", appointments:"Afspraken", totalLower:"totaal", noAppointmentsYet:"Nog geen afspraken.", noPaymentMethods:"Nog geen betaalwijzen.", paymentSingular:"betaling", paymentPlural:"betalingen",
     customerCount:"Aantal klanten", pastAppointments:"Afgeronde afspraken", futureAppointments:"Geplande afspraken", totalRevenueUntilToday:"Totale omzet tot vandaag", chosenServices:"Gekozen behandelingen", revenueByService:"Omzet per behandeling", chosenPaymentMethod:"Gekozen betaalwijze", topCustomers:"Top klanten", all:"Alle", noCustomerStats:"Nog geen klantgegevens beschikbaar.", more:"Meer...", less:"Minder",
@@ -94,6 +130,20 @@ const i18nTodo = {
   "fr-FR": { todo: "To Do", newTodo: "Nouvelle tâche", editTodo: "Modifier la tâche", todoTitle: "Titre", todoDescription: "Description", addBullet: "Ajouter une puce", noTodos: "Aucune tâche pour le moment.", markDone: "Terminer", markOpen: "Rouvrir", completed: "Terminée", open: "Ouverte" }
 };
 Object.keys(i18nTodo).forEach(lang => Object.assign(i18n[lang], i18nTodo[lang]));
+
+const i18nCosts = {
+  "nl-BE": { costs: "Kosten", newCost: "Nieuwe kost", editCost: "Kost bewerken", costDescription: "Omschrijving", costDate: "Datum", costAmountInclVat: "Bedrag incl. btw", vat: "Btw", standardCost: "Standaardkost", noCosts: "Nog geen kosten.", saveAsStandardCostQuestion: "Wil je deze kost opslaan als standaardkost zodat je ze later snel opnieuw kunt selecteren?", costSaved: "Kost opgeslagen.", costDeleted: "Kost verwijderd.", chooseStandardCost: "Zoek of kies een standaardkost...", totalInclVat: "Totaal incl. btw", totalExclVat: "Totaal excl. btw", standardCosts: "Standaardkosten", noStandardCosts: "Nog geen standaardkosten.", editStandardCost: "Standaardkost aanpassen", deleteStandardCostConfirm: "Deze standaardkost verwijderen?" },
+  "en-GB": { costs: "Costs", newCost: "New cost", editCost: "Edit cost", costDescription: "Description", costDate: "Date", costAmountInclVat: "Amount incl. VAT", vat: "VAT", standardCost: "Standard cost", noCosts: "No costs yet.", saveAsStandardCostQuestion: "Do you want to save this cost as a standard cost so you can quickly select it again later?", costSaved: "Cost saved.", costDeleted: "Cost deleted.", chooseStandardCost: "Search or choose a standard cost...", totalInclVat: "Total incl. VAT", totalExclVat: "Total excl. VAT", standardCosts: "Standard costs", noStandardCosts: "No standard costs yet.", editStandardCost: "Edit standard cost", deleteStandardCostConfirm: "Delete this standard cost?" },
+  "fr-FR": { costs: "Frais", newCost: "Nouveau frais", editCost: "Modifier le frais", costDescription: "Description", costDate: "Date", costAmountInclVat: "Montant TVAC", vat: "TVA", standardCost: "Frais standard", noCosts: "Aucun frais pour le moment.", saveAsStandardCostQuestion: "Voulez-vous enregistrer ce frais comme frais standard afin de pouvoir le sélectionner rapidement plus tard ?", costSaved: "Frais enregistré.", costDeleted: "Frais supprimé.", chooseStandardCost: "Rechercher ou choisir un frais standard...", totalInclVat: "Total TVAC", totalExclVat: "Total HTVA", standardCosts: "Frais standard", noStandardCosts: "Aucun frais standard pour le moment.", editStandardCost: "Modifier le frais standard", deleteStandardCostConfirm: "Supprimer ce frais standard ?" }
+};
+Object.keys(i18nCosts).forEach(lang => Object.assign(i18n[lang], i18nCosts[lang]));
+
+const i18nSubscription = {
+  "nl-BE": { subscription: "Abonnement" },
+  "en-GB": { subscription: "Subscription" },
+  "fr-FR": { subscription: "Abonnement" }
+};
+Object.keys(i18nSubscription).forEach(lang => Object.assign(i18n[lang], i18nSubscription[lang]));
 
 
 let currentProfilePreferences = { language: DEFAULT_LANGUAGE, currency: DEFAULT_CURRENCY };
@@ -129,9 +179,254 @@ function buildLanguageOptions(selected = DEFAULT_LANGUAGE) {
   return SUPPORTED_LANGUAGES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.label}</option>`).join("");
 }
 
+function getShortLanguageLabel(code) {
+  const map = { "nl-BE": "NL", "en-GB": "EN", "fr-FR": "FR" };
+  return map[normalizeLanguage(code)] || "NL";
+}
+
+function syncHeaderLanguageSelect() {
+  document.querySelectorAll(".header-language-select").forEach(select => {
+    select.value = getCurrentLanguage();
+  });
+  syncHeaderLanguageButton();
+}
+
+function syncHeaderLanguageButton() {
+  const current = getCurrentLanguage();
+  const currentLabel = document.getElementById("headerLanguageCurrent");
+  const overlay = document.getElementById("headerLanguageOverlay");
+  if (currentLabel) currentLabel.textContent = getShortLanguageLabel(current);
+  if (!overlay) return;
+
+  overlay.innerHTML = SUPPORTED_LANGUAGES
+    .filter(item => item.code !== current)
+    .map(item => `<button class="header-language-option" type="button" role="menuitem" data-header-language="${item.code}">${getShortLanguageLabel(item.code)}</button>`)
+    .join("");
+}
+
+function closeHeaderLanguageOverlay() {
+  const menu = document.getElementById("headerLanguageMenu");
+  const button = document.getElementById("headerLanguageBtn");
+  const overlay = document.getElementById("headerLanguageOverlay");
+  overlay?.classList.add("hidden");
+  menu?.classList.remove("is-open");
+  button?.setAttribute("aria-expanded", "false");
+}
+
+function toggleHeaderLanguageOverlay() {
+  const menu = document.getElementById("headerLanguageMenu");
+  const button = document.getElementById("headerLanguageBtn");
+  const overlay = document.getElementById("headerLanguageOverlay");
+  if (!menu || !button || !overlay || menu.classList.contains("is-saving")) return;
+  syncHeaderLanguageButton();
+  const willOpen = overlay.classList.contains("hidden");
+  overlay.classList.toggle("hidden", !willOpen);
+  menu.classList.toggle("is-open", willOpen);
+  button.setAttribute("aria-expanded", String(willOpen));
+}
+
+function setHeaderLanguageBusy(isBusy) {
+  const menu = document.getElementById("headerLanguageMenu");
+  const button = document.getElementById("headerLanguageBtn");
+  const status = document.getElementById("headerLanguageStatus");
+  menu?.classList.toggle("is-saving", Boolean(isBusy));
+  if (button) button.disabled = Boolean(isBusy);
+  status?.classList.toggle("hidden", !isBusy);
+  if (isBusy) closeHeaderLanguageOverlay();
+}
+
+async function saveHeaderLanguageFromMenu(language) {
+  const nextLanguage = normalizeLanguage(language);
+  if (nextLanguage === getCurrentLanguage()) return;
+
+  setHeaderLanguageBusy(true);
+  try {
+    await runWithGlobalActionBusy(async () => {
+      await saveHeaderLanguagePreference(nextLanguage);
+    });
+  } finally {
+    setHeaderLanguageBusy(false);
+  }
+}
+
+function getDialogTitleText(dialog) {
+  const titleEl = dialog?.querySelector?.(".modal-head h3");
+  return (titleEl?.textContent || document.getElementById("screenTitle")?.textContent || "NailBooker").trim();
+}
+
+const sharedModalHeaderState = {
+  activeDialog: null,
+  originalParent: null,
+  originalNextSibling: null,
+  previousTitle: "",
+  returnDialog: null
+};
+
+function getSharedAppHeader() {
+  const header = document.getElementById("appTopbar") || document.querySelector(".app-shell > .topbar");
+  if (header && !header.id) header.id = "appTopbar";
+  return header;
+}
+
+function moveSharedHeaderToDialog(dialog) {
+  if (dialog?.classList?.contains("agenda-unpaid-message-dialog")) return;
+  const header = getSharedAppHeader();
+  const screenTitle = document.getElementById("screenTitle");
+  if (!dialog || !header) return;
+
+  if (sharedModalHeaderState.activeDialog && sharedModalHeaderState.activeDialog !== dialog) {
+    const previousDialog = sharedModalHeaderState.activeDialog;
+    restoreSharedHeaderFromDialog();
+    sharedModalHeaderState.returnDialog = previousDialog?.open ? previousDialog : null;
+  }
+
+  if (header.parentElement !== dialog) {
+    sharedModalHeaderState.originalParent = header.parentElement;
+    sharedModalHeaderState.originalNextSibling = header.nextSibling;
+    sharedModalHeaderState.previousTitle = screenTitle?.textContent || "Agenda";
+    dialog.insertBefore(header, dialog.firstElementChild);
+  }
+
+  if (screenTitle) screenTitle.textContent = getDialogTitleText(dialog);
+  dialog.classList.add("has-app-topbar");
+  sharedModalHeaderState.activeDialog = dialog;
+}
+
+function restoreSharedHeaderFromDialog() {
+  const header = getSharedAppHeader();
+  const screenTitle = document.getElementById("screenTitle");
+  const parent = sharedModalHeaderState.originalParent;
+
+  if (header && parent && header.parentElement !== parent) {
+    parent.insertBefore(header, sharedModalHeaderState.originalNextSibling || parent.firstChild);
+  }
+
+  if (screenTitle && sharedModalHeaderState.previousTitle) {
+    screenTitle.textContent = sharedModalHeaderState.previousTitle;
+  }
+
+  if (sharedModalHeaderState.activeDialog) {
+    sharedModalHeaderState.activeDialog.classList.remove("has-app-topbar");
+  }
+
+  sharedModalHeaderState.activeDialog = null;
+  sharedModalHeaderState.originalParent = null;
+  sharedModalHeaderState.originalNextSibling = null;
+  sharedModalHeaderState.previousTitle = "";
+}
+
+function syncModalAppHeader(dialog) {
+  if (sharedModalHeaderState.activeDialog === dialog) {
+    const screenTitle = document.getElementById("screenTitle");
+    if (screenTitle) screenTitle.textContent = getDialogTitleText(dialog);
+  }
+}
+
+function ensureModalAppHeaders() {
+  const header = getSharedAppHeader();
+  if (header) header.id = "appTopbar";
+
+  document.querySelectorAll("dialog.modal").forEach(dialog => {
+    dialog.querySelector(":scope > .modal-app-topbar")?.remove();
+
+    if (!dialog.dataset.modalAppHeaderBound) {
+      const originalShowModal = dialog.showModal?.bind(dialog);
+      if (originalShowModal) {
+        dialog.showModal = function patchedShowModal(...args) {
+          moveSharedHeaderToDialog(dialog);
+          return originalShowModal(...args);
+        };
+      }
+
+      dialog.addEventListener("close", () => {
+        if (sharedModalHeaderState.activeDialog === dialog) {
+          const returnDialog = sharedModalHeaderState.returnDialog;
+          restoreSharedHeaderFromDialog();
+          if (returnDialog?.open) {
+            sharedModalHeaderState.returnDialog = null;
+            moveSharedHeaderToDialog(returnDialog);
+          }
+        }
+      });
+
+      dialog.dataset.modalAppHeaderBound = "1";
+    }
+  });
+  syncHeaderLanguageSelect();
+}
+
+async function saveHeaderLanguagePreference(language) {
+  const nextLanguage = normalizeLanguage(language || DEFAULT_LANGUAGE);
+  const previousLanguage = getCurrentLanguage();
+  if (nextLanguage === previousLanguage) {
+    syncHeaderLanguageSelect();
+    closeHeaderLanguageOverlay();
+    return;
+  }
+
+  setHeaderLanguageBusy(true);
+
+  currentProfilePreferences.language = nextLanguage;
+  const data = getData();
+  data.settings = { ...getSettings(), language: nextLanguage, currency: getCurrentCurrency() };
+  saveData(data);
+  syncHeaderLanguageSelect();
+  const settingsLanguage = document.getElementById("settingsLanguage");
+  if (settingsLanguage) settingsLanguage.value = nextLanguage;
+  rerenderAll();
+
+  const user = await getCurrentUser();
+  if (!user) {
+    setHeaderLanguageBusy(false);
+    return;
+  }
+
+  const updatedAt = new Date().toISOString();
+  const profileResult = await supabaseClient
+    .from("profiles")
+    .update({ language: nextLanguage, updated_at: updatedAt })
+    .eq("id", user.id);
+
+  const currentSettings = getSettings();
+  const settingsResult = await supabaseClient
+    .from("user_settings")
+    .upsert({
+      user_id: user.id,
+      default_break_minutes: Number(currentSettings.defaultBreakMinutes ?? 10),
+      notifications_enabled: Boolean(currentSettings.notificationsEnabled ?? false),
+      reminder_minutes: Number(currentSettings.reminderMinutes ?? 30),
+      overlap_warnings_enabled: currentSettings.overlapWarningsEnabled !== false,
+      language: nextLanguage,
+      currency: normalizeCurrency(currentSettings.currency || getCurrentCurrency()),
+      payment_beneficiary_name: currentSettings.paymentBeneficiaryName || null,
+      payment_reference_prefix: currentSettings.paymentReferencePrefix || null,
+      calendar_feed_token: currentSettings.calendarFeedToken || null,
+      updated_at: updatedAt
+    }, { onConflict: "user_id" });
+
+  if (profileResult.error || settingsResult.error) {
+    currentProfilePreferences.language = previousLanguage;
+    data.settings = { ...getSettings(), language: previousLanguage, currency: getCurrentCurrency() };
+    saveData(data);
+    syncHeaderLanguageSelect();
+    if (settingsLanguage) settingsLanguage.value = previousLanguage;
+    rerenderAll();
+    setHeaderLanguageBusy(false);
+    await appAlert("Taal opslaan mislukt: " + (profileResult.error?.message || settingsResult.error?.message), { title: "Opslaan mislukt", variant: "danger" });
+    return;
+  }
+
+  setHeaderLanguageBusy(false);
+}
+
 function buildCurrencyOptions(selected = DEFAULT_CURRENCY) {
   const safe = normalizeCurrency(selected);
   return SUPPORTED_CURRENCIES.map(item => `<option value="${item.code}"${item.code === safe ? " selected" : ""}>${item.label} (${item.symbol})</option>`).join("");
+}
+
+function normalizePaymentReferencePrefix(value) {
+  const text = String(value || "").trim();
+  return text === "Idle & Ease" ? "" : text;
 }
 
 function updateStaticI18n() {
@@ -225,14 +520,28 @@ function updateStaticI18n() {
     if (key) el.textContent = t(key);
   });
 
-  const revenueMainKeys = ["total", "paid", "unpaid"];
-  document.querySelectorAll(".revenue-main-label").forEach((el, index) => {
-    const key = revenueMainKeys[index];
-    if (key) el.textContent = t(key);
+  const revenueAppointmentLabels = [
+    [".revenue-summary-appointments .revenue-main-label", "appointments"],
+    [".revenue-summary-completed .revenue-main-label", "completed"],
+    [".revenue-summary-planned-count .revenue-main-label", "planned"]
+  ];
+  revenueAppointmentLabels.forEach(([selector, key]) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = t(key);
+  });
+
+  const revenueMoneyLabels = [
+    [".revenue-summary-total .revenue-main-label", "total"],
+    [".revenue-summary-paid .revenue-main-label", "paid"],
+    [".revenue-summary-unpaid .revenue-main-label", "unpaid"]
+  ];
+  revenueMoneyLabels.forEach(([selector, key]) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = t(key);
   });
 
   const settingsLabels = document.querySelectorAll("#settingsScreen .detail-label");
-  [[0, "planning"], [1, "notifications"], [3, "extras"]].forEach(([index, key]) => {
+  [[1, "planning"], [2, "notifications"]].forEach(([index, key]) => {
     if (settingsLabels[index]) settingsLabels[index].textContent = t(key);
   });
 
@@ -306,6 +615,11 @@ function updateStaticI18n() {
     if (strong) strong.textContent = t("enableNotifications");
     if (small) small.textContent = t("enableNotificationsHint");
   }
+  const agendaFabMenuLabel = document.querySelector('.settings-switch-row[for="settingsAgendaFabMenuEnabled"]');
+  if (agendaFabMenuLabel) {
+    const small = agendaFabMenuLabel.querySelector('small');
+    if (small) small.textContent = t("enableAgendaFabMenuHint");
+  }
   const serviceReactivate = document.querySelector('#serviceReactivateWrap');
   if (serviceReactivate) {
     const strong = serviceReactivate.querySelector('strong');
@@ -330,6 +644,8 @@ const state = {
   clientLetter: "",
   serviceLetter: "",
   settingsSavePending: false,
+  settingsDirty: false,
+  settingsInitialSignature: "",
   statsTopCustomersVisible: 10,
   revenueInitialized: false,
   revenueSelectedDateSynced: null,
@@ -337,6 +653,10 @@ const state = {
   revenueLastRenderSignature: "",
   showInactiveServices: false,
   todoFilter: "all",
+  standardCostLetter: "",
+  standardCostSearch: "",
+  costsPeriodType: "month",
+  costsPeriodDate: todayStr,
   appNavigationReady: false,
   appNavigationLastScreen: null
 };
@@ -367,17 +687,33 @@ function capitalizeFirst(value) {
 
 const defaultPaymentMethods = [
   { id: 1, name: "Cash", sortOrder: 1 },
-  { id: 2, name: "Bancontact", sortOrder: 2 },
-  { id: 3, name: "Kaart", sortOrder: 3 },
-  { id: 4, name: "Overschrijving", sortOrder: 4 },
-  { id: 5, name: "Andere", sortOrder: 5 }
+  { id: 2, name: "Overschrijving", sortOrder: 2 },
+  { id: 3, name: "QR-Code", sortOrder: 3 }
 ];
 
 const revenuePickerState = {
   mode: "year",
+  target: "revenue",
   columns: [],
   selected: {}
 };
+
+function getRevenuePickerTarget() {
+  return revenuePickerState.target || "revenue";
+}
+
+function getRevenuePickerAnchorDate() {
+  if (getRevenuePickerTarget() === "costs") return getCostsPeriodDate();
+  return document.getElementById("revenueDate")?.value || todayStr;
+}
+
+function setRevenuePickerPeriod(type, dateStr) {
+  if (getRevenuePickerTarget() === "costs") {
+    setCostsPeriod(type, dateStr);
+    return;
+  }
+  setRevenuePeriod(type, dateStr);
+}
 
 const notificationTimers = new Map();
 let notificationHeartbeatId = null;
@@ -399,18 +735,42 @@ function addDaysStr(dateStr, days) {
   return formatDateInput(d);
 }
 
+function readAgendaFabMenuEnabledPreference() {
+  try {
+    const stored = localStorage.getItem(AGENDA_FAB_MENU_SETTING_KEY);
+    if (stored === "true") return true;
+    if (stored === "false") return false;
+  } catch (error) {}
+  return true;
+}
+
+function writeAgendaFabMenuEnabledPreference(enabled) {
+  try {
+    localStorage.setItem(AGENDA_FAB_MENU_SETTING_KEY, enabled ? "true" : "false");
+  } catch (error) {}
+}
+
+function isAgendaFabMenuEnabled() {
+  const settings = getData()?.settings || {};
+  if (typeof settings.agendaFabMenuEnabled === "boolean") return settings.agendaFabMenuEnabled;
+  return readAgendaFabMenuEnabledPreference();
+}
+
 function getDefaultSettings() {
   return {
     defaultBreakMinutes: 10,
     notificationsEnabled: false,
     reminderMinutes: 30,
     overlapWarningsEnabled: true,
+    agendaFabMenuEnabled: readAgendaFabMenuEnabledPreference(),
+    showTipsOnOpen: true,
     language: DEFAULT_LANGUAGE,
     currency: DEFAULT_CURRENCY,
     paymentBeneficiaryName: "",
-    paymentIban: "",
+    paymentAccountNumber: "",
     paymentBic: "",
-    paymentReferencePrefix: "Idle & Ease"
+    paymentReferencePrefix: "",
+    calendarFeedToken: ""
   };
 }
 
@@ -419,19 +779,31 @@ function normalizeData(data) {
   const safe = data && typeof data === "object" ? data : {};
   const paymentMethods = normalizePaymentMethods(safe.paymentMethods);
 
-  const appointments = Array.isArray(safe.appointments) ? safe.appointments.map(appointment => {
-    const paymentMethodName = appointment?.paymentMethodName
-      || appointment?.paymentMethodLabel
-      || appointment?.paymentMethod
-      || null;
+  const appointments = Array.isArray(safe.appointments) ? safe.appointments
+    .map(appointment => {
+      const paymentMethodName = appointment?.paymentMethodName
+        || appointment?.paymentMethodLabel
+        || appointment?.payment_method_label
+        || appointment?.paymentMethod
+        || appointment?.payment_method
+        || null;
 
-    return {
-      ...appointment,
-      paymentMethodName: paymentMethodName ? String(paymentMethodName).trim() : null,
-      currency: normalizeCurrency(appointment?.currency || safe.settings?.currency || DEFAULT_CURRENCY),
-      remarks: String(appointment?.remarks || appointment?.note || appointment?.appointment_remarks || "").trim()
-    };
-  }) : [];
+      return {
+        ...appointment,
+        paymentMethodName: paymentMethodName ? String(paymentMethodName).trim() : null,
+        currency: normalizeCurrency(appointment?.currency || safe.settings?.currency || DEFAULT_CURRENCY),
+        remarks: String(appointment?.remarks || appointment?.note || appointment?.appointment_remarks || "").trim(),
+        isPrivate: Boolean(appointment?.isPrivate ?? appointment?.is_private),
+        privateTitle: String(appointment?.privateTitle || appointment?.private_title || "").trim(),
+        privateDetails: String(appointment?.privateDetails || appointment?.private_details || "").trim(),
+        privateEndTime: appointment?.privateEndTime || appointment?.private_end_time || "",
+        privateEndDate: getStoredPrivateEndDate(appointment, appointment?.date || appointment?.appointment_date || todayStr),
+        recurrenceGroupId: appointment?.recurrenceGroupId || appointment?.recurrence_group_id || null,
+        recurrenceRule: appointment?.recurrenceRule || appointment?.recurrence_rule || "none"
+      };
+    })
+    .filter(appointment => !appointmentHasHiddenPaymentMethod(appointment))
+    : [];
 
   const todos = Array.isArray(safe.todos) ? safe.todos.map(todo => ({
     id: todo?.id,
@@ -442,6 +814,25 @@ function normalizeData(data) {
     updatedAt: todo?.updatedAt || todo?.updated_at || null
   })).filter(todo => todo.title || todo.description) : [];
 
+  const costs = Array.isArray(safe.costs) ? safe.costs.map(cost => ({
+    id: cost?.id,
+    description: String(cost?.description || cost?.omschrijving || "").trim(),
+    date: cost?.date || cost?.cost_date || todayStr,
+    amountInclVat: Number(cost?.amountInclVat ?? cost?.amount_incl_vat ?? cost?.amount ?? 0),
+    vatRate: Number(cost?.vatRate ?? cost?.vat_rate ?? 21),
+    standardCostId: cost?.standardCostId ?? cost?.standard_cost_id ?? null,
+    createdAt: cost?.createdAt || cost?.created_at || null,
+    updatedAt: cost?.updatedAt || cost?.updated_at || null
+  })).filter(cost => cost.description || Number(cost.amountInclVat) > 0) : [];
+
+  const standardCosts = Array.isArray(safe.standardCosts) ? safe.standardCosts.map(item => ({
+    id: item?.id,
+    description: String(item?.description || item?.omschrijving || "").trim(),
+    vatRate: Number(item?.vatRate ?? item?.vat_rate ?? 21),
+    createdAt: item?.createdAt || item?.created_at || null,
+    updatedAt: item?.updatedAt || item?.updated_at || null
+  })).filter(item => item.description) : [];
+
   return {
     customers: Array.isArray(safe.customers) ? safe.customers : [],
     services: Array.isArray(safe.services) ? safe.services.map(service => ({
@@ -450,6 +841,8 @@ function normalizeData(data) {
     })) : [],
     appointments,
     todos,
+    costs,
+    standardCosts,
     paymentMethods,
     settings: {
       ...defaults,
@@ -483,7 +876,7 @@ function normalizePaymentMethods(items) {
       const sortOrder = Number(item?.sortOrder ?? item?.sort_order ?? index + 1);
       const name = String(item?.name || item?.label || "").trim();
       const legacyPaymentName = "pay" + "coniq";
-      if (!name || name.toLowerCase() === legacyPaymentName) return null;
+      if (!name || name.toLowerCase() === legacyPaymentName || isHiddenPaymentMethodName(name)) return null;
       return {
         id: Number.isFinite(id) ? id : index + 1,
         name,
@@ -543,6 +936,11 @@ function formatLongDate(dateStr) {
 function formatShortDate(dateStr) {
   const d = new Date(dateStr + "T00:00:00");
   return new Intl.DateTimeFormat(getCurrentLanguage(), { day: "numeric", month: "long" }).format(d);
+}
+
+function formatCompactDayMonth(dateStr) {
+  const d = new Date(dateStr + "T00:00:00");
+  return new Intl.DateTimeFormat(getCurrentLanguage(), { day: "2-digit", month: "short" }).format(d).replace(/\.$/, "");
 }
 
 function nextId(items) {
@@ -679,14 +1077,221 @@ function timeStringFromMinutes(totalMinutes) {
   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+function isPrivateAppointment(appointment) {
+  return Boolean(appointment?.isPrivate ?? appointment?.is_private);
+}
+
+
+const PRIVATE_END_DATE_META_PREFIX = "[NB_PRIVATE_END_DATE:";
+
+function isDateInputValue(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ""));
+}
+
+function extractPrivateEndDateFromRemarks(value) {
+  const text = String(value || "");
+  const match = text.match(/\[NB_PRIVATE_END_DATE:(\d{4}-\d{2}-\d{2})\]/);
+  return match ? match[1] : "";
+}
+
+function stripPrivateEndDateMeta(value) {
+  return String(value || "").replace(/\s*\[NB_PRIVATE_END_DATE:\d{4}-\d{2}-\d{2}\]\s*/g, "").trim();
+}
+
+function getStoredPrivateEndDate(appointment, fallbackDate = todayStr) {
+  const explicit = appointment?.privateEndDate || appointment?.private_end_date;
+  if (isDateInputValue(explicit)) return explicit;
+  const fromRemarks = extractPrivateEndDateFromRemarks(appointment?.remarks || appointment?.appointment_remarks || "");
+  if (isDateInputValue(fromRemarks)) return fromRemarks;
+  return fallbackDate || appointment?.date || appointment?.appointment_date || todayStr;
+}
+
+function withPrivateEndDateMeta(remarks, privateEndDate) {
+  const clean = stripPrivateEndDateMeta(remarks);
+  if (!isDateInputValue(privateEndDate)) return clean;
+  return `${clean ? `${clean} ` : ""}[NB_PRIVATE_END_DATE:${privateEndDate}]`.trim();
+}
+
+function getPrivateRangeBounds(appointment) {
+  const start = appointment?.originalDate || appointment?.date || appointment?.appointment_date || todayStr;
+  const end = getStoredPrivateEndDate(appointment, start);
+  return end >= start ? { start, end } : { start, end: start };
+}
+
+function appointmentIsActiveOnDate(appointment, dateStr) {
+  if (!isPrivateAppointment(appointment)) return (appointment?.date || appointment?.appointment_date) === dateStr;
+  const bounds = getPrivateRangeBounds(appointment);
+  return dateStr >= bounds.start && dateStr <= bounds.end;
+}
+
+function expandPrivateAppointmentDateRange(appointment) {
+  if (!isPrivateAppointment(appointment)) return [appointment];
+  const bounds = getPrivateRangeBounds(appointment);
+  const dates = [];
+  const cursor = new Date(bounds.start + "T00:00:00");
+  const endDate = new Date(bounds.end + "T00:00:00");
+  if (Number.isNaN(cursor.getTime()) || Number.isNaN(endDate.getTime())) return [appointment];
+
+  let index = 0;
+  while (cursor <= endDate && index < 370) {
+    const date = formatDateInput(cursor);
+    dates.push({
+      ...appointment,
+      originalDate: appointment.originalDate || appointment.date,
+      date,
+      privateEndDate: bounds.end,
+      isVirtualPrivateRange: date !== (appointment.originalDate || appointment.date)
+    });
+    cursor.setDate(cursor.getDate() + 1);
+    index += 1;
+  }
+  return dates;
+}
+
+function appointmentsShareActiveDate(a, b) {
+  const aStart = a?.date || a?.appointment_date || todayStr;
+  const aEnd = isPrivateAppointment(a) ? getPrivateRangeBounds(a).end : aStart;
+  const bStart = b?.date || b?.appointment_date || todayStr;
+  const bEnd = isPrivateAppointment(b) ? getPrivateRangeBounds(b).end : bStart;
+  return aStart <= bEnd && bStart <= aEnd;
+}
+
+function getVirtualPrivateRecurrenceAppointments(data = getData()) {
+  const appointments = Array.isArray(data?.appointments) ? data.appointments : [];
+  const counts = {
+    daily: 365,
+    weekly: 52,
+    biweekly: 26,
+    triweekly: 18,
+    monthly: 24,
+    quarterly: 12,
+    semiannual: 10,
+    yearly: 5
+  };
+  const stepDays = { daily: 1, weekly: 7, biweekly: 14, triweekly: 21 };
+  const stepMonths = { monthly: 1, quarterly: 3, semiannual: 6 };
+
+  return appointments
+    .flatMap(appointment => {
+      const rule = appointment?.recurrenceRule || appointment?.recurrence_rule || "none";
+      if (!isPrivateAppointment(appointment) || rule === "none" || appointment.recurrenceGroupId || appointment.recurrence_group_id) {
+        return [appointment];
+      }
+
+      const startDate = new Date((appointment.date || appointment.appointment_date || todayStr) + "T00:00:00");
+      if (Number.isNaN(startDate.getTime())) return [appointment];
+
+      const rangeBounds = getPrivateRangeBounds(appointment);
+      const rangeDays = Math.max(0, Math.round((new Date(rangeBounds.end + "T00:00:00") - new Date(rangeBounds.start + "T00:00:00")) / 86400000));
+      const total = counts[rule] || 1;
+
+      return Array.from({ length: total }, (_, index) => {
+        const d = new Date(startDate);
+        if (rule === "yearly") d.setFullYear(startDate.getFullYear() + index);
+        else if (stepMonths[rule]) d.setMonth(startDate.getMonth() + (stepMonths[rule] * index));
+        else d.setDate(startDate.getDate() + (stepDays[rule] || 0) * index);
+
+        const occurrenceDate = formatDateInput(d);
+        const occurrenceEndDateObject = new Date(d);
+        occurrenceEndDateObject.setDate(d.getDate() + rangeDays);
+
+        return {
+          ...appointment,
+          id: index === 0 ? appointment.id : `${appointment.id}__${rule}_${index}`,
+          sourceAppointmentId: appointment.id,
+          originalDate: occurrenceDate,
+          date: occurrenceDate,
+          privateEndDate: formatDateInput(occurrenceEndDateObject),
+          isVirtualRecurrence: index > 0
+        };
+      });
+    })
+    .flatMap(expandPrivateAppointmentDateRange);
+}
+function isMultiDayPrivateAppointment(appointment) {
+  if (!isPrivateAppointment(appointment)) return false;
+  const bounds = getPrivateRangeBounds(appointment);
+  return bounds.end > bounds.start;
+}
+
+function getPrivateAgendaDisplayTime(appointment, dateStr) {
+  const bounds = getPrivateRangeBounds(appointment);
+  const currentDate = dateStr || appointment?.date || todayStr;
+  const startTime = String(appointment?.time || appointment?.appointment_time || "00:00").slice(0, 5);
+  const endTime = String(appointment?.privateEndTime || appointment?.private_end_time || startTime || "00:00").slice(0, 5);
+
+  if (bounds.end <= bounds.start) {
+    return { main: startTime, sub: `tot ${endTime}` };
+  }
+
+  if (currentDate === bounds.start) {
+    return { main: startTime, sub: "tot 00:00" };
+  }
+
+  if (currentDate === bounds.end) {
+    return { main: "00:00", sub: `tot ${endTime}` };
+  }
+
+  return { main: "Hele dag", sub: `tot ${formatShortDate(bounds.end)}` };
+}
+
+function getAppointmentSortMinutesForDate(appointment, dateStr) {
+  if (isPrivateAppointment(appointment) && isMultiDayPrivateAppointment(appointment)) {
+    const bounds = getPrivateRangeBounds(appointment);
+    const currentDate = dateStr || appointment?.date || todayStr;
+    if (currentDate === bounds.start) {
+      return minutesFromTimeString(appointment.time || appointment.appointment_time || "00:00");
+    }
+    return 0;
+  }
+
+  return minutesFromTimeString(appointment.time || appointment.appointment_time || "00:00");
+}
+
+function getAppointmentsForDate(dateStr, data = getData()) {
+  return getVirtualPrivateRecurrenceAppointments(data)
+    .filter(appointment => appointment.date === dateStr)
+    .sort((a, b) => {
+      const timeSort = getAppointmentSortMinutesForDate(a, dateStr) - getAppointmentSortMinutesForDate(b, dateStr);
+      if (timeSort) return timeSort;
+
+      const privateSort = Number(isPrivateAppointment(b)) - Number(isPrivateAppointment(a));
+      if (privateSort) return privateSort;
+
+      return String(a.id || "").localeCompare(String(b.id || ""));
+    });
+}
+
+function getAppointmentDisplayEndTime(appointment, breakMinutes = 0) {
+  if (isPrivateAppointment(appointment)) {
+    return String(appointment.privateEndTime || appointment.private_end_time || "").slice(0, 5) || getAppointmentEndTime(appointment, 0);
+  }
+  return getAppointmentEndTime(appointment, breakMinutes);
+}
+
+function calculatePrivateDuration(startTime, endTime) {
+  const start = minutesFromTimeString(startTime || "00:00");
+  let end = minutesFromTimeString(endTime || startTime || "00:00");
+  if (end < start) end = start;
+  return Math.max(0, end - start);
+}
+
 function getSettings() {
   return getData().settings || getDefaultSettings();
 }
 
 function appointmentTimeRange(appointment, breakMinutes = 0) {
+  const bounds = isPrivateAppointment(appointment) ? getPrivateRangeBounds(appointment) : null;
+  const isMultiDayPrivate = Boolean(bounds && bounds.end > bounds.start);
+  if (isMultiDayPrivate) {
+    return { startMinutes: 0, endMinutes: 24 * 60 };
+  }
+
   const startMinutes = minutesFromTimeString(appointment.time || appointment.appointment_time || "00:00");
-  const duration = Number(appointment.duration || 0);
-  const buffer = Math.max(0, Number(breakMinutes) || 0);
+  const duration = isPrivateAppointment(appointment)
+    ? calculatePrivateDuration(appointment.time || appointment.appointment_time, appointment.privateEndTime || appointment.private_end_time)
+    : Number(appointment.duration || 0);
+  const buffer = isPrivateAppointment(appointment) ? 0 : Math.max(0, Number(breakMinutes) || 0);
   return {
     startMinutes,
     endMinutes: startMinutes + duration + buffer
@@ -694,13 +1299,10 @@ function appointmentTimeRange(appointment, breakMinutes = 0) {
 }
 
 function findAppointmentOverlap(payload, appointments, breakMinutes = 0, excludeId = null) {
-  const newRange = appointmentTimeRange({
-    time: payload.time,
-    duration: payload.duration
-  }, breakMinutes);
+  const newRange = appointmentTimeRange(payload, breakMinutes);
 
   return appointments
-    .filter(app => app.date === payload.date)
+    .filter(app => appointmentsShareActiveDate(payload, app))
     .filter(app => String(app.id) !== String(excludeId || ""))
     .find(app => {
       const existingRange = appointmentTimeRange(app, breakMinutes);
@@ -709,9 +1311,10 @@ function findAppointmentOverlap(payload, appointments, breakMinutes = 0, exclude
 }
 
 function findNextAvailableStartTime(payload, appointments, breakMinutes = 0, excludeId = null) {
-  const durationWithBreak = Math.max(0, Number(payload.duration || 0)) + Math.max(0, Number(breakMinutes) || 0);
+  const payloadRange = appointmentTimeRange(payload, breakMinutes);
+  const durationWithBreak = Math.max(0, payloadRange.endMinutes - payloadRange.startMinutes);
   const dayAppointments = appointments
-    .filter(app => app.date === payload.date)
+    .filter(app => appointmentsShareActiveDate(payload, app))
     .filter(app => String(app.id) !== String(excludeId || ""))
     .map(app => ({
       ...app,
@@ -737,17 +1340,21 @@ function findNextAvailableStartTime(payload, appointments, breakMinutes = 0, exc
 
 function buildOverlapMessage(payload, overlapApp, appointments, breakMinutes = 0, excludeId = null) {
   const data = getData();
-  const customer = customerById(data, overlapApp.customerId);
-  const service = serviceById(data, overlapApp.serviceId);
+  const privateOverlap = isPrivateAppointment(overlapApp);
+  const customer = privateOverlap ? null : customerById(data, overlapApp.customerId);
+  const service = privateOverlap ? null : serviceById(data, overlapApp.serviceId);
   const range = appointmentTimeRange(overlapApp, breakMinutes);
   const nextPossibleStart = findNextAvailableStartTime(payload, appointments, breakMinutes, excludeId);
+  const overlapTitle = privateOverlap
+    ? `${overlapApp.privateTitle || "Privé-afspraak"}${overlapApp.privateDetails ? ` (${overlapApp.privateDetails})` : ""}`
+    : `${customer ? fullName(customer) : "Onbekende klant"}${service ? ` (${service.name})` : ""}`;
 
   return [
     "Deze afspraak overlapt met een bestaande afspraak.",
     "",
-    `${overlapApp.time} - ${timeStringFromMinutes(range.endMinutes)} · ${customer ? fullName(customer) : "Onbekende klant"}${service ? ` (${service.name})` : ""}`,
+    `${overlapApp.time} - ${timeStringFromMinutes(range.endMinutes)} · ${overlapTitle}`,
     "",
-    `Eerstvolgend mogelijk tijdstip voor deze behandeling: ${timeStringFromMinutes(nextPossibleStart)}`,
+    `Eerstvolgend mogelijk tijdstip: ${timeStringFromMinutes(nextPossibleStart)}`,
     "",
     "Wil je deze afspraak toch opslaan?"
   ].join("\n");
@@ -772,6 +1379,129 @@ function buildPastAppointmentMessage(payload) {
     "",
     "Wil je deze afspraak toch opslaan?"
   ].join("\n");
+}
+
+
+function getSupabaseProjectUrl() {
+  if (typeof SUPABASE_URL !== "undefined" && SUPABASE_URL) return SUPABASE_URL;
+  if (typeof supabaseClient !== "undefined" && supabaseClient?.supabaseUrl) return supabaseClient.supabaseUrl;
+  return "";
+}
+
+function createCalendarFeedToken() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID().replace(/-/g, "");
+  }
+
+  const bytes = new Uint8Array(24);
+  if (window.crypto?.getRandomValues) {
+    window.crypto.getRandomValues(bytes);
+    return Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+  }
+
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+}
+
+function getCalendarFeedUrl(token = getSettings().calendarFeedToken) {
+  const projectUrl = getSupabaseProjectUrl().replace(/\/$/, "");
+  const safeToken = String(token || "").trim();
+  if (!projectUrl || !safeToken) return "";
+  return `${projectUrl}/functions/v1/calendar-feed?token=${encodeURIComponent(safeToken)}`;
+}
+
+async function ensureCalendarFeedToken({ forceNew = false } = {}) {
+  const user = await getCurrentUser();
+  if (!user) {
+    await appAlert("Log eerst in om een automatische kalenderlink te maken.", { title: "Google kalender", variant: "warning" });
+    return "";
+  }
+
+  const currentSettings = getSettings();
+  const token = forceNew || !currentSettings.calendarFeedToken
+    ? createCalendarFeedToken()
+    : currentSettings.calendarFeedToken;
+
+  const payload = {
+    user_id: user.id,
+    default_break_minutes: Number(currentSettings.defaultBreakMinutes ?? 10),
+    notifications_enabled: Boolean(currentSettings.notificationsEnabled),
+    reminder_minutes: Number(currentSettings.reminderMinutes ?? 30),
+    overlap_warnings_enabled: currentSettings.overlapWarningsEnabled !== false,
+    language: normalizeLanguage(currentSettings.language || getCurrentLanguage()),
+    currency: normalizeCurrency(currentSettings.currency || getCurrentCurrency()),
+    payment_beneficiary_name: currentSettings.paymentBeneficiaryName || null,
+    payment_reference_prefix: String(currentSettings.paymentReferencePrefix || "").trim() || null,
+    calendar_feed_token: token,
+    updated_at: new Date().toISOString()
+  };
+
+  const { error } = await supabaseClient
+    .from("user_settings")
+    .upsert(payload, { onConflict: "user_id" });
+
+  if (error) {
+    await appAlert("Kalenderlink maken mislukt: " + error.message, { title: "Google kalender", variant: "danger" });
+    return "";
+  }
+
+  const data = getData();
+  data.settings = { ...currentSettings, calendarFeedToken: token };
+  saveData(data);
+  renderCalendarFeedSettings();
+  return token;
+}
+
+function renderCalendarFeedSettings() {
+  const input = document.getElementById("calendarFeedUrl");
+  const status = document.getElementById("calendarFeedStatus");
+  const token = getSettings().calendarFeedToken;
+  const url = getCalendarFeedUrl(token);
+
+  if (input) input.value = url || "";
+  if (status) {
+    status.textContent = url
+      ? "Deze link kun je één keer toevoegen in Google Calendar via ‘Via URL’. Nieuwe wijzigingen in NailBooker komen daarna automatisch mee zodra Google de feed ververst."
+      : "Maak eerst een persoonlijke kalenderlink. Daarna kun je die één keer toevoegen in Google Calendar.";
+  }
+}
+
+async function createOrCopyCalendarFeedUrl() {
+  const token = await ensureCalendarFeedToken();
+  const url = getCalendarFeedUrl(token);
+  if (!url) return;
+
+  try {
+    await navigator.clipboard.writeText(url);
+    await appAlert("Kalenderlink gekopieerd. Voeg deze in Google Calendar toe via: Andere agenda’s → Via URL.", { title: "Google kalender", variant: "success" });
+  } catch (error) {
+    const input = document.getElementById("calendarFeedUrl");
+    if (input) {
+      input.focus();
+      input.select();
+    }
+    await appAlert("De kalenderlink staat in het tekstvak. Kopieer hem manueel en voeg hem toe in Google Calendar via ‘Via URL’.", { title: "Google kalender", variant: "info" });
+  }
+}
+
+async function openGoogleCalendarSubscribePage() {
+  await ensureCalendarFeedToken();
+  renderCalendarFeedSettings();
+  window.open("https://calendar.google.com/calendar/u/0/r/settings/addbyurl", "_blank", "noopener,noreferrer");
+}
+
+async function regenerateCalendarFeedUrl() {
+  const confirmed = await appConfirm(
+    "Wil je een nieuwe kalenderlink maken? De oude link werkt daarna niet meer. Je moet de nieuwe link opnieuw toevoegen in Google Calendar.",
+    { title: "Nieuwe kalenderlink", confirmText: "Nieuwe link maken" }
+  );
+  if (!confirmed) return;
+
+  const token = await ensureCalendarFeedToken({ forceNew: true });
+  const url = getCalendarFeedUrl(token);
+  if (url) {
+    try { await navigator.clipboard.writeText(url); } catch (error) {}
+    await appAlert("Nieuwe kalenderlink gemaakt en gekopieerd. Voeg deze opnieuw toe in Google Calendar.", { title: "Google kalender", variant: "success" });
+  }
 }
 
 function jumpToToday() {
@@ -815,7 +1545,8 @@ function showAppDialog({
   confirmText = t("ok") || "OK",
   cancelText = t("cancel"),
   showCancel = false,
-  variant = "info"
+  variant = "info",
+  presentationClass = ""
 } = {}) {
   return new Promise(resolve => {
     const dialog = document.getElementById("appMessageDialog");
@@ -826,8 +1557,11 @@ function showAppDialog({
     const card = dialog?.querySelector(".app-message-card");
 
     if (!dialog || !titleEl || !messageEl || !confirmBtn || !cancelBtn || !card) {
+      const suspendedBusyDepth = suspendGlobalActionBusyForDialog();
       if (showCancel) {
-        resolve(window.confirm(message));
+        const result = window.confirm(message);
+        if (result) resumeGlobalActionBusyAfterDialog(suspendedBusyDepth);
+        resolve(result);
         return;
       }
       window.alert(message);
@@ -835,12 +1569,18 @@ function showAppDialog({
       return;
     }
 
+    const suspendedBusyDepth = suspendGlobalActionBusyForDialog();
+
     titleEl.textContent = title;
     setDialogMessage(messageEl, message);
     confirmBtn.textContent = confirmText;
     cancelBtn.textContent = cancelText;
+    cancelBtn.dataset.actionType = "cancel";
+    cancelBtn.dataset.actionLabel = cancelText;
     cancelBtn.classList.toggle("hidden", !showCancel);
     card.dataset.variant = variant;
+    const dialogPresentationClass = String(presentationClass || "").trim();
+    if (dialogPresentationClass) dialog.classList.add(dialogPresentationClass);
 
     let settled = false;
 
@@ -852,6 +1592,10 @@ function showAppDialog({
       confirmBtn.removeEventListener("click", onConfirm);
       cancelBtn.removeEventListener("click", onCancelClick);
       closeStyledDialog(dialog);
+      if (dialogPresentationClass) dialog.classList.remove(dialogPresentationClass);
+      if (result === true && showCancel) {
+        resumeGlobalActionBusyAfterDialog(suspendedBusyDepth);
+      }
       resolve(result);
     };
 
@@ -889,7 +1633,8 @@ async function appAlert(message, options = {}) {
     message,
     confirmText: options.confirmText || (t("ok") || "OK"),
     showCancel: false,
-    variant: options.variant || "info"
+    variant: options.variant || "info",
+    presentationClass: options.presentationClass || ""
   });
 }
 
@@ -901,6 +1646,182 @@ async function appConfirm(message, options = {}) {
     cancelText: options.cancelText || t("cancel"),
     showCancel: true,
     variant: options.variant || "warning"
+  });
+}
+
+function getPastUnpaidAppointments(data = getData()) {
+  const appointments = Array.isArray(data?.appointments) ? data.appointments : [];
+  return appointments
+    .filter(appointment => {
+      if (!appointment || isPrivateAppointment(appointment)) return false;
+      if (appointment.deletedAt || appointment.deleted_at) return false;
+      if (appointment.paid) return false;
+      if (String(appointment.status || "").toLowerCase() === "no-show") return false;
+      const date = String(appointment.date || appointment.appointment_date || "").slice(0, 10);
+      return isDateInputValue(date) && date < todayStr;
+    })
+    .sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")) || String(a.time || "").localeCompare(String(b.time || "")));
+}
+
+let pastUnpaidAgendaAlertOpen = false;
+let pastUnpaidAgendaAlertShown = false;
+
+function showPastUnpaidAgendaAlertIfNeeded() {
+  if (pastUnpaidAgendaAlertShown || pastUnpaidAgendaAlertOpen || state.currentScreen !== "agendaScreen") return;
+
+  const data = getData();
+  const unpaidAppointments = getPastUnpaidAppointments(data);
+  if (!unpaidAppointments.length) return;
+
+  const count = unpaidAppointments.length;
+  const first = unpaidAppointments[0];
+  const customer = first ? customerById(data, first.customerId) : null;
+  const customerName = customer ? fullName(customer) : "Onbekende klant";
+  const firstLine = first
+    ? `Oudste openstaande afspraak:\n${formatCompactDayMonth(first.date)}${first.time ? ` om ${first.time}` : ""} (${customerName})`
+    : "";
+  const message = `Er zijn ${count} niet afgeronde afspraken in het verleden.\n\n${firstLine}`;
+
+  pastUnpaidAgendaAlertOpen = true;
+  pastUnpaidAgendaAlertShown = true;
+  appAlert(message, {
+    title: "Melding",
+    variant: "warning",
+    confirmText: "OK",
+    presentationClass: "agenda-unpaid-message-dialog"
+  }).finally(() => {
+    pastUnpaidAgendaAlertOpen = false;
+  });
+}
+
+function schedulePastUnpaidAgendaAlert() {
+  window.setTimeout(showPastUnpaidAgendaAlertIfNeeded, 180);
+}
+
+
+function isRecurringAppointment(appointment) {
+  return Boolean(appointment?.recurrenceGroupId || appointment?.recurrence_group_id) && String(appointment?.recurrenceRule || appointment?.recurrence_rule || "none") !== "none";
+}
+
+function getAppointmentRecurrenceGroupId(appointment) {
+  return appointment?.recurrenceGroupId || appointment?.recurrence_group_id || null;
+}
+
+function dayDiff(dateA, dateB) {
+  const a = new Date(String(dateA || todayStr) + "T00:00:00");
+  const b = new Date(String(dateB || todayStr) + "T00:00:00");
+  if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return 0;
+  return Math.round((a.getTime() - b.getTime()) / 86400000);
+}
+
+function applyRecurringEditToAppointment(appointment, localPayload, originalAppointment, scope = "single") {
+  const dateShift = scope === "single" ? 0 : dayDiff(localPayload.date, originalAppointment.date);
+  const nextDate = scope === "single" ? localPayload.date : addDaysStr(appointment.date, dateShift);
+  const localRangeDays = isPrivateAppointment(localPayload)
+    ? Math.max(0, Math.round((new Date((localPayload.privateEndDate || localPayload.date) + "T00:00:00") - new Date(localPayload.date + "T00:00:00")) / 86400000))
+    : 0;
+  const shiftedPrivateEnd = new Date(nextDate + "T00:00:00");
+  shiftedPrivateEnd.setDate(shiftedPrivateEnd.getDate() + localRangeDays);
+
+  return {
+    ...appointment,
+    ...localPayload,
+    id: appointment.id,
+    date: nextDate,
+    privateEndDate: isPrivateAppointment(localPayload) ? formatDateInput(shiftedPrivateEnd) : "",
+    paid: appointment.paid,
+    paymentMethodName: appointment.paymentMethodName ?? paymentMethodNameForAppointment(appointment),
+    currency: appointment.currency || getCurrentCurrency(),
+    recurrenceGroupId: getAppointmentRecurrenceGroupId(originalAppointment),
+    recurrenceRule: localPayload.recurrenceRule || originalAppointment.recurrenceRule || "none"
+  };
+}
+
+function getRecurringAffectedAppointments(data, originalAppointment, scope = "single") {
+  if (!isRecurringAppointment(originalAppointment) || scope === "single") return [originalAppointment];
+  const groupId = getAppointmentRecurrenceGroupId(originalAppointment);
+  return (data.appointments || []).filter(appointment => {
+    if (String(getAppointmentRecurrenceGroupId(appointment)) !== String(groupId)) return false;
+    if (scope === "following") return String(appointment.date || "") >= String(originalAppointment.date || "");
+    return true;
+  });
+}
+
+function chooseRecurringAppointmentScope(action = "update") {
+  const actionLabel = action === "delete" ? "verwijderd" : "aangepast";
+  return new Promise(resolve => {
+    const dialog = document.getElementById("appMessageDialog");
+    const titleEl = document.getElementById("appMessageDialogTitle");
+    const messageEl = document.getElementById("appMessageDialogText");
+    const confirmBtn = document.getElementById("appMessageConfirmBtn");
+    const cancelBtn = document.getElementById("appMessageCancelBtn");
+    const card = dialog?.querySelector(".app-message-card");
+    const actions = dialog?.querySelector(".modal-actions") || dialog?.querySelector(".app-message-actions");
+
+    if (!dialog || !titleEl || !messageEl || !confirmBtn || !cancelBtn || !card || !actions) {
+      const suspendedBusyDepth = suspendGlobalActionBusyForDialog();
+      const wholeSeries = window.confirm(`Deze afspraak maakt deel uit van een herhalende reeks. OK = hele reeks ${actionLabel}, Annuleren = enkel deze afspraak.`);
+      const result = wholeSeries ? "series" : "single";
+      resumeGlobalActionBusyAfterDialog(suspendedBusyDepth);
+      resolve(result);
+      return;
+    }
+
+    const suspendedBusyDepth = suspendGlobalActionBusyForDialog();
+
+    titleEl.textContent = action === "delete" ? "Herhalende afspraak verwijderen" : "Herhalende afspraak aanpassen";
+    setDialogMessage(messageEl, `Deze afspraak maakt deel uit van een herhalende reeks. Wat wil je ${action === "delete" ? "verwijderen" : "aanpassen"}?`);
+    card.dataset.variant = action === "delete" ? "danger" : "warning";
+    confirmBtn.textContent = "Enkel deze afspraak";
+    cancelBtn.textContent = t("cancel");
+    cancelBtn.classList.remove("hidden");
+
+    const followingBtn = document.createElement("button");
+    followingBtn.type = "button";
+    followingBtn.className = "btn btn-secondary";
+    followingBtn.textContent = "Deze en volgende";
+
+    const seriesBtn = document.createElement("button");
+    seriesBtn.type = "button";
+    seriesBtn.className = action === "delete" ? "btn btn-danger" : "btn btn-primary";
+    seriesBtn.textContent = "De hele reeks";
+
+    actions.insertBefore(followingBtn, cancelBtn);
+    actions.insertBefore(seriesBtn, cancelBtn);
+    actions.classList.add("recurrence-choice-actions");
+
+    let settled = false;
+    const cleanup = (result) => {
+      if (settled) return;
+      settled = true;
+      dialog.removeEventListener("cancel", onCancel);
+      confirmBtn.removeEventListener("click", onSingle);
+      followingBtn.removeEventListener("click", onFollowing);
+      seriesBtn.removeEventListener("click", onSeries);
+      cancelBtn.removeEventListener("click", onCancelClick);
+      followingBtn.remove();
+      seriesBtn.remove();
+      actions.classList.remove("recurrence-choice-actions");
+      closeStyledDialog(dialog);
+      if (result) {
+        resumeGlobalActionBusyAfterDialog(suspendedBusyDepth);
+      }
+      resolve(result);
+    };
+
+    const onSingle = () => cleanup("single");
+    const onFollowing = () => cleanup("following");
+    const onSeries = () => cleanup("series");
+    const onCancel = (event) => { event.preventDefault(); cleanup(null); };
+    const onCancelClick = () => cleanup(null);
+
+    dialog.addEventListener("cancel", onCancel);
+    confirmBtn.addEventListener("click", onSingle);
+    followingBtn.addEventListener("click", onFollowing);
+    seriesBtn.addEventListener("click", onSeries);
+    cancelBtn.addEventListener("click", onCancelClick);
+    openStyledDialog(dialog);
+    confirmBtn.focus();
   });
 }
 
@@ -919,15 +1840,393 @@ async function getCurrentProfile() {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) return null;
 
-    const { data: profile } = await supabaseClient
+    const baseSelect = "first_name, last_name, salon_name, vat_number, email, country, region, timezone, language, currency, terms_accepted, terms_accepted_at, terms_version, privacy_version, privacy_accepted_at, is_blocked, blocked_at, blocked_reason, is_admin";
+    const subscriptionBaseSelect = `${baseSelect}, subscription_plan, subscription_status, trial_started_at, trial_ends_at, subscription_current_period_end, subscription_price_monthly, subscription_currency, subscription_updated_at, is_lifetime, access_expires_at, data_delete_at`;
+    const subscriptionSelect = `${subscriptionBaseSelect}, payment_provider, payment_customer_id, payment_subscription_id`;
+
+    let result = await supabaseClient
         .from("profiles")
-        .select("first_name, last_name, salon_name, vat_number, language, currency, terms_accepted, terms_accepted_at")
+        .select(subscriptionSelect)
         .eq("id", user.id)
         .maybeSingle();
 
-    return profile ?? null;
+    // Compatibel houden tijdens de migratie: als de nieuwe provider-onafhankelijke
+    // betaalvelden nog niet bestaan, halen we de bestaande abonnementsvelden wel op.
+    if (result.error) {
+      console.warn("Betaalprovider-velden nog niet beschikbaar. Voer de Mollie/provider-SQL uit:", result.error.message);
+      result = await supabaseClient
+        .from("profiles")
+        .select(subscriptionBaseSelect)
+        .eq("id", user.id)
+        .maybeSingle();
+    }
+
+    if (result.error) {
+      console.warn("Profiel opgehaald zonder abonnementvelden. Voer de abonnement-SQL uit om proefdagen te tonen:", result.error.message);
+      result = await supabaseClient
+        .from("profiles")
+        .select(baseSelect)
+        .eq("id", user.id)
+        .maybeSingle();
+    }
+
+    return result.data ?? null;
 }
 
+function getTrialStartDate(profile = null, user = null) {
+  const value = profile?.trial_started_at || profile?.created_at || user?.created_at || null;
+  const date = value ? new Date(value) : null;
+  return date && !Number.isNaN(date.getTime()) ? date : null;
+}
+
+function isProSubscription(profile = null) {
+  const plan = String(profile?.subscription_plan || "free").toLowerCase();
+  const status = String(profile?.subscription_status || "trial").toLowerCase();
+  return plan === "pro" && (status === "active" || Boolean(profile?.is_lifetime));
+}
+
+function isLifetimeProSubscription(profile = null) {
+  const plan = String(profile?.subscription_plan || "free").toLowerCase();
+  const status = String(profile?.subscription_status || "trial").toLowerCase();
+  return plan === "pro" && (Boolean(profile?.is_lifetime) || status === "lifetime");
+}
+
+function getPaymentProviderLabel(profile = null) {
+  const provider = String(profile?.payment_provider || "").trim().toLowerCase();
+  if (provider === "mollie") return "Mollie";
+  if (provider === "stripe") return "Stripe";
+  if (provider === "manual" || provider === "admin") return "Handmatig beheerd";
+  return "Mollie (voorzien)";
+}
+
+function parseSubscriptionDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function addMonthsSafe(date, months) {
+  const copy = new Date(date);
+  const originalDay = copy.getDate();
+  copy.setDate(1);
+  copy.setMonth(copy.getMonth() + months);
+  const lastDay = new Date(copy.getFullYear(), copy.getMonth() + 1, 0).getDate();
+  copy.setDate(Math.min(originalDay, lastDay));
+  return copy;
+}
+
+function getSubscriptionAccessState(profile = null, user = null) {
+  if (!user) return { mode: "signed_out", canWrite: false, accessEndsAt: null, dataDeleteAt: null };
+
+  if (isLifetimeProSubscription(profile)) {
+    return { mode: "active", canWrite: true, accessEndsAt: null, dataDeleteAt: null };
+  }
+
+  let accessEndsAt = parseSubscriptionDate(profile?.access_expires_at);
+
+  if (!accessEndsAt && isProSubscription(profile)) {
+    const periodEnd = parseSubscriptionDate(profile?.subscription_current_period_end);
+    if (!periodEnd) {
+      return { mode: "active", canWrite: true, accessEndsAt: null, dataDeleteAt: null };
+    }
+    accessEndsAt = periodEnd;
+  }
+
+  if (!accessEndsAt) {
+    const explicitTrialEnd = parseSubscriptionDate(profile?.trial_ends_at);
+    if (explicitTrialEnd) {
+      accessEndsAt = explicitTrialEnd;
+    } else {
+      const start = getTrialStartDate(profile, user);
+      if (start) {
+        accessEndsAt = new Date(start);
+        accessEndsAt.setDate(accessEndsAt.getDate() + 30);
+      }
+    }
+  }
+
+  if (!accessEndsAt) {
+    return { mode: "active", canWrite: true, accessEndsAt: null, dataDeleteAt: null };
+  }
+
+  const now = Date.now();
+  if (accessEndsAt.getTime() > now) {
+    return { mode: "active", canWrite: true, accessEndsAt, dataDeleteAt: null };
+  }
+
+  const dataDeleteAt = parseSubscriptionDate(profile?.data_delete_at) || addMonthsSafe(accessEndsAt, 6);
+  if (dataDeleteAt.getTime() > now) {
+    return { mode: "readonly", canWrite: false, accessEndsAt, dataDeleteAt };
+  }
+
+  return { mode: "delete_due", canWrite: false, accessEndsAt, dataDeleteAt };
+}
+
+function formatSubscriptionDate(date) {
+  if (!date) return "";
+  try {
+    return new Intl.DateTimeFormat("nl-BE", { day: "numeric", month: "long", year: "numeric" }).format(date);
+  } catch (_) {
+    return date.toLocaleDateString("nl-BE");
+  }
+}
+
+let subscriptionReadonlyNoticeShown = false;
+
+async function showExpiredSubscriptionPrompt(state = null, profile = null) {
+  const deleteDate = formatSubscriptionDate(state?.dataDeleteAt);
+  const isTrial = String(profile?.subscription_plan || "free").toLowerCase() !== "pro";
+  const title = isTrial ? "Proefperiode verlopen" : "Abonnement verlopen";
+  const retentionText = deleteDate
+    ? ` Je bestaande gegevens blijven tot ${deleteDate} beschikbaar in alleen-lezen modus.`
+    : " Je bestaande gegevens blijven tijdelijk beschikbaar in alleen-lezen modus.";
+
+  const openSubscription = await appConfirm(
+    `${isTrial ? "Je gratis proefperiode is afgelopen." : "Je abonnement is afgelopen."}${retentionText} Om opnieuw afspraken of andere gegevens toe te voegen of te wijzigen, heb je een actief NailBooker PRO-abonnement nodig.`,
+    {
+      title,
+      confirmText: "Bekijk abonnement",
+      cancelText: "Sluiten",
+      variant: "warning"
+    }
+  );
+
+  if (openSubscription) {
+    switchScreen("subscriptionScreen", t("subscription"));
+  }
+}
+
+async function ensureDataWriteAccess(options = {}) {
+  const user = await getCurrentUser();
+  if (!user) {
+    await appAlert("Log eerst in om gegevens te wijzigen.", { title: "Niet ingelogd", variant: "warning" });
+    return false;
+  }
+
+  const profile = await getCurrentProfile();
+  let state = getSubscriptionAccessState(profile, user);
+
+  // Laat Supabase de finale beslissing nemen. Dit voorkomt dat een lokaal verouderde
+  // abonnementsstatus toch tot een technische RLS-fout bij INSERT/UPDATE leidt.
+  if (state.canWrite && supabaseClient?.rpc) {
+    try {
+      const { data: serverCanWrite, error } = await supabaseClient.rpc("nailbooker_can_write", { p_user_id: user.id });
+      if (!error && serverCanWrite === false) {
+        const accessEndsAt = state.accessEndsAt || parseSubscriptionDate(profile?.access_expires_at) || parseSubscriptionDate(profile?.trial_ends_at);
+        state = {
+          mode: "readonly",
+          canWrite: false,
+          accessEndsAt,
+          dataDeleteAt: parseSubscriptionDate(profile?.data_delete_at) || (accessEndsAt ? addMonthsSafe(accessEndsAt, 6) : null)
+        };
+      }
+    } catch (_) {
+      // Als de optionele RPC niet beschikbaar is, blijft de lokale datumcontrole gelden.
+    }
+  }
+
+  if (state.canWrite) return true;
+
+  if (state.mode === "readonly") {
+    if (options.navigateToSubscription !== false) {
+      await showExpiredSubscriptionPrompt(state, profile);
+    } else {
+      const deleteDate = formatSubscriptionDate(state.dataDeleteAt);
+      await appAlert(
+        `Je proefperiode of abonnement is verlopen. Je gegevens blijven alleen-lezen beschikbaar${deleteDate ? ` tot ${deleteDate}` : ""}.`,
+        { title: "Abonnement verlopen", variant: "warning" }
+      );
+    }
+    return false;
+  }
+
+  await appAlert(
+    "De bewaartermijn van 6 maanden is verstreken. Dit account is gedeactiveerd en komt in aanmerking voor definitieve verwijdering.",
+    { title: "Account gedeactiveerd", variant: "danger" }
+  );
+  return false;
+}
+
+async function runWriteEntryPoint(action) {
+  if (!(await ensureDataWriteAccess())) return;
+  action?.();
+}
+
+function getTrialDaysRemaining(profile = null, user = null) {
+  if (isProSubscription(profile)) return null;
+
+  const explicitEnd = profile?.trial_ends_at ? new Date(profile.trial_ends_at) : null;
+  const end = explicitEnd && !Number.isNaN(explicitEnd.getTime())
+    ? explicitEnd
+    : (() => {
+        const start = getTrialStartDate(profile, user);
+        if (!start) return null;
+        const trialEnd = new Date(start);
+        trialEnd.setDate(trialEnd.getDate() + 30);
+        return trialEnd;
+      })();
+
+  if (!end) return null;
+  return Math.max(0, Math.ceil((end.getTime() - Date.now()) / 86400000));
+}
+
+function updateHeaderTrialBadge(profile = null, user = null) {
+  const badge = document.getElementById("headerTrialBadge");
+  if (!badge) return;
+
+  badge.classList.remove("is-pro");
+
+  if (!user) {
+    badge.classList.add("hidden");
+    renderSubscriptionPage(profile, user);
+    return;
+  }
+
+  if (isProSubscription(profile)) {
+    badge.textContent = "PRO";
+    badge.classList.remove("hidden");
+    badge.classList.add("is-pro");
+    const label = isLifetimeProSubscription(profile) ? "Lifetime PRO actief" : "Pro abonnement actief";
+    badge.setAttribute("aria-label", `${label}. Abonnement bekijken.`);
+    badge.title = label;
+    renderSubscriptionPage(profile, user);
+    return;
+  }
+
+  const accessState = getSubscriptionAccessState(profile, user);
+  if (accessState.mode === "readonly" || accessState.mode === "delete_due") {
+    badge.classList.remove("hidden");
+    badge.textContent = "!";
+    const label = accessState.mode === "readonly"
+      ? `Abonnement verlopen. Gegevens bewaard tot ${formatSubscriptionDate(accessState.dataDeleteAt)}.`
+      : "Account gedeactiveerd. Bewaartermijn verstreken.";
+    badge.setAttribute("aria-label", `${label} Abonnement bekijken.`);
+    badge.title = label;
+    renderSubscriptionPage(profile, user);
+    return;
+  }
+
+  const days = getTrialDaysRemaining(profile, user);
+  badge.classList.toggle("hidden", days === null);
+  if (days !== null) {
+    badge.textContent = String(days);
+    badge.setAttribute("aria-label", `${days} dagen proefperiode resterend. Abonnement bekijken.`);
+    badge.title = `${days} dagen proefperiode resterend`;
+  }
+  renderSubscriptionPage(profile, user);
+}
+
+function renderSubscriptionPage(profile = null, user = null) {
+  const heroTitle = document.getElementById("subscriptionHeroTitle");
+  const heroText = document.getElementById("subscriptionHeroText");
+  const statusText = document.getElementById("subscriptionStatusText");
+  const daysText = document.getElementById("subscriptionDaysText");
+  const cancelBtn = document.getElementById("subscriptionCancelBtn");
+  const upgradeBtn = document.getElementById("subscriptionUpgradeBtn");
+  const paymentProviderText = document.getElementById("subscriptionPaymentProviderText");
+  if (!heroTitle && !heroText && !statusText && !daysText && !cancelBtn && !upgradeBtn && !paymentProviderText) return;
+
+  const days = user ? getTrialDaysRemaining(profile, user) : null;
+  const providerLabel = getPaymentProviderLabel(profile);
+  if (paymentProviderText) {
+    paymentProviderText.textContent = profile?.payment_provider
+      ? `Betaalbeheer: ${providerLabel}.`
+      : "Betalingen worden binnenkort veilig verwerkt via Mollie.";
+  }
+
+  if (isLifetimeProSubscription(profile)) {
+    if (heroTitle) heroTitle.textContent = "Je hebt Lifetime PRO";
+    if (heroText) heroText.textContent = "Je Lifetime PRO-toegang is actief. Je behoudt onbeperkt toegang tot NailBooker zonder maandelijkse verlenging.";
+    if (statusText) statusText.textContent = "Lifetime PRO";
+    if (daysText) daysText.textContent = "Je abonnement is levenslang actief.";
+    if (upgradeBtn) {
+      upgradeBtn.textContent = "Lifetime PRO actief";
+      upgradeBtn.disabled = true;
+    }
+    if (cancelBtn) cancelBtn.classList.add("hidden");
+    return;
+  }
+
+  if (isProSubscription(profile)) {
+    if (heroTitle) heroTitle.textContent = "Je bent al PRO";
+    if (heroText) heroText.textContent = "Je Pro-abonnement is actief. Je behoudt volledige toegang tot NailBooker.";
+    if (statusText) statusText.textContent = "Pro abonnement";
+    if (daysText) daysText.textContent = "Je abonnement is actief.";
+    if (upgradeBtn) {
+      upgradeBtn.textContent = "PRO actief";
+      upgradeBtn.disabled = true;
+    }
+    if (cancelBtn) cancelBtn.classList.remove("hidden");
+    return;
+  }
+
+  const accessState = user ? getSubscriptionAccessState(profile, user) : null;
+  if (accessState?.mode === "readonly") {
+    const deleteDate = formatSubscriptionDate(accessState.dataDeleteAt);
+    if (heroTitle) heroTitle.textContent = "Je abonnement is verlopen";
+    if (heroText) heroText.textContent = `Je bestaande gegevens blijven tot ${deleteDate} beschikbaar in alleen-lezen modus. Activeer PRO om opnieuw gegevens toe te voegen of te wijzigen.`;
+    if (statusText) statusText.textContent = "Vervallen – alleen-lezen";
+    if (daysText) daysText.textContent = `Definitieve verwijdering voorzien op ${deleteDate}.`;
+    if (upgradeBtn) {
+      upgradeBtn.textContent = "Upgrade binnenkort beschikbaar";
+      upgradeBtn.disabled = true;
+    }
+    if (cancelBtn) cancelBtn.classList.add("hidden");
+    return;
+  }
+
+  if (accessState?.mode === "delete_due") {
+    if (heroTitle) heroTitle.textContent = "Account gedeactiveerd";
+    if (heroText) heroText.textContent = "De bewaartermijn van 6 maanden is verstreken. De accountgegevens worden definitief verwijderd door de automatische opschoning.";
+    if (statusText) statusText.textContent = "Gedeactiveerd";
+    if (daysText) daysText.textContent = "Bewaartermijn verstreken.";
+    if (upgradeBtn) {
+      upgradeBtn.textContent = "Niet meer beschikbaar";
+      upgradeBtn.disabled = true;
+    }
+    if (cancelBtn) cancelBtn.classList.add("hidden");
+    return;
+  }
+
+  if (heroTitle) heroTitle.textContent = "Upgrade naar NailBooker Pro";
+  if (heroText) heroText.textContent = "Je proefperiode is 30 dagen geldig. Met Pro behoud je volledige toegang tot alle functies.";
+  if (statusText) statusText.textContent = "Free proefperiode";
+  if (daysText) {
+    daysText.textContent = days === null
+      ? "Startdatum proefperiode nog niet ingesteld."
+      : `Nog ${days} ${days === 1 ? "dag" : "dagen"} geldig`;
+  }
+  if (upgradeBtn) {
+    upgradeBtn.textContent = "PRO activeren via Mollie – binnenkort";
+    upgradeBtn.disabled = true;
+  }
+  if (cancelBtn) cancelBtn.classList.add("hidden");
+}
+
+async function handleSubscriptionCancelRequest() {
+  const profile = await getCurrentProfile();
+  if (!isProSubscription(profile)) {
+    await appAlert("Je hebt momenteel geen actief Pro-abonnement om op te zeggen.", { title: "Abonnement", variant: "info" });
+    return;
+  }
+
+  const provider = getPaymentProviderLabel(profile);
+  await appAlert(
+    `Automatisch opzeggen via ${provider} wordt geactiveerd zodra de betaalintegratie live staat. Voorlopig kun je je Pro-abonnement manueel laten stopzetten via support.`,
+    { title: "Abonnement opzeggen", variant: "info" }
+  );
+}
+
+function updateAdminNavVisibility(profile = null) {
+  const adminNavBtn = document.getElementById("adminNavBtn");
+  if (!adminNavBtn) return;
+
+  const showAdminNav = Boolean(profile?.is_admin);
+  adminNavBtn.classList.toggle("hidden", !showAdminNav);
+  adminNavBtn.disabled = !showAdminNav || isAuthLocked();
+  adminNavBtn.setAttribute("aria-hidden", String(!showAdminNav));
+  adminNavBtn.tabIndex = showAdminNav ? 0 : -1;
+}
 
 function extractFirstNameFromUser(user, profile = null) {
   if (profile?.first_name?.trim()) return profile.first_name.trim();
@@ -948,8 +2247,8 @@ function extractFirstNameFromUser(user, profile = null) {
 
 function buildHeaderAccountIcon(profile = null) {
   return `
-  <svg width="28" height="28" viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-login" aria-hidden="true" focusable="false">
-    <path id="path2" style="fill:currentColor;stroke-width:1" d="M 1.8124886,6.9333659 C 1.7864235,6.7804715 1.7675079,6.6355105 1.7704544,6.6112293 1.7743344,6.5791763 3.2588613,4.9500562 3.6672626,4.5296574 3.6940726,4.5020544 3.6817556,4.4755334 3.6188266,4.425408 3.5724096,4.388429 3.5335256,4.344646 3.5324256,4.328105 3.5313256,4.311564 3.5784656,4.24943 3.6371651,4.190023 L 3.743907,4.0820167 3.6711381,3.8171814 C 3.5432433,3.3517168 3.5840966,2.9635266 3.8048285,2.5468598 3.9526753,2.2677754 4.1120754,2.0888386 4.369907,1.9125214 4.6988872,1.6875506 5.174746,1.5806658 5.5623491,1.6446829 5.9455505,1.7079728 6.4213255,1.954885 6.385528,2.0718868 6.3560867,2.1681128 6.2487288,2.2797964 6.1129319,2.3554651 6.0094977,2.413101 5.9644173,2.4204328 5.9054735,2.3892065 5.808312,2.3377351 5.6135914,2.3202589 5.4920442,2.3521006 5.1460796,2.442733 4.9278982,2.9089857 5.0917653,3.2074952 5.2806656,3.5516062 5.6895166,3.6612769 5.9957466,3.4499807 6.0421964,3.4179296 6.1840751,3.3540262 6.3110328,3.3079697 6.4382469,3.2618206 6.6381177,3.1540276 6.7562874,3.0678378 L 6.9707089,2.9114445 6.9939334,3.0735519 C 7.0862544,3.7179479 6.8127652,4.3503043 6.2714299,4.7441086 5.914249,5.0039462 5.2762027,5.1209502 4.8933961,4.99681 4.722491,4.9413899 4.6931818,4.9477209 4.5685144,5.067006 4.4838016,5.1480612 4.4422798,5.1679996 4.4022548,5.1468401 4.3565878,5.1226989 4.3099551,5.1606477 4.078425,5.4103609 3.8295073,5.6788283 3.8015789,5.7004845 3.7281058,5.6820133 3.594652,5.6484652 3.4958483,5.6715865 3.4273062,5.7524076 c -0.057393,0.067676 -0.059392,0.091231 -0.016618,0.195882 0.042422,0.1037917 0.040434,0.1292321 -0.015596,0.1995756 -0.055858,0.070129 -0.084479,0.077642 -0.219925,0.057742 C 3.0361147,6.1851726 3.011994,6.192098 2.9496638,6.2703521 2.888426,6.3472338 2.8845914,6.3742424 2.9183956,6.4906524 2.9676806,6.6603784 2.9117465,6.7212636 2.712942,6.714319 l -0.1461225,-0.0051 0.02626,0.1371901 c 0.025352,0.132446 0.022775,0.1410274 -0.074519,0.2481344 -0.097084,0.1068766 -0.1110022,0.1110506 -0.3797304,0.1138782 l -0.2789518,0.00293 z M 0.09960021,5.0870474 0.11589215,4.7646101 1.3278707,3.9098107 c 0.666588,-0.4701393 1.218946,-0.8679514 1.2274616,-0.884026 0.00852,-0.016072 -0.00559,-0.05068 -0.031333,-0.076906 C 2.472748,2.8966862 2.5091547,2.8303121 2.6557246,2.7087317 2.7306989,2.6465361 2.7314386,2.6299145 2.6809931,2.1401865 2.6524125,1.862725 2.6407297,1.5926531 2.6550305,1.5400279 2.7663945,1.1302263 3.6377145,0.59092624 4.173342,0.60027388 c 0.1849952,0.003229 0.2622435,0.0686643 0.482957,0.40909022 0.1135274,0.175104 0.201693,0.3272804 0.1959249,0.3381686 -0.00577,0.010894 -0.057456,0.032381 -0.1148583,0.047752 C 4.4180462,1.4808097 3.9677633,1.7800491 3.7305645,2.0643631 3.4185721,2.4383276 3.2858035,3.0129759 3.3569496,3.6814435 3.3751936,3.852863 3.3694166,3.8865005 3.3144696,3.928804 3.2648716,3.966987 3.2398666,3.966848 3.200867,3.9281568 3.173367,3.9008678 3.135841,3.8677158 3.117484,3.8544798 3.097962,3.8403988 2.9354725,3.9319018 2.7259976,4.0749347 L 2.3678889,4.3194562 2.2230535,4.2720535 C 2.1027543,4.232676 2.0617043,4.2349153 1.9807172,4.2852716 l -0.097502,0.060623 0.022417,0.135099 c 0.021597,0.1301522 0.019205,0.1374826 -0.06535,0.2002618 -0.07645,0.05676 -0.1059088,0.058432 -0.2284586,0.012964 -0.12352,-0.045829 -0.1517074,-0.044023 -0.230969,0.014827 -0.086495,0.064221 -0.08997,0.073126 -0.082915,0.2125912 0.0089,0.1759408 -0.052824,0.2349933 -0.199976,0.1913195 -0.21334754,-0.063321 -0.20352337,-0.067493 -0.20591318,0.087464 l -0.00214,0.139313 -0.12557933,0.094597 C 0.63898081,5.5287487 0.63821642,5.528815 0.36102383,5.4692058 L 0.08330531,5.409483 Z M 5.3265891,3.0592103 C 5.3010296,3.0092112 5.3036646,2.958744 5.3348832,2.9004991 5.3922039,2.7935457 5.4165768,2.7813191 5.5913626,2.7718554 5.816862,2.7596463 6.1922715,2.6417936 6.3438787,2.5356152 6.5451665,2.3946435 6.7113544,2.1144278 6.743435,1.861909 6.7761353,1.6045091 6.6791806,1.2535598 6.5112082,1.0213137 6.3972027,0.86368469 6.3555062,0.82842208 6.1635999,0.72734506 5.8105691,0.54137617 5.5164609,0.55837155 5.1160516,0.78780471 4.8952048,0.91434919 4.8088969,0.92769622 4.7213306,0.84884547 4.5882933,0.72904661 4.6614868,0.58222964 4.9275521,0.43519154 5.5919044,0.06804531 6.2583927,0.15465655 6.7434354,0.67116792 7.0723054,1.0213743 7.2205795,1.5762025 7.1118315,2.0496729 7.0641943,2.2570766 6.9022819,2.5557179 6.756509,2.7050549 6.5001169,2.9677084 6.0480675,3.1526559 5.6291733,3.1662813 5.4129289,3.1733146 5.3787404,3.1612174 5.3265888,3.0592066 Z" />
+  <svg class="header-account-svg" width="28" height="28" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 3.8617798 0.31005859 C 2.9582518 0.26493829 2.025428 0.58087526 1.2950114 1.333252 C -0.69412006 3.3821882 0.57271814 6.7574126 3.4437174 7.0579671 C 5.5379113 7.2772007 7.3912588 5.3012295 7.0631348 3.1992879 C 6.7922288 1.4638815 5.3676597 0.3852591 3.8617798 0.31005859 z M 3.716569 1.5673462 C 4.5693501 1.5673462 4.896384 2.2967116 4.8906576 2.740918 C 4.8906576 3.5393214 4.2681271 3.9021506 3.753776 3.9155233 C 3.1213517 3.9318815 2.5429972 3.4892773 2.5429972 2.740918 C 2.5429972 2.2320433 2.8406225 1.5755089 3.716569 1.5673462 z M 3.6958984 2.0102132 A 0.75140572 0.75140572 0 0 0 2.9445231 2.7615885 A 0.75140572 0.75140572 0 0 0 3.6958984 3.5129639 A 0.75140572 0.75140572 0 0 0 4.4472738 2.7615885 A 0.75140572 0.75140572 0 0 0 3.6958984 2.0102132 z M 3.8147542 4.0741699 L 4.3883626 4.0808879 L 4.4896484 4.104659 C 5.0513905 4.2380308 5.5324788 4.7773655 5.5324788 5.2730632 C 5.5324788 5.6237649 5.1140306 5.6046287 5.0462036 5.2508423 C 4.9819262 4.9155692 4.7152747 4.6477208 4.37441 4.5764648 L 4.2710571 4.5552775 L 3.6654093 4.5599284 L 3.0597616 4.5645793 L 2.949174 4.6043701 C 2.6609871 4.7095437 2.4412234 4.9624788 2.3869344 5.2508423 C 2.3633283 5.3762204 2.3262513 5.448053 2.2665283 5.483903 L 2.2665283 5.4833862 C 2.1507059 5.5529145 2.0199 5.5288422 1.9435506 5.4234416 L 1.9006592 5.3645304 L 1.9006592 5.2808146 C 1.9006592 4.8959817 2.2341795 4.4116338 2.6318807 4.2183472 C 2.9142584 4.0811219 3.0500538 4.0649184 3.8147542 4.0741699 z " fill="currentColor" />
   </svg>
   `;
 }
@@ -1013,15 +2312,27 @@ async function uploadAvatar(userId, file) {
 async function upsertProfile(userId, values) {
   const payload = {
     id: userId,
+    email: values.email || null,
     first_name: values.first_name || "",
     last_name: values.last_name || "",
     salon_name: values.salon_name || null,
     vat_number: values.vat_number || null,
+    country: values.country || null,
+    region: values.region || null,
+    timezone: values.timezone || null,
     language: normalizeLanguage(values.language || DEFAULT_LANGUAGE),
     currency: normalizeCurrency(values.currency || DEFAULT_CURRENCY),
     terms_accepted: Boolean(values.terms_accepted),
-    terms_accepted_at: values.terms_accepted_at || null
+    terms_accepted_at: values.terms_accepted_at || null,
+    terms_version: values.terms_version || LEGAL_TERMS_VERSION,
+    privacy_version: values.privacy_version || LEGAL_PRIVACY_VERSION,
+    privacy_accepted_at: values.privacy_accepted_at || values.terms_accepted_at || null
   };
+
+  if (values.subscription_plan) payload.subscription_plan = values.subscription_plan;
+  if (values.subscription_status) payload.subscription_status = values.subscription_status;
+  if (values.trial_started_at) payload.trial_started_at = values.trial_started_at;
+  if (values.trial_ends_at) payload.trial_ends_at = values.trial_ends_at;
 
   const { error } = await supabaseClient
     .from("profiles")
@@ -1033,16 +2344,51 @@ async function upsertProfile(userId, values) {
 async function syncAuthUI() {
 	const { data: { user } } = await supabaseClient.auth.getUser();
 	const profile = await getCurrentProfile();
+  updateAdminNavVisibility(profile);
   currentProfilePreferences = {
     language: normalizeLanguage(profile?.language || user?.user_metadata?.language || getData()?.settings?.language || DEFAULT_LANGUAGE),
     currency: normalizeCurrency(profile?.currency || user?.user_metadata?.currency || getData()?.settings?.currency || DEFAULT_CURRENCY)
   };
+
+  if (user && profile?.is_blocked) {
+    await supabaseClient.auth.signOut();
+    setAuthLocked(true);
+    const reason = profile?.blocked_reason ? `
+
+Reden: ${profile.blocked_reason}` : "";
+    await appAlert(`Dit account is tijdelijk geblokkeerd. Neem contact op met NailBooker support.${reason}`, { title: "Account geblokkeerd", variant: "warning" });
+    return;
+  }
+
+  const subscriptionAccess = getSubscriptionAccessState(profile, user);
+  if (user && subscriptionAccess.mode === "delete_due") {
+    await supabaseClient.auth.signOut();
+    setAuthLocked(true);
+    await appAlert(
+      "De bewaartermijn van 6 maanden is verstreken. Dit account is gedeactiveerd en de gegevens worden definitief verwijderd.",
+      { title: "Account gedeactiveerd", variant: "warning" }
+    );
+    return;
+  }
+
   updateStaticI18n();
+  syncHeaderLanguageSelect();
+  updateHeaderTrialBadge(profile, user);
 
   setAuthLocked(!user);
 
+  if (user && subscriptionAccess.mode === "readonly" && !subscriptionReadonlyNoticeShown) {
+    subscriptionReadonlyNoticeShown = true;
+    await appAlert(
+      `Je abonnement is verlopen. Je bestaande gegevens blijven tot ${formatSubscriptionDate(subscriptionAccess.dataDeleteAt)} beschikbaar, maar kunnen niet meer worden toegevoegd, aangepast of verwijderd.`,
+      { title: "Alleen-lezen toegang", variant: "warning" }
+    );
+  }
+
   const headerUserName = document.getElementById("headerUserName");
   const headerAccountIcon = document.querySelector("#headerAccountBtn .header-account-icon");
+  const headerUserLabel = user ? extractFirstNameFromUser(user, profile) : "log in";
+  const headerIconHtml = buildHeaderAccountIcon(profile);
 
   const guestView = document.getElementById("accountGuestView");
   const loggedInView = document.getElementById("accountLoggedInView");
@@ -1057,12 +2403,20 @@ async function syncAuthUI() {
   const accountProfileCurrency = document.getElementById("accountProfileCurrency");
 
   if (headerUserName) {
-    headerUserName.textContent = user ? extractFirstNameFromUser(user, profile) : "log in";
+    headerUserName.textContent = headerUserLabel;
   }
 
+  document.querySelectorAll(".modal-app-account-name").forEach(nameEl => {
+    nameEl.textContent = headerUserLabel;
+  });
+
   if (headerAccountIcon) {
-    headerAccountIcon.innerHTML = buildHeaderAccountIcon(profile);
+    headerAccountIcon.innerHTML = headerIconHtml;
   }
+
+  document.querySelectorAll(".modal-app-account-icon").forEach(iconEl => {
+    iconEl.innerHTML = headerIconHtml;
+  });
 
   if (!user) {
     if (guestView) guestView.classList.remove("hidden");
@@ -1199,6 +2553,29 @@ function scheduleAuthUiRefresh() {
   }, 0);
 }
 
+function refreshEditProfileSelects() {
+  ["editLanguage", "editCountry", "editRegion", "editTimezone", "editCurrency"].forEach(id => {
+    const select = document.getElementById(id);
+    if (select && typeof refreshAppSelect === "function") refreshAppSelect(select);
+  });
+}
+
+function syncEditProfileRegionOptions() {
+  const countryEl = document.getElementById("editCountry");
+  const regionEl = document.getElementById("editRegion");
+  const timezoneEl = document.getElementById("editTimezone");
+  if (!countryEl || !regionEl) return;
+
+  const previousRegion = regionEl.value;
+  const regions = getRegistrationRegions(countryEl.value || "BE");
+  regionEl.innerHTML = regions.map(region => `<option value="${region.value}">${region.label}</option>`).join("");
+  regionEl.value = regions.some(region => region.value === previousRegion) ? previousRegion : regions[0]?.value || "";
+
+  const selectedRegion = regions.find(region => region.value === regionEl.value) || regions[0];
+  if (timezoneEl && selectedRegion?.timezone) timezoneEl.value = selectedRegion.timezone;
+  refreshEditProfileSelects();
+}
+
 async function openEditProfileDialog() {
   const { data: userData } = await supabaseClient.auth.getUser();
   const user = userData?.user;
@@ -1210,13 +2587,47 @@ async function openEditProfileDialog() {
   const profile = await getCurrentProfile();
   document.getElementById("editFirstName").value = profile?.first_name || user.user_metadata?.first_name || "";
   document.getElementById("editLastName").value = profile?.last_name || user.user_metadata?.last_name || "";
-  document.getElementById("editSalonName").value = profile?.salon_name || "";
-  document.getElementById("editVatNumber").value = profile?.vat_number || "";
+  document.getElementById("editSalonName").value = profile?.salon_name || user.user_metadata?.salon_name || "";
+  document.getElementById("editVatNumber").value = profile?.vat_number || user.user_metadata?.vat_number || "";
+
   const editLanguage = document.getElementById("editLanguage");
+  const editCountry = document.getElementById("editCountry");
+  const editRegion = document.getElementById("editRegion");
+  const editTimezone = document.getElementById("editTimezone");
   const editCurrency = document.getElementById("editCurrency");
-  if (editLanguage) editLanguage.innerHTML = buildLanguageOptions(profile?.language || getCurrentLanguage());
-  if (editCurrency) editCurrency.innerHTML = buildCurrencyOptions(profile?.currency || getCurrentCurrency());
+
+  const selectedLanguage = normalizeLanguage(profile?.language || user.user_metadata?.language || getCurrentLanguage());
+  const selectedCurrency = normalizeCurrency(profile?.currency || user.user_metadata?.currency || getCurrentCurrency());
+  const selectedCountry = profile?.country || user.user_metadata?.country || "BE";
+  const selectedRegion = profile?.region || user.user_metadata?.region || "";
+  const selectedTimezone = profile?.timezone || user.user_metadata?.timezone || "Europe/Brussels";
+
+  if (editLanguage) {
+    editLanguage.innerHTML = buildLanguageOptions(selectedLanguage);
+    editLanguage.value = selectedLanguage;
+  }
+
+  if (editCountry) editCountry.value = selectedCountry;
+  syncEditProfileRegionOptions();
+
+  if (editRegion && selectedRegion) {
+    const regionExists = Array.from(editRegion.options || []).some(option => option.value === selectedRegion);
+    if (regionExists) editRegion.value = selectedRegion;
+  }
+
+  if (editTimezone) editTimezone.value = selectedTimezone;
+
+  if (editCurrency) {
+    editCurrency.innerHTML = buildCurrencyOptions(selectedCurrency);
+    editCurrency.value = selectedCurrency;
+  }
+
+  refreshEditProfileSelects();
   document.getElementById("editProfileDialog").showModal();
+  window.requestAnimationFrame(() => {
+    refreshEditProfileSelects();
+    window.requestAnimationFrame(refreshEditProfileSelects);
+  });
 }
 
 async function saveProfileFromForm(event) {
@@ -1226,6 +2637,9 @@ async function saveProfileFromForm(event) {
   const lastName = document.getElementById("editLastName")?.value.trim();
   const salonName = document.getElementById("editSalonName")?.value.trim() || "";
   const vatNumber = document.getElementById("editVatNumber")?.value.trim() || "";
+  const country = document.getElementById("editCountry")?.value || "BE";
+  const region = document.getElementById("editRegion")?.value || "Flanders";
+  const timezone = document.getElementById("editTimezone")?.value || "Europe/Brussels";
   const language = normalizeLanguage(document.getElementById("editLanguage")?.value || getCurrentLanguage());
   const currency = normalizeCurrency(document.getElementById("editCurrency")?.value || getCurrentCurrency());
 
@@ -1251,6 +2665,9 @@ async function saveProfileFromForm(event) {
         full_name: `${firstName} ${lastName}`.trim(),
         salon_name: salonName,
         vat_number: vatNumber,
+        country,
+        region,
+        timezone,
         language,
         currency,
         terms_accepted: true
@@ -1266,6 +2683,9 @@ async function saveProfileFromForm(event) {
       last_name: lastName,
       salon_name: salonName,
       vat_number: vatNumber,
+      country,
+      region,
+      timezone,
       language,
       currency,
       terms_accepted: true,
@@ -1421,76 +2841,393 @@ async function savePasswordFromForm(event) {
   }
 }
 
+
+const registerWizardState = { step: 1 };
+
+const registerWizardCopy = {
+  "nl-BE": {
+    title: "Registreren",
+    subtitle: "Maak je NailBooker-account aan in enkele korte stappen.",
+    stepTitles: ["Taal", "E-mail", "Gegevens", "Beveiliging"],
+    languageHint: "De app wordt meteen in deze taal gezet.",
+    emailHint: "Dit e-mailadres gebruik je om in te loggen en om je account te verifiëren.",
+    verifyHint: "Na registratie krijg je een e-mail om je account te voltooien.",
+    terms: "Ik ga akkoord met de gebruiksvoorwaarden en het privacybeleid.",
+    previous: "Vorige",
+    next: "Volgende",
+    register: "Registreren",
+    country: "Land",
+    region: "Regio",
+    timezone: "Tijdzone",
+    emailExists: "Er bestaat al een account voor dit e-mailadres. Log in of gebruik een ander e-mailadres.",
+    emailCheckFailed: "E-mailcontrole mislukt. Probeer opnieuw.",
+    requiredEmail: "Vul een geldig e-mailadres in.",
+    requiredDetails: "Vul voornaam, naam, salonnaam, land, regio en tijdzone in.",
+    requiredPassword: "Vul je wachtwoord en bevestiging in.",
+    termsRequired: "Je moet akkoord gaan met de gebruiksvoorwaarden en het privacybeleid om te registreren.",
+    passwordMismatch: "De wachtwoorden komen niet overeen.",
+    registrationDone: "Registratie gelukt. Controleer je mailbox en klik op de bevestigingslink om je account te voltooien.",
+    duplicateFallback: "Er bestaat mogelijk al een account voor dit e-mailadres. Probeer in te loggen of gebruik een ander e-mailadres."
+  },
+  "en-GB": {
+    title: "Register",
+    subtitle: "Create your NailBooker account in a few short steps.",
+    stepTitles: ["Language", "Email", "Details", "Security"],
+    languageHint: "The app switches to this language immediately.",
+    emailHint: "You use this email address to log in and verify your account.",
+    verifyHint: "After registration, you will receive an email to complete your account.",
+    terms: "I agree to the terms of use and the privacy policy.",
+    previous: "Previous",
+    next: "Next",
+    register: "Register",
+    country: "Country",
+    region: "Region",
+    timezone: "Time zone",
+    emailExists: "An account already exists for this email address. Log in or use another email address.",
+    emailCheckFailed: "Email check failed. Please try again.",
+    requiredEmail: "Enter a valid email address.",
+    requiredDetails: "Enter first name, last name, salon name, country, region and time zone.",
+    requiredPassword: "Enter your password and confirmation.",
+    termsRequired: "You must agree to the terms of use and privacy policy to register.",
+    passwordMismatch: "The passwords do not match.",
+    registrationDone: "Registration successful. Check your mailbox and click the confirmation link to complete your account.",
+    duplicateFallback: "An account may already exist for this email address. Try logging in or use another email address."
+  },
+  "fr-FR": {
+    title: "S'inscrire",
+    subtitle: "Créez votre compte NailBooker en quelques étapes courtes.",
+    stepTitles: ["Langue", "E-mail", "Données", "Sécurité"],
+    languageHint: "L'application passe immédiatement dans cette langue.",
+    emailHint: "Vous utilisez cette adresse e-mail pour vous connecter et vérifier votre compte.",
+    verifyHint: "Après l'inscription, vous recevrez un e-mail pour compléter votre compte.",
+    terms: "J’accepte les conditions d’utilisation et la politique de confidentialité.",
+    previous: "Précédent",
+    next: "Suivant",
+    register: "S'inscrire",
+    country: "Pays",
+    region: "Région",
+    timezone: "Fuseau horaire",
+    emailExists: "Un compte existe déjà pour cette adresse e-mail. Connectez-vous ou utilisez une autre adresse.",
+    emailCheckFailed: "La vérification de l'e-mail a échoué. Réessayez.",
+    requiredEmail: "Saisissez une adresse e-mail valable.",
+    requiredDetails: "Saisissez le prénom, le nom, le nom du salon, le pays, la région et le fuseau horaire.",
+    requiredPassword: "Saisissez votre mot de passe et sa confirmation.",
+    termsRequired: "Vous devez accepter les conditions d’utilisation et la politique de confidentialité pour vous inscrire.",
+    passwordMismatch: "Les mots de passe ne correspondent pas.",
+    registrationDone: "Inscription réussie. Consultez votre boîte mail et cliquez sur le lien de confirmation pour compléter votre compte.",
+    duplicateFallback: "Un compte existe peut-être déjà pour cette adresse e-mail. Essayez de vous connecter ou utilisez une autre adresse."
+  }
+};
+
+function getRegisterCopy() {
+  return registerWizardCopy[getCurrentLanguage()] || registerWizardCopy[DEFAULT_LANGUAGE];
+}
+
+function buildRegisterTermsConsentHtml() {
+  const lang = getCurrentLanguage();
+  if (lang === "en-GB") {
+    return 'I agree to the <a href="terms.html">terms of use</a> and the <a href="privacy.html">privacy policy</a>.';
+  }
+  if (lang === "fr-FR") {
+    return 'J’accepte les <a href="terms.html">conditions d’utilisation</a> et la <a href="privacy.html">politique de confidentialité</a>.';
+  }
+  return 'Ik ga akkoord met de <a href="terms.html">gebruiksvoorwaarden</a> en het <a href="privacy.html">privacybeleid</a>.';
+}
+
+function getRegistrationRegions(country) {
+  if (country === "NL") return [{ value: "NL", label: "Nederland", timezone: "Europe/Amsterdam" }];
+  return [
+    { value: "Flanders", label: "Vlaanderen", timezone: "Europe/Brussels" },
+    { value: "Brussels", label: "Brussel", timezone: "Europe/Brussels" }
+  ];
+}
+
+function syncRegisterRegionOptions() {
+  const countryEl = document.getElementById("registerCountry");
+  const regionEl = document.getElementById("registerRegion");
+  const timezoneEl = document.getElementById("registerTimezone");
+  if (!countryEl || !regionEl) return;
+
+  const previousRegion = regionEl.value;
+  const regions = getRegistrationRegions(countryEl.value || "BE");
+  regionEl.innerHTML = regions.map(region => `<option value="${region.value}">${region.label}</option>`).join("");
+  regionEl.value = regions.some(region => region.value === previousRegion) ? previousRegion : regions[0]?.value || "";
+
+  const selectedRegion = regions.find(region => region.value === regionEl.value) || regions[0];
+  if (timezoneEl && selectedRegion?.timezone) timezoneEl.value = selectedRegion.timezone;
+  refreshRegisterWizardSelects();
+}
+
+function refreshRegisterWizardSelects() {
+  ["registerLanguage", "registerCountry", "registerRegion", "registerTimezone", "registerCurrency"].forEach(id => {
+    const select = document.getElementById(id);
+    if (select && typeof refreshAppSelect === "function") refreshAppSelect(select);
+  });
+}
+
+function setRegisterStep(step) {
+  registerWizardState.step = Math.min(4, Math.max(1, Number(step) || 1));
+  const copy = getRegisterCopy();
+
+  document.querySelectorAll(".register-step").forEach(section => {
+    section.classList.toggle("active", Number(section.dataset.registerStep) === registerWizardState.step);
+  });
+  document.querySelectorAll(".register-progress-dot").forEach(dot => {
+    const value = Number(dot.dataset.registerProgress);
+    dot.classList.toggle("active", value === registerWizardState.step);
+    dot.classList.toggle("done", value < registerWizardState.step);
+  });
+
+  const title = document.getElementById("registerDialogTitle");
+  const subtitle = document.getElementById("registerDialogSubtitle");
+  if (title) title.textContent = `${copy.title} · ${copy.stepTitles[registerWizardState.step - 1]}`;
+  if (subtitle) subtitle.textContent = copy.subtitle;
+
+  document.getElementById("registerLanguageHint") && (document.getElementById("registerLanguageHint").textContent = copy.languageHint);
+  document.getElementById("registerEmailHint") && (document.getElementById("registerEmailHint").textContent = copy.emailHint);
+  document.getElementById("registerVerifyHint") && (document.getElementById("registerVerifyHint").textContent = copy.verifyHint);
+  document.getElementById("registerTermsLabel") && (document.getElementById("registerTermsLabel").innerHTML = buildRegisterTermsConsentHtml());
+  document.getElementById("registerBackBtn") && (document.getElementById("registerBackBtn").textContent = copy.previous);
+  document.getElementById("registerNextBtn") && (document.getElementById("registerNextBtn").textContent = copy.next);
+  document.getElementById("registerBtn") && (document.getElementById("registerBtn").textContent = copy.register);
+
+  const backBtn = document.getElementById("registerBackBtn");
+  const nextBtn = document.getElementById("registerNextBtn");
+  const submitBtn = document.getElementById("registerBtn");
+  if (backBtn) backBtn.classList.toggle("hidden", registerWizardState.step === 1);
+  if (nextBtn) nextBtn.classList.toggle("hidden", registerWizardState.step === 4);
+  if (submitBtn) submitBtn.classList.toggle("hidden", registerWizardState.step !== 4);
+  updateRegisterSubmitState();
+
+  const labelMap = {
+    registerEmail: "email",
+    registerFirstName: "firstName",
+    registerLastName: "lastName",
+    registerSalonName: "salonName",
+    registerCurrency: "currency",
+    registerPassword: "password",
+    registerPasswordConfirm: "confirmPassword"
+  };
+  Object.entries(labelMap).forEach(([id, key]) => {
+    const label = document.querySelector(`label[for="${id}"]`);
+    if (label) label.textContent = t(key);
+  });
+  const countryLabel = document.querySelector('label[for="registerCountry"]');
+  const regionLabel = document.querySelector('label[for="registerRegion"]');
+  const timezoneLabel = document.querySelector('label[for="registerTimezone"]');
+  if (countryLabel) countryLabel.textContent = copy.country;
+  if (regionLabel) regionLabel.textContent = copy.region;
+  if (timezoneLabel) timezoneLabel.textContent = copy.timezone;
+
+  window.requestAnimationFrame(refreshRegisterWizardSelects);
+}
+
+function resetRegisterWizard() {
+  const form = document.getElementById("registerForm");
+  if (form) form.reset();
+  const lang = document.getElementById("registerLanguage");
+  if (lang) lang.value = getCurrentLanguage();
+  syncRegisterRegionOptions();
+  setRegisterStep(1);
+  updateRegisterSubmitState();
+  window.requestAnimationFrame(refreshRegisterWizardSelects);
+}
+
+function getRegisterValues() {
+  return {
+    language: normalizeLanguage(document.getElementById("registerLanguage")?.value || DEFAULT_LANGUAGE),
+    email: document.getElementById("registerEmail")?.value.trim() || "",
+    firstName: document.getElementById("registerFirstName")?.value.trim() || "",
+    lastName: document.getElementById("registerLastName")?.value.trim() || "",
+    salonName: document.getElementById("registerSalonName")?.value.trim() || "",
+    country: document.getElementById("registerCountry")?.value || "BE",
+    region: document.getElementById("registerRegion")?.value || "Flanders",
+    timezone: document.getElementById("registerTimezone")?.value || "Europe/Brussels",
+    currency: normalizeCurrency(document.getElementById("registerCurrency")?.value || DEFAULT_CURRENCY),
+    password: document.getElementById("registerPassword")?.value || "",
+    passwordConfirm: document.getElementById("registerPasswordConfirm")?.value || "",
+    termsAccepted: Boolean(document.getElementById("registerTermsAccepted")?.checked)
+  };
+}
+
+async function checkRegisterEmailAlreadyExists(email) {
+  const cleanEmail = String(email || "").trim().toLocaleLowerCase();
+  if (!cleanEmail) return false;
+
+  try {
+    const { data, error } = await supabaseClient.rpc("email_exists", { check_email: cleanEmail });
+    if (error) {
+      console.warn("email_exists RPC niet beschikbaar of mislukt:", error.message);
+      return false;
+    }
+    return Boolean(data);
+  } catch (error) {
+    console.warn("E-mailcontrole overgeslagen:", error?.message || error);
+    return false;
+  }
+}
+
+function updateRegisterSubmitState() {
+  const btn = document.getElementById("registerBtn");
+  if (!btn) return;
+
+  const values = getRegisterValues();
+  const canSubmit = Boolean(
+    values.password &&
+    values.passwordConfirm &&
+    values.password === values.passwordConfirm &&
+    values.termsAccepted
+  );
+
+  btn.disabled = registerWizardState.step === 4 && !canSubmit;
+  btn.classList.toggle("is-disabled", btn.disabled);
+}
+
+async function validateRegisterStep(step = registerWizardState.step) {
+  const values = getRegisterValues();
+  const copy = getRegisterCopy();
+
+  if (step === 2) {
+    if (!values.email || !values.email.includes("@")) {
+      await appAlert(copy.requiredEmail, { title: copy.stepTitles[1], variant: "warning" });
+      return false;
+    }
+    const exists = await checkRegisterEmailAlreadyExists(values.email);
+    if (exists) {
+      await appAlert(copy.emailExists, { title: copy.stepTitles[1], variant: "warning" });
+      return false;
+    }
+  }
+
+  if (step === 3) {
+    if (!values.firstName || !values.lastName || !values.salonName || !values.country || !values.region || !values.timezone) {
+      await appAlert(copy.requiredDetails, { title: copy.stepTitles[2], variant: "warning" });
+      return false;
+    }
+  }
+
+  if (step === 4) {
+    if (!values.password || !values.passwordConfirm) {
+      await appAlert(copy.requiredPassword, { title: copy.stepTitles[3], variant: "warning" });
+      return false;
+    }
+    if (!values.termsAccepted) {
+      await appAlert(copy.termsRequired, { title: copy.stepTitles[3], variant: "warning" });
+      return false;
+    }
+    if (values.password !== values.passwordConfirm) {
+      await appAlert(copy.passwordMismatch, { title: copy.stepTitles[3], variant: "warning" });
+      return false;
+    }
+  }
+
+  return true;
+}
+
+async function goToNextRegisterStep() {
+  if (!(await validateRegisterStep(registerWizardState.step))) return;
+  setRegisterStep(registerWizardState.step + 1);
+}
+
+function goToPreviousRegisterStep() {
+  setRegisterStep(registerWizardState.step - 1);
+}
+
+function handleRegisterLanguageChange(event) {
+  currentProfilePreferences.language = normalizeLanguage(event.target.value || DEFAULT_LANGUAGE);
+  const data = getData();
+  data.settings = { ...getSettings(), language: currentProfilePreferences.language, currency: getCurrentCurrency() };
+  saveData(data);
+  updateStaticI18n();
+  setRegisterStep(registerWizardState.step);
+}
+
 async function registerAccount(event) {
   if (event) event.preventDefault();
 
-  const firstName = document.getElementById("registerFirstName").value.trim();
-  const lastName = document.getElementById("registerLastName").value.trim();
-  const salonName = document.getElementById("registerSalonName")?.value.trim() || "";
-  const vatNumber = document.getElementById("registerVatNumber")?.value.trim() || "";
-  const email = document.getElementById("registerEmail").value.trim();
-  const password = document.getElementById("registerPassword").value;
-  const passwordConfirm = document.getElementById("registerPasswordConfirm").value;
-  const language = normalizeLanguage(document.getElementById("registerLanguage")?.value || DEFAULT_LANGUAGE);
-  const currency = normalizeCurrency(document.getElementById("registerCurrency")?.value || DEFAULT_CURRENCY);
-  const termsAccepted = Boolean(document.getElementById("registerTermsAccepted")?.checked);
+  const copy = getRegisterCopy();
+  if (!(await validateRegisterStep(4))) return;
 
-  if (!firstName || !lastName || !email || !password || !passwordConfirm) {
-    await appAlert("Vul voornaam, naam, e-mail, wachtwoord en bevestiging in.");
+  const values = getRegisterValues();
+  const duplicate = await checkRegisterEmailAlreadyExists(values.email);
+  if (duplicate) {
+    await appAlert(copy.emailExists, { title: copy.stepTitles[1], variant: "warning" });
     return;
   }
 
-  if (!termsAccepted) {
-    await appAlert("Je moet akkoord gaan met de gebruiksvoorwaarden om te registreren.");
-    return;
-  }
-
-  if (password !== passwordConfirm) {
-    await appAlert("De wachtwoorden komen niet overeen.");
-    return;
-  }
+  const emailRedirectTo = `${window.location.origin}${window.location.pathname}`;
+  const trialStartedAt = new Date().toISOString();
+  const trialEndsAtDate = new Date(trialStartedAt);
+  trialEndsAtDate.setDate(trialEndsAtDate.getDate() + 30);
 
   const { data, error } = await supabaseClient.auth.signUp({
-    email,
-    password,
+    email: values.email,
+    password: values.password,
     options: {
+      emailRedirectTo,
       data: {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: `${firstName} ${lastName}`.trim(),
-        salon_name: salonName,
-        vat_number: vatNumber,
-        language,
-        currency,
-        terms_accepted: true
+        first_name: values.firstName,
+        last_name: values.lastName,
+        full_name: `${values.firstName} ${values.lastName}`.trim(),
+        salon_name: values.salonName,
+        country: values.country,
+        region: values.region,
+        timezone: values.timezone,
+        language: values.language,
+        currency: values.currency,
+        terms_accepted: true,
+        terms_accepted_at: trialStartedAt,
+        terms_version: LEGAL_TERMS_VERSION,
+        privacy_version: LEGAL_PRIVACY_VERSION,
+        privacy_accepted_at: trialStartedAt,
+        subscription_plan: "free",
+        subscription_status: "trial",
+        trial_started_at: trialStartedAt,
+        trial_ends_at: trialEndsAtDate.toISOString()
       }
     }
   });
 
   if (error) {
-    await appAlert("Registratie mislukt: " + error.message, { title: "Registratie mislukt", variant: "danger" });
+    const message = String(error.message || "");
+    const isDuplicate = /already|registered|exists|user/i.test(message);
+    await appAlert(isDuplicate ? copy.duplicateFallback : "Registratie mislukt: " + message, { title: copy.title, variant: "danger" });
+    return;
+  }
+
+  if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    await appAlert(copy.duplicateFallback, { title: copy.title, variant: "warning" });
     return;
   }
 
   try {
     if (data.user && data.session) {
       await upsertProfile(data.user.id, {
-        first_name: firstName,
-        last_name: lastName,
-        salon_name: salonName,
-        vat_number: vatNumber,
-        language,
-        currency,
+        email: values.email,
+        first_name: values.firstName,
+        last_name: values.lastName,
+        salon_name: values.salonName,
+        country: values.country,
+        region: values.region,
+        timezone: values.timezone,
+        language: values.language,
+        currency: values.currency,
         terms_accepted: true,
-        terms_accepted_at: new Date().toISOString()
+        terms_accepted_at: trialStartedAt,
+        terms_version: LEGAL_TERMS_VERSION,
+        privacy_version: LEGAL_PRIVACY_VERSION,
+        privacy_accepted_at: trialStartedAt,
+        subscription_plan: "free",
+        subscription_status: "trial",
+        trial_started_at: trialStartedAt,
+        trial_ends_at: trialEndsAtDate.toISOString()
       });
     }
   } catch (profileError) {
     console.error("Profiel opslaan mislukt:", profileError.message);
-    await appAlert("Je account is aangemaakt, maar de profielgegevens konden niet volledig opgeslagen worden.", { title: "Registratie voltooid", variant: "warning" });
   }
 
-  document.getElementById("registerForm").reset();
+  resetRegisterWizard();
   closeDialog("registerDialog");
 
   await refreshAuthState();
@@ -1500,12 +3237,18 @@ async function registerAccount(event) {
     rerenderAll();
     await syncAuthUI();
     switchScreen("agendaScreen", t("agenda"));
-    await appAlert("Registratie gelukt. Je bent nu ingelogd.", { title: "Registratie gelukt", variant: "success" });
+    await appAlert("Registratie gelukt. Je bent nu ingelogd.", { title: copy.title, variant: "success" });
+    openWelcomeGuide(true);
   } else {
     await syncAuthUI();
     switchScreen("accountScreen", t("account"));
-    await appAlert("Registratie gelukt. Controleer eventueel je mailbox en log daarna in.", { title: "Registratie gelukt", variant: "success" });
+    await appAlert(copy.registrationDone, { title: copy.title, variant: "success" });
   }
+}
+
+async function isCurrentAccountBlocked() {
+  const profile = await getCurrentProfile();
+  return Boolean(profile?.is_blocked);
 }
 
 async function loginAccount() {
@@ -1522,10 +3265,17 @@ async function loginAccount() {
     return;
   }
 
+  if (await isCurrentAccountBlocked()) {
+    await supabaseClient.auth.signOut();
+    await appAlert("Dit account is tijdelijk geblokkeerd. Neem contact op met de beheerder van NailBooker.", { title: "Account geblokkeerd", variant: "danger" });
+    return;
+  }
+
   document.getElementById("loginPassword").value = "";
 
   await refreshAuthState();
   await loadAllDataFromSupabase();
+  state.revenueLastRenderSignature = "";
   rerenderAll();
   await syncAuthUI();
   switchScreen("agendaScreen", t("agenda"));
@@ -1545,9 +3295,80 @@ async function logoutAccount() {
 
   localStorage.removeItem(STORAGE_KEY);
   seedData();
+  state.revenueLastRenderSignature = "";
   rerenderAll();
   await syncAuthUI();
   switchScreen("accountScreen", t("account"));
+}
+
+
+/* =========================
+   SUPPORT
+========================= */
+
+const APP_VERSION = "1.0.0";
+
+function getSupportBrowserInfo() {
+  const ua = navigator.userAgent || "Onbekende browser";
+  if (/Edg\//.test(ua)) return "Microsoft Edge";
+  if (/Chrome\//.test(ua) && !/Edg\//.test(ua)) return "Google Chrome";
+  if (/Safari\//.test(ua) && !/Chrome\//.test(ua)) return "Safari";
+  if (/Firefox\//.test(ua)) return "Firefox";
+  return ua.slice(0, 80);
+}
+
+function buildSupportDiagnostics() {
+  const profile = authProfileCache || {};
+  const user = authUserCache || {};
+  const salonName = profile.salon_name || getData()?.profile?.salonName || "-";
+  const userLabel = profile.email || user.email || "Niet ingelogd";
+
+  return [
+    `NailBooker versie: ${APP_VERSION}`,
+    `Datum/tijd: ${new Date().toLocaleString("nl-BE")}`,
+    `Scherm: ${getScreenTitle(state.currentScreen, state.currentScreen || "-")}`,
+    `Browser: ${getSupportBrowserInfo()}`,
+    `Platform: ${navigator.platform || "-"}`,
+    `Taal: ${navigator.language || "-"}`,
+    `Salonnaam: ${salonName}`,
+    `Gebruiker: ${userLabel}`,
+    `User ID: ${user.id || "-"}`
+  ].join("\n");
+}
+
+function renderSupportPage() {
+  const versionEl = document.getElementById("supportAppVersion");
+  const browserEl = document.getElementById("supportBrowserInfo");
+  const userEl = document.getElementById("supportUserInfo");
+  const profile = authProfileCache || {};
+  const user = authUserCache || {};
+
+  if (versionEl) versionEl.textContent = APP_VERSION;
+  if (browserEl) browserEl.textContent = getSupportBrowserInfo();
+  if (userEl) userEl.textContent = profile.email || user.email || "Niet ingelogd";
+}
+
+async function copySupportDiagnostics() {
+  const diagnostics = buildSupportDiagnostics();
+  try {
+    await navigator.clipboard.writeText(diagnostics);
+    await appAlert("Technische info gekopieerd.", { title: "Support", variant: "success" });
+  } catch (error) {
+    await appAlert(diagnostics, { title: "Technische info" });
+  }
+}
+
+function submitSupportForm(event) {
+  event.preventDefault();
+
+  const subject = document.getElementById("supportSubject")?.value?.trim() || "Supportvraag NailBooker";
+  const message = document.getElementById("supportMessage")?.value?.trim() || "";
+  const includeDiagnostics = document.getElementById("supportIncludeDiagnostics")?.checked !== false;
+  const diagnostics = includeDiagnostics ? `\n\n--- Technische info ---\n${buildSupportDiagnostics()}` : "";
+  const body = `${message}${diagnostics}`;
+
+  const mailto = `mailto:support@nailbooker.be?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
 }
 
 /* =========================
@@ -1559,57 +3380,226 @@ function getScreenTitle(screenId, fallback = "") {
   const map = {
     agendaScreen: "agenda",
     revenueScreen: "revenue",
+    costsScreen: "costs",
     todoScreen: "todo",
     clientsScreen: "clients",
     servicesScreen: "services",
     paymentMethodsScreen: "paymentMethods",
     statisticsScreen: "statistics",
     settingsScreen: "settings",
+    supportScreen: "support",
     accountScreen: "account"
   };
   const key = map[screenId];
   return key ? t(key) : fallback;
 }
 
+
+const agendaFabActions = [
+  { key: "payment", screenId: "paymentMethodsScreen", labelKey: "newPaymentMethod", iconScreen: "paymentMethodsScreen", dx: -92, dy: 0, open: () => openNewPaymentMethodDialog() },
+  { key: "services", screenId: "servicesScreen", labelKey: "newService", iconScreen: "servicesScreen", dx: -74, dy: -54, open: () => openNewServiceDialog() },
+  { key: "clients", screenId: "clientsScreen", labelKey: "newClient", iconScreen: "clientsScreen", dx: -28, dy: -88, open: () => openNewClientDialog() },
+  { key: "costs", screenId: "costsScreen", labelKey: "newCost", iconScreen: "costsScreen", dx: 28, dy: -88, open: () => openNewCostDialog() },
+  { key: "todo", screenId: "todoScreen", labelKey: "newTodo", iconScreen: "todoScreen", dx: 74, dy: -54, open: () => openNewTodoDialog() },
+  { key: "agenda", screenId: "agendaScreen", labelKey: "newAppointment", iconScreen: "agendaScreen", dx: 92, dy: 0, open: () => openNewAppointmentDialog() }
+];
+
+let agendaFabMenuDocumentHandlersInstalled = false;
+
+function getNavIconHtmlForScreen(screenId) {
+  const navIcon = document.querySelector(`.nav-btn[data-screen="${screenId}"] .nav-ico`);
+  return navIcon ? navIcon.innerHTML : "+";
+}
+
+function closeAgendaFabMenu() {
+  const menu = document.getElementById("agendaFabMenu");
+  const fab = document.getElementById("floatingAddBtn");
+  if (menu) menu.classList.remove("open");
+  if (fab) {
+    fab.classList.remove("fab-menu-open");
+    fab.setAttribute("aria-expanded", "false");
+  }
+}
+
+function openAgendaFabMenu() {
+  const menu = ensureAgendaFabMenu();
+  const fab = document.getElementById("floatingAddBtn");
+  if (!menu || !fab) return;
+  menu.classList.add("open");
+  fab.classList.add("fab-menu-open");
+  fab.setAttribute("aria-expanded", "true");
+}
+
+async function toggleAgendaFabMenu(event) {
+  event?.stopPropagation?.();
+  if (isAuthLocked()) return;
+  if (!(await ensureDataWriteAccess())) return;
+  const menu = ensureAgendaFabMenu();
+  if (!menu) return;
+  if (menu.classList.contains("open")) closeAgendaFabMenu();
+  else openAgendaFabMenu();
+}
+
+async function runAgendaFabAction(action) {
+  closeAgendaFabMenu();
+
+  if (!action || isAuthLocked()) return;
+  if (!(await ensureDataWriteAccess())) return;
+
+  if (state.currentScreen !== action.screenId) {
+    switchScreen(action.screenId, getScreenTitle(action.screenId));
+  }
+
+  window.setTimeout(() => {
+    action.open?.();
+  }, 0);
+}
+
+function ensureAgendaFabMenu() {
+  let menu = document.getElementById("agendaFabMenu");
+  const fab = document.getElementById("floatingAddBtn");
+  if (!fab) return null;
+
+  if (!menu) {
+    menu = document.createElement("div");
+    menu.id = "agendaFabMenu";
+    menu.className = "agenda-fab-menu";
+    menu.setAttribute("aria-label", "Snel toevoegen");
+
+    agendaFabActions.forEach(action => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "agenda-fab-menu-item";
+      button.dataset.action = action.key;
+      button.style.setProperty("--fab-x", `${action.dx}px`);
+      button.style.setProperty("--fab-y", `${action.dy}px`);
+      button.setAttribute("aria-label", t(action.labelKey));
+
+      const icon = document.createElement("span");
+      icon.className = "agenda-fab-menu-icon";
+      icon.innerHTML = getNavIconHtmlForScreen(action.iconScreen);
+
+      const label = document.createElement("span");
+      label.className = "agenda-fab-menu-label";
+      label.textContent = t(action.labelKey);
+
+      button.appendChild(icon);
+      button.appendChild(label);
+
+      button.addEventListener("click", event => {
+        event.stopPropagation();
+        runAgendaFabAction(action);
+      });
+
+      menu.appendChild(button);
+    });
+
+    document.body.appendChild(menu);
+  } else {
+    agendaFabActions.forEach(action => {
+      const button = menu.querySelector(`[data-action="${action.key}"]`);
+      if (!button) return;
+      button.setAttribute("aria-label", t(action.labelKey));
+      const label = button.querySelector(".agenda-fab-menu-label");
+      if (label) label.textContent = t(action.labelKey);
+      const icon = button.querySelector(".agenda-fab-menu-icon");
+      if (icon && !icon.innerHTML.trim()) icon.innerHTML = getNavIconHtmlForScreen(action.iconScreen);
+    });
+  }
+
+  if (!agendaFabMenuDocumentHandlersInstalled) {
+    document.addEventListener("click", event => {
+      const activeMenu = document.getElementById("agendaFabMenu");
+      const activeFab = document.getElementById("floatingAddBtn");
+      if (!activeMenu?.classList.contains("open")) return;
+      if (activeMenu.contains(event.target) || activeFab?.contains(event.target)) return;
+      closeAgendaFabMenu();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeAgendaFabMenu();
+    });
+
+    agendaFabMenuDocumentHandlersInstalled = true;
+  }
+
+  return menu;
+}
+
+
 function updateTopbar(screenId, title) {
   document.getElementById("screenTitle").textContent = getScreenTitle(screenId, title);
 
   const backBtn = document.getElementById("backBtn");
   const fab = document.getElementById("floatingAddBtn");
+  const standardCostsBtn = document.getElementById("standardCostsBtn");
 
-  backBtn.classList.toggle("hidden-btn", screenId !== "clientDetailScreen");
+  backBtn?.classList.toggle("hidden-btn", true);
+  const showStandardCostsFab = screenId === "costsScreen" && getStandardCosts(getData()).length > 0;
+
+  if (standardCostsBtn) {
+    standardCostsBtn.onclick = openStandardCostsPopover;
+    standardCostsBtn.classList.toggle("hidden", !showStandardCostsFab);
+  }
+
+  document.body.classList.toggle("costs-fab-pair", showStandardCostsFab);
+  document.body.classList.toggle("costs-action-mode", screenId === "costsScreen");
+
+  if (screenId !== "agendaScreen") {
+    closeAgendaFabMenu();
+  }
 
   if (screenId === "agendaScreen") {
-    fab.onclick = () => openNewAppointmentDialog();
+    if (isAgendaFabMenuEnabled()) {
+      ensureAgendaFabMenu();
+      fab.onclick = toggleAgendaFabMenu;
+      fab.setAttribute("aria-expanded", "false");
+    } else {
+      closeAgendaFabMenu();
+      fab.onclick = () => runWriteEntryPoint(openNewAppointmentDialog);
+      fab.classList.remove("fab-menu-open");
+      fab.setAttribute("aria-expanded", "false");
+    }
+    fab.style.display = "block";
+  } else if (screenId === "costsScreen") {
+    closeAgendaFabMenu();
+    fab.onclick = () => runWriteEntryPoint(openNewCostDialog);
     fab.style.display = "block";
   } else if (screenId === "todoScreen") {
-    fab.onclick = openNewTodoDialog;
+    fab.onclick = () => runWriteEntryPoint(openNewTodoDialog);
     fab.style.display = "block";
   } else if (screenId === "clientsScreen") {
-    fab.onclick = openNewClientDialog;
+    fab.onclick = () => runWriteEntryPoint(openNewClientDialog);
     fab.style.display = "block";
   } else if (screenId === "servicesScreen") {
-    fab.onclick = openNewServiceDialog;
+    fab.onclick = () => runWriteEntryPoint(openNewServiceDialog);
     fab.style.display = "block";
   } else if (screenId === "paymentMethodsScreen") {
-    fab.onclick = openNewPaymentMethodDialog;
+    fab.onclick = () => runWriteEntryPoint(openNewPaymentMethodDialog);
     fab.style.display = "block";
   } else {
+    closeAgendaFabMenu();
     fab.style.display = "none";
   }
 }
 
 function switchScreen(screenId, title, options = {}) {
+  closeHeaderLanguageOverlay();
   const previousScreen = state.currentScreen;
 
-  if (isAuthLocked() && screenId !== "accountScreen") {
+  if (previousScreen === "settingsScreen" && screenId !== "settingsScreen" && !confirmLeaveSettingsIfDirty()) {
+    pushCurrentAppHistoryGuard?.();
+    return;
+  }
+
+  if (isAuthLocked() && !["accountScreen", "supportScreen", "subscriptionScreen"].includes(screenId)) {
     screenId = "accountScreen";
     title = "Account";
   }
 
   state.currentScreen = screenId;
 
-  if (["agendaScreen", "revenueScreen", "todoScreen", "clientsScreen", "servicesScreen", "paymentMethodsScreen", "statisticsScreen", "settingsScreen", "accountScreen"].includes(screenId)) {
+  if (["agendaScreen", "revenueScreen", "costsScreen", "todoScreen", "clientsScreen", "servicesScreen", "paymentMethodsScreen", "statisticsScreen", "settingsScreen", "supportScreen", "subscriptionScreen", "adminScreen", "accountScreen"].includes(screenId)) {
     state.previousMainScreen = screenId;
   }
 
@@ -1633,6 +3623,10 @@ function switchScreen(screenId, title, options = {}) {
     }
   }
 
+  if (screenId === "costsScreen") {
+    renderCosts();
+  }
+
   if (screenId === "todoScreen") {
     renderTodos();
   }
@@ -1652,6 +3646,14 @@ function switchScreen(screenId, title, options = {}) {
     renderSettings();
   }
 
+  if (screenId === "supportScreen") {
+    renderSupportPage();
+  }
+
+  if (screenId === "subscriptionScreen") {
+    getCurrentProfile().then(profile => getCurrentUser().then(user => renderSubscriptionPage(profile, user)));
+  }
+
   if (screenId === "paymentMethodsScreen") {
     renderPaymentMethods();
   }
@@ -1659,6 +3661,12 @@ function switchScreen(screenId, title, options = {}) {
   const activeClient = state.selectedClientId ? customerById(getData(), state.selectedClientId) : null;
   updateClientActionBar(activeClient);
   updateRevenueActionBar();
+  updateCostsActionBar();
+
+  if (screenId === "agendaScreen") {
+    scheduleWelcomeGuideCheck();
+    schedulePastUnpaidAgendaAlert();
+  }
 
   syncAppBrowserHistory(screenId, title, {
     replace: Boolean(options.replaceHistory),
@@ -1672,118 +3680,152 @@ function panelIsCalendarSwiping() {
   return panel?.dataset?.swipeAnimating === "true" || panel?.classList?.contains("is-swipe-animating");
 }
 
-function renderCalendar() {
+function createCalendarDayCell(dateStr, dayNumber, { isOtherMonth = false, interactive = true, preview = false } = {}) {
   const data = getData();
-  const grid = document.getElementById("calendarGrid");
+  const appts = getAppointmentsForDate(dateStr, data);
+  const cell = document.createElement("div");
+  const isSelected = dateStr === state.selectedDate;
+  const isToday = dateStr === todayStr;
+  cell.className = `day-cell${isSelected ? " selected" : ""}${isToday ? " today" : ""}${isOtherMonth ? " other-month" : ""}`;
+  cell.innerHTML = `<button class="day-button" aria-label="${dateStr}"${preview ? ' tabindex="-1" aria-hidden="true"' : ""}></button><span class="day-number">${dayNumber}</span>`;
 
-  grid.innerHTML = "";
-  document.getElementById("monthPickerBtn").textContent = `${getMonthNameUpper(state.currentMonth)} ${state.currentYear}`;
+  if (appts.length) {
+    const dots = document.createElement("div");
+    dots.className = "day-dots";
 
-  const first = new Date(state.currentYear, state.currentMonth, 1);
-  const last = new Date(state.currentYear, state.currentMonth + 1, 0);
+    const maxVisibleDots = window.matchMedia("(max-width: 420px)").matches ? 3 : 4;
+    const visibleDots = Math.min(appts.length, maxVisibleDots);
 
-  let weekday = first.getDay();
-  weekday = weekday === 0 ? 7 : weekday;
+    appts.slice(0, visibleDots).forEach(appointment => {
+      const i = document.createElement("i");
+      if (isPrivateAppointment(appointment)) i.classList.add("private-dot");
+      dots.appendChild(i);
+    });
 
-  for (let i = 1; i < weekday; i++) {
-    const empty = document.createElement("div");
-    empty.className = "empty-cell";
-    grid.appendChild(empty);
+    if (appts.length > visibleDots) {
+      const more = document.createElement("span");
+      more.className = "day-dots-more";
+      more.textContent = "+";
+      dots.appendChild(more);
+    }
+
+    cell.appendChild(dots);
   }
 
-  for (let day = 1; day <= last.getDate(); day++) {
-    const dateStr = `${state.currentYear}-${String(state.currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    const appts = data.appointments.filter(a => a.date === dateStr);
+  if (!interactive || preview) return cell;
 
-    const cell = document.createElement("div");
-    const isSelected = dateStr === state.selectedDate;
-    const isToday = dateStr === todayStr;
-    cell.className = `day-cell${isSelected ? " selected" : ""}${isToday ? " today" : ""}`;
-    cell.innerHTML = `<button class="day-button" aria-label="${dateStr}"></button><span class="day-number">${day}</span>`;
+  let dayTapStartX = 0;
+  let dayTapStartY = 0;
+  let dayTapMoved = false;
+  const dayTapMoveTolerance = 12;
 
-    if (appts.length) {
-      const dots = document.createElement("div");
-      dots.className = "day-dots";
-
-      const maxVisibleDots = window.matchMedia("(max-width: 420px)").matches ? 3 : 4;
-      const visibleDots = Math.min(appts.length, maxVisibleDots);
-
-      Array.from({ length: visibleDots }).forEach(() => {
-        const i = document.createElement("i");
-        dots.appendChild(i);
-      });
-
-      if (appts.length > visibleDots) {
-        const more = document.createElement("span");
-        more.className = "day-dots-more";
-        more.textContent = "+";
-        dots.appendChild(more);
-      }
-
-      cell.appendChild(dots);
+  const selectCalendarDate = (event = null) => {
+    closeAgendaFabMenu();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
     }
-
-    let dayTapStartX = 0;
-    let dayTapStartY = 0;
-    let dayTapMoved = false;
-    const dayTapMoveTolerance = 12;
-
-    const selectCalendarDate = (event = null) => {
-      if (event) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-      if (state.selectedDate !== dateStr) {
-        state.revenueSyncSelectedDateOnOpen = true;
-      }
-      state.selectedDate = dateStr;
-      renderCalendar();
-      renderAgendaList();
-    };
-
-    const rememberDayTapStart = (x, y) => {
-      dayTapStartX = x;
-      dayTapStartY = y;
-      dayTapMoved = false;
-    };
-
-    const updateDayTapMove = (x, y) => {
-      if (Math.abs(x - dayTapStartX) > dayTapMoveTolerance || Math.abs(y - dayTapStartY) > dayTapMoveTolerance) {
-        dayTapMoved = true;
-      }
-    };
-
-    if (window.PointerEvent) {
-      cell.addEventListener("pointerdown", event => rememberDayTapStart(event.clientX, event.clientY));
-      cell.addEventListener("pointermove", event => updateDayTapMove(event.clientX, event.clientY));
-      cell.addEventListener("pointerup", event => {
-        if (dayTapMoved || panelIsCalendarSwiping()) return;
-        selectCalendarDate(event);
-      });
-    } else {
-      cell.addEventListener("touchstart", event => {
-        if (event.touches.length !== 1) return;
-        rememberDayTapStart(event.touches[0].clientX, event.touches[0].clientY);
-      }, { passive: true });
-      cell.addEventListener("touchmove", event => {
-        if (event.touches.length !== 1) return;
-        updateDayTapMove(event.touches[0].clientX, event.touches[0].clientY);
-      }, { passive: true });
-      cell.addEventListener("touchend", event => {
-        if (dayTapMoved || panelIsCalendarSwiping()) return;
-        selectCalendarDate(event);
-      }, { passive: false });
+    if (state.selectedDate !== dateStr) {
+      state.revenueSyncSelectedDateOnOpen = true;
     }
+    state.selectedDate = dateStr;
+    const picked = new Date(dateStr + "T00:00:00");
+    if (!Number.isNaN(picked.getTime())) {
+      state.currentYear = picked.getFullYear();
+      state.currentMonth = picked.getMonth();
+    }
+    renderCalendar();
+    renderAgendaList();
+  };
+
+  const rememberDayTapStart = (x, y) => {
+    dayTapStartX = x;
+    dayTapStartY = y;
+    dayTapMoved = false;
+  };
+
+  const updateDayTapMove = (x, y) => {
+    if (Math.abs(x - dayTapStartX) > dayTapMoveTolerance || Math.abs(y - dayTapStartY) > dayTapMoveTolerance) {
+      dayTapMoved = true;
+    }
+  };
+
+  if (window.PointerEvent) {
+    cell.addEventListener("pointerdown", event => rememberDayTapStart(event.clientX, event.clientY));
+    cell.addEventListener("pointermove", event => updateDayTapMove(event.clientX, event.clientY));
+    cell.addEventListener("pointerup", event => {
+      if (dayTapMoved || panelIsCalendarSwiping()) return;
+      selectCalendarDate(event);
+    });
+
+    // Een pointerup wordt normaal gevolgd door een synthetische click. Wanneer een
+    // uitgegrijsde dag de kalender naar een andere maand laat springen, zou die
+    // tweede click anders op hetzelfde vakje in de nieuw gerenderde maand belanden.
+    // Alleen toetsenbord-clicks (detail === 0) worden hier nog apart verwerkt.
+    cell.addEventListener("click", event => {
+      if (event.detail !== 0 || dayTapMoved || panelIsCalendarSwiping()) return;
+      selectCalendarDate(event);
+    });
+  } else {
+    cell.addEventListener("touchstart", event => {
+      if (event.touches.length !== 1) return;
+      rememberDayTapStart(event.touches[0].clientX, event.touches[0].clientY);
+    }, { passive: true });
+    cell.addEventListener("touchmove", event => {
+      if (event.touches.length !== 1) return;
+      updateDayTapMove(event.touches[0].clientX, event.touches[0].clientY);
+    }, { passive: true });
+    cell.addEventListener("touchend", event => {
+      if (dayTapMoved || panelIsCalendarSwiping()) return;
+      selectCalendarDate(event);
+    }, { passive: false });
 
     cell.addEventListener("click", event => {
       if (dayTapMoved || panelIsCalendarSwiping()) return;
       selectCalendarDate(event);
     });
+  }
 
-    grid.appendChild(cell);
+  return cell;
+}
+
+function appendCalendarMonthCells(grid, year, month, { interactive = true, preview = false } = {}) {
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const first = new Date(year, month, 1);
+  const start = new Date(first);
+  const weekday = first.getDay() === 0 ? 7 : first.getDay();
+  start.setDate(first.getDate() - (weekday - 1));
+
+  const last = new Date(year, month + 1, 0);
+  const end = new Date(last);
+  const lastWeekday = last.getDay() === 0 ? 7 : last.getDay();
+  end.setDate(last.getDate() + (7 - lastWeekday));
+
+  // Toon enkel de volledige weken die de huidige maand effectief raken:
+  // - vóór de 1ste enkel aanvullen tot maandag
+  // - na de laatste dag enkel aanvullen tot zondag
+  // - geen extra volledige weken van vorige/volgende maand
+  let index = 0;
+  while (true) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + index);
+    if (d > end) break;
+
+    const dateStr = formatDateInput(d);
+    const isOtherMonth = d.getMonth() !== month;
+    grid.appendChild(createCalendarDayCell(dateStr, d.getDate(), { isOtherMonth, interactive, preview }));
+    index += 1;
   }
 }
 
+function renderCalendar() {
+  const grid = document.getElementById("calendarGrid");
+  if (!grid) return;
+  document.getElementById("monthPickerBtn").textContent = `${getMonthNameUpper(state.currentMonth)} ${state.currentYear}`;
+  appendCalendarMonthCells(grid, state.currentYear, state.currentMonth, { interactive: true, preview: false });
+}
 
 function shiftedCalendarMonth(year, month, step) {
   const d = new Date(year, month + step, 1);
@@ -1803,7 +3845,6 @@ function setCalendarMonth(step) {
 }
 
 function fillCalendarPreview(preview, year, month) {
-  const data = getData();
   const panel = document.querySelector(".calendar-panel");
   if (!preview || !panel) return;
 
@@ -1819,47 +3860,7 @@ function fillCalendarPreview(preview, year, month) {
   if (!title || !grid) return;
 
   title.textContent = `${getMonthNameUpper(month)} ${year}`;
-  grid.innerHTML = "";
-
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month + 1, 0);
-  let weekday = first.getDay();
-  weekday = weekday === 0 ? 7 : weekday;
-
-  for (let i = 1; i < weekday; i++) {
-    const empty = document.createElement("div");
-    empty.className = "empty-cell";
-    grid.appendChild(empty);
-  }
-
-  for (let day = 1; day <= last.getDate(); day++) {
-    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    const appts = data.appointments.filter(a => a.date === dateStr);
-    const cell = document.createElement("div");
-    const isToday = dateStr === todayStr;
-    cell.className = `day-cell${isToday ? " today" : ""}`;
-    cell.innerHTML = `<button class="day-button" aria-label="${dateStr}" tabindex="-1" aria-hidden="true"></button><span class="day-number">${day}</span>`;
-
-    if (appts.length) {
-      const dots = document.createElement("div");
-      dots.className = "day-dots";
-      const maxVisibleDots = window.matchMedia("(max-width: 420px)").matches ? 3 : 4;
-      const visibleDots = Math.min(appts.length, maxVisibleDots);
-      Array.from({ length: visibleDots }).forEach(() => {
-        const i = document.createElement("i");
-        dots.appendChild(i);
-      });
-      if (appts.length > visibleDots) {
-        const more = document.createElement("span");
-        more.className = "day-dots-more";
-        more.textContent = "+";
-        dots.appendChild(more);
-      }
-      cell.appendChild(dots);
-    }
-
-    grid.appendChild(cell);
-  }
+  appendCalendarMonthCells(grid, year, month, { interactive: false, preview: true });
 }
 
 function animateCalendarMonth(step) {
@@ -2107,6 +4108,10 @@ function getMainSwipeScreens() {
       title: btn.dataset.title || btn.textContent.trim()
     }))
     .filter(item => item.screenId && document.getElementById(item.screenId))
+    .filter(item => {
+      const btn = document.querySelector(`.bottom-nav .nav-btn[data-screen="${item.screenId}"]`);
+      return !btn || (!btn.classList.contains("hidden") && btn.getAttribute("aria-hidden") !== "true" && !btn.disabled);
+    })
     .filter(item => !isAuthLocked() || item.screenId === "accountScreen");
 }
 
@@ -2427,9 +4432,7 @@ function renderAgendaList() {
     jumpBtn.classList.toggle("hidden", state.selectedDate === todayStr);
   }
 
-  const appts = data.appointments
-    .filter(a => a.date === state.selectedDate)
-    .sort((a, b) => a.time.localeCompare(b.time));
+  const appts = getAppointmentsForDate(state.selectedDate, data);
 
   if (!appts.length) {
     list.innerHTML = `<div class="empty-state">${t("noAppointmentsOnDay")}</div>`;
@@ -2444,35 +4447,92 @@ function renderAgendaList() {
   appts.forEach(app => {
     const customer = customerById(data, app.customerId);
     const service = serviceById(data, app.serviceId);
+    const privateApp = isPrivateAppointment(app);
 
     const row = document.createElement("div");
-    row.className = "appointment-row";
-    const endTime = getAppointmentEndTime(app, getSettings().defaultBreakMinutes);
+    row.className = `appointment-row${privateApp ? " private-appointment-row" : ""}`;
+    const endTime = getAppointmentDisplayEndTime(app, getSettings().defaultBreakMinutes);
+    const privateBounds = privateApp ? getPrivateRangeBounds(app) : null;
+    const isMultiDayPrivate = Boolean(privateBounds && privateBounds.end > privateBounds.start);
+    const privateDisplayTime = privateApp ? getPrivateAgendaDisplayTime(app, state.selectedDate) : null;
 
     const appointmentMetaParts = [];
-    if (service?.name) {
-      appointmentMetaParts.push(service.name);
-    }
-    if ((app.status || "").toLowerCase() === "no-show") {
-      appointmentMetaParts.push("no show");
-    } else if (app.paid && paymentMethodNameForAppointment(app, data)) {
-      appointmentMetaParts.push(paymentMethodNameForAppointment(app, data));
+    if (privateApp) {
+      if (isMultiDayPrivate) appointmentMetaParts.push(`${formatShortDate(privateBounds.start)} t/m ${formatShortDate(privateBounds.end)}`);
+      if (String(app.privateDetails || "").trim()) appointmentMetaParts.push("Meer details ...");
+      else appointmentMetaParts.push("Privé-afspraak");
+    } else {
+      if (service?.name) appointmentMetaParts.push(service.name);
+      if ((app.status || "").toLowerCase() === "no-show") {
+        appointmentMetaParts.push("no show");
+      } else if (app.paid && paymentMethodNameForAppointment(app, data)) {
+        appointmentMetaParts.push(paymentMethodNameForAppointment(app, data));
+      }
     }
 
     row.innerHTML = `
       <div class="time-block">
-        <div class="time">${app.time}</div>
-        <div class="time-end">tot ${endTime}</div>
+        <div class="time">${privateApp ? privateDisplayTime.main : app.time}</div>
+        <div class="time-end">${privateApp ? privateDisplayTime.sub : `tot ${endTime}`}</div>
       </div>
       <div>
-        <div class="main-name appointment-main-name">${customer ? fullName(customer) : "Onbekend"}${String(app.remarks || "").trim() ? '<span class="appointment-remarks-star" title="Opmerking aanwezig" aria-label="Opmerking aanwezig">★</span>' : ""}</div>
-        <div class="meta">${appointmentMetaParts.join(" · ")}</div>
+        <div class="main-name appointment-main-name">${privateApp ? htmlEscape(app.privateTitle || "Privé") : `${customer ? fullName(customer) : "Onbekend"}${String(app.remarks || "").trim() ? '<span class="appointment-remarks-star" title="Opmerking aanwezig" aria-label="Opmerking aanwezig">★</span>' : ""}`}</div>
+        <div class="meta">${htmlEscape(appointmentMetaParts.join(" · "))}</div>
       </div>
-      <button class="price-chip ${app.paid ? "paid" : ""} ${(app.status || "").toLowerCase() === "no-show" ? "no-show" : ""}" data-id="${app.id}" type="button">${euro(app.price, app.currency)}</button>
+      ${privateApp ? '<span class="private-chip">Privé</span>' : `<button class="price-chip ${app.paid ? "paid" : ""} ${(app.status || "").toLowerCase() === "no-show" ? "no-show" : ""}" data-id="${app.id}" type="button">${euro(app.price, app.currency)}</button>`}
     `;
+
+    let appointmentLongPressTimer = null;
+    let appointmentLongPressTriggered = false;
+    let appointmentLongPressStartX = 0;
+    let appointmentLongPressStartY = 0;
+
+    const cancelAppointmentLongPress = () => {
+      if (appointmentLongPressTimer !== null) {
+        window.clearTimeout(appointmentLongPressTimer);
+        appointmentLongPressTimer = null;
+      }
+    };
+
+    row.addEventListener("pointerdown", (event) => {
+      if (event.button !== undefined && event.button !== 0) return;
+      if (event.target.closest(".price-chip")) return;
+
+      appointmentLongPressTriggered = false;
+      appointmentLongPressStartX = event.clientX;
+      appointmentLongPressStartY = event.clientY;
+      cancelAppointmentLongPress();
+
+      appointmentLongPressTimer = window.setTimeout(() => {
+        appointmentLongPressTimer = null;
+        appointmentLongPressTriggered = true;
+        closeAppointmentActionPopover();
+        openEditAppointmentDialog(app.sourceAppointmentId || app.id);
+      }, 450);
+    });
+
+    row.addEventListener("pointermove", (event) => {
+      const movedX = Math.abs(event.clientX - appointmentLongPressStartX);
+      const movedY = Math.abs(event.clientY - appointmentLongPressStartY);
+      if (movedX > 10 || movedY > 10) cancelAppointmentLongPress();
+    });
+
+    row.addEventListener("pointerup", cancelAppointmentLongPress);
+    row.addEventListener("pointercancel", cancelAppointmentLongPress);
+    row.addEventListener("pointerleave", cancelAppointmentLongPress);
 
     row.addEventListener("click", (e) => {
       if (e.target.closest(".price-chip")) return;
+      if (appointmentLongPressTriggered) {
+        appointmentLongPressTriggered = false;
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      if (privateApp) {
+        openEditAppointmentDialog(app.sourceAppointmentId || app.id);
+        return;
+      }
       openAppointmentActionPopover(app.id, row);
     });
 
@@ -2738,12 +4798,25 @@ function shiftRevenueDate(baseDateStr, mode, step) {
   return formatDateInput(d);
 }
 
+function getRevenueStatusFilterState() {
+  return {
+    showPaid: true,
+    showUnpaid: true
+  };
+}
+
+function getRevenueStatusFilterLabel() {
+  const { showPaid, showUnpaid } = getRevenueStatusFilterState();
+  if (showPaid && showUnpaid) return "Betaald + Onbetaald";
+  if (showPaid) return "Betaald";
+  if (showUnpaid) return "Onbetaald";
+  return "Geen status geselecteerd";
+}
+
 function getRevenueRenderSignature() {
   const data = getData();
   const type = document.getElementById("revenuePeriodType")?.value || "day";
   const anchor = document.getElementById("revenueDate")?.value || todayStr;
-  const paymentFilter = document.getElementById("revenuePaymentFilter")?.value || "";
-  const statusFilter = document.getElementById("revenuePaymentStatusFilter")?.value || "";
   const appointmentSignature = (data.appointments || [])
     .map(a => [
       a.id,
@@ -2756,7 +4829,7 @@ function getRevenueRenderSignature() {
     ].join(":"))
     .join("|");
 
-  return [type, anchor, paymentFilter, statusFilter, appointmentSignature].join("||");
+  return [type, anchor, appointmentSignature].join("||");
 }
 
 function syncRevenueToSelectedDateBeforePreview() {
@@ -2798,6 +4871,124 @@ function setRevenuePeriod(type, dateStr) {
   renderRevenue();
 }
 
+
+function attachRevenuePeriodSwipe(button, mode, target = "revenue") {
+  if (!button || button.dataset.revenueSwipeReady === "1") return;
+  button.dataset.revenueSwipeReady = "1";
+  button.dataset.revenueSwipeTarget = target;
+
+  const threshold = 20;
+  const maxDrag = 5;
+  const resetSwipeVisual = () => {
+    button.classList.remove("is-revenue-swiping", "is-revenue-swipe-committing", "is-revenue-swipe-settling");
+    button.style.removeProperty("--revenue-swipe-y");
+    button.style.removeProperty("--revenue-swipe-opacity");
+  };
+
+  let pointerId = null;
+  let startX = 0;
+  let startY = 0;
+  let lastDeltaY = 0;
+  let isSwiping = false;
+  let moved = false;
+
+  const setSwipeVisual = (deltaY, opacity = 1) => {
+    button.style.setProperty("--revenue-swipe-y", `${deltaY}px`);
+    button.style.setProperty("--revenue-swipe-opacity", String(opacity));
+  };
+
+  const commitSwipe = (step) => {
+    const anchor = target === "costs" ? getCostsPeriodDate() : (document.getElementById("revenueDate")?.value || todayStr);
+    const nextDate = shiftRevenueDate(anchor, mode, step);
+    const exitY = step > 0 ? -14 : 14;
+    const enterY = step > 0 ? 14 : -14;
+
+    button.dataset.revenueSwipeSuppressClick = "1";
+    window.setTimeout(() => delete button.dataset.revenueSwipeSuppressClick, 360);
+
+    button.classList.remove("is-revenue-swiping");
+    button.classList.add("is-revenue-swipe-committing");
+    setSwipeVisual(exitY, 0.25);
+
+    window.setTimeout(() => {
+      if (target === "costs") setCostsPeriod(mode, nextDate);
+      else setRevenuePeriod(mode, nextDate);
+      button.classList.remove("is-revenue-swipe-committing");
+      button.classList.add("is-revenue-swipe-settling");
+      setSwipeVisual(enterY, 0.25);
+
+      requestAnimationFrame(() => {
+        setSwipeVisual(0, 1);
+        window.setTimeout(resetSwipeVisual, 230);
+      });
+    }, 105);
+  };
+
+  button.addEventListener("pointerdown", event => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    pointerId = event.pointerId;
+    startX = event.clientX;
+    startY = event.clientY;
+    lastDeltaY = 0;
+    isSwiping = false;
+    moved = false;
+    button.classList.remove("is-revenue-swipe-committing", "is-revenue-swipe-settling");
+  });
+
+  button.addEventListener("pointermove", event => {
+    if (pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - startX;
+    const deltaY = event.clientY - startY;
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+
+    if (!isSwiping && absY > 8 && absY > absX * 1.15) {
+      isSwiping = true;
+      moved = true;
+      button.classList.add("is-revenue-swiping");
+      try { button.setPointerCapture(event.pointerId); } catch (error) {}
+    }
+
+    if (!isSwiping) return;
+    event.preventDefault();
+    lastDeltaY = deltaY;
+    const limitedY = Math.max(-maxDrag, Math.min(maxDrag, deltaY * 0.16));
+    const opacity = Math.max(0.94, 1 - (Math.abs(limitedY) / 260));
+    setSwipeVisual(limitedY, opacity);
+  }, { passive: false });
+
+  const finish = (event) => {
+    if (pointerId !== event.pointerId) return;
+    if (isSwiping) {
+      event.preventDefault();
+      const step = lastDeltaY < -threshold ? 1 : (lastDeltaY > threshold ? -1 : 0);
+      if (step) {
+        commitSwipe(step);
+      } else {
+        button.classList.remove("is-revenue-swiping");
+        button.classList.add("is-revenue-swipe-settling");
+        setSwipeVisual(0, 1);
+        window.setTimeout(resetSwipeVisual, 220);
+      }
+    }
+    pointerId = null;
+    isSwiping = false;
+    if (moved) {
+      button.dataset.revenueSwipeSuppressClick = "1";
+      window.setTimeout(() => delete button.dataset.revenueSwipeSuppressClick, 260);
+    }
+  };
+
+  button.addEventListener("pointerup", finish, { passive: false });
+  button.addEventListener("pointercancel", event => {
+    if (pointerId !== event.pointerId) return;
+    pointerId = null;
+    isSwiping = false;
+    resetSwipeVisual();
+  });
+}
+
 function syncRevenuePeriodChips() {
   const type = document.getElementById("revenuePeriodType").value;
   const anchor = document.getElementById("revenueDate").value || todayStr;
@@ -2828,10 +5019,7 @@ function revenueFilteredAppointments() {
   const data = getData();
   const type = document.getElementById("revenuePeriodType").value;
   const anchor = document.getElementById("revenueDate").value || todayStr;
-  const paymentStatusFilter = document.getElementById("revenuePaymentStatusFilter").value;
-  const paymentFilter = document.getElementById("revenuePaymentFilter").value;
-
-  let filtered = data.appointments.filter(a => a.status !== "no-show");
+  let filtered = data.appointments.filter(a => !isPrivateAppointment(a) && String(a.status || "").toLowerCase() !== "no-show");
 
   if (type === "day") {
     filtered = filtered.filter(a => a.date === anchor);
@@ -2846,25 +5034,11 @@ function revenueFilteredAppointments() {
     filtered = filtered.filter(a => a.date.startsWith(prefix));
   }
 
-  if (paymentStatusFilter === "paid") filtered = filtered.filter(a => a.paid);
-  if (paymentStatusFilter === "unpaid") filtered = filtered.filter(a => !a.paid);
-  if (paymentFilter) filtered = filtered.filter(a => paymentMethodNameForAppointment(a, data) === paymentFilter);
-
   return filtered;
 }
 
 function renderRevenueFilters() {
-  const data = getData();
-  const paymentSel = document.getElementById("revenuePaymentFilter");
-  const existingPayment = paymentSel ? paymentSel.value : "";
-
-  if (paymentSel) {
-    paymentSel.innerHTML =
-      `<option value="">${t("allPaymentMethods")}</option>` +
-      getRevenuePaymentFilterOptions(data).map(name => `<option value="${name}">${name}</option>`).join("");
-    paymentSel.value = existingPayment;
-  }
-
+  // Geen zichtbare omzetfilters meer nodig.
 }
 
 
@@ -2875,13 +5049,16 @@ function clampRevenueDay(year, monthIndex, day) {
 
 function getRevenueDataYears() {
   const data = getData();
-  const appointmentYears = data.appointments
-    .map(a => Number(String(a.date || "").slice(0, 4)))
+  const sourceItems = getRevenuePickerTarget() === "costs"
+    ? getCosts(data)
+    : data.appointments.filter(appointment => !isPrivateAppointment(appointment));
+  const years = sourceItems
+    .map(item => Number(String(item.date || "").slice(0, 4)))
     .filter(Boolean);
 
-  const currentYear = new Date((document.getElementById("revenueDate")?.value || todayStr) + "T00:00:00").getFullYear();
-  const minYear = appointmentYears.length ? Math.min(...appointmentYears, currentYear) : currentYear - 3;
-  const maxYear = appointmentYears.length ? Math.max(...appointmentYears, currentYear) : currentYear + 3;
+  const currentYear = new Date(getRevenuePickerAnchorDate() + "T00:00:00").getFullYear();
+  const minYear = years.length ? Math.min(...years, currentYear) : currentYear - 3;
+  const maxYear = years.length ? Math.max(...years, currentYear) : currentYear + 3;
 
   return Array.from({ length: (maxYear - minYear + 5) }, (_, i) => minYear - 2 + i);
 }
@@ -3010,11 +5187,203 @@ function formatAppointmentTimeLabel(timeStr) {
 function syncAppointmentDateTimeDisplays() {
   const dateInput = document.getElementById("appointmentDate");
   const timeInput = document.getElementById("appointmentTime");
+  const privateEndTimeInput = document.getElementById("appointmentPrivateEndTime");
   const dateBtn = document.getElementById("appointmentDateDisplayBtn");
   const timeBtn = document.getElementById("appointmentTimeDisplayBtn");
+  const privateEndTimeBtn = document.getElementById("appointmentPrivateEndTimeDisplayBtn");
+  const privateEndDateInput = document.getElementById("appointmentPrivateEndDate");
+  const privateEndDateBtn = document.getElementById("appointmentPrivateEndDateDisplayBtn");
 
   if (dateBtn && dateInput) dateBtn.textContent = formatAppointmentDateLabel(dateInput.value);
   if (timeBtn && timeInput) timeBtn.textContent = formatAppointmentTimeLabel(timeInput.value);
+  if (privateEndDateInput && !privateEndDateInput.value) privateEndDateInput.value = dateInput?.value || state.selectedDate || todayStr;
+  if (privateEndDateBtn && privateEndDateInput) privateEndDateBtn.textContent = formatAppointmentDateLabel(privateEndDateInput.value);
+  if (privateEndTimeBtn && privateEndTimeInput) privateEndTimeBtn.textContent = formatAppointmentTimeLabel(privateEndTimeInput.value);
+}
+
+function syncCostDateDisplay() {
+  const dateInput = document.getElementById("costDate");
+  const dateBtn = document.getElementById("costDateDisplayBtn");
+  if (dateBtn && dateInput) dateBtn.textContent = formatAppointmentDateLabel(dateInput.value || todayStr);
+}
+
+function syncPrivateEndTimeWithStart() {
+  const isPrivate = Boolean(document.getElementById("appointmentIsPrivate")?.checked);
+  if (!isPrivate) return;
+
+  const startInput = document.getElementById("appointmentTime");
+  const endInput = document.getElementById("appointmentPrivateEndTime");
+  if (!startInput || !endInput || !startInput.value) return;
+
+  if (!endInput.value || minutesFromTimeString(endInput.value) <= minutesFromTimeString(startInput.value)) {
+    endInput.value = getAppointmentTimePlusMinutes(startInput.value, 60);
+  }
+
+  syncAppointmentDateTimeDisplays();
+}
+
+function getPrivateRepeatLabel(value) {
+  const labels = {
+    none: "Niet herhaald",
+    daily: "Dagelijks",
+    weekly: "Wekelijks",
+    biweekly: "Om de 2 weken",
+    triweekly: "Om de 3 weken",
+    monthly: "Maandelijks",
+    quarterly: "Om de 3 maanden",
+    semiannual: "Om de 6 maanden",
+    yearly: "Jaarlijks"
+  };
+  return labels[value || "none"] || labels.none;
+}
+
+function updatePrivateRepeatWeeklyLabel() {
+  const repeat = document.getElementById("appointmentPrivateRepeat");
+  if (!repeat) return;
+  Array.from(repeat.options || []).forEach(option => {
+    option.textContent = getPrivateRepeatLabel(option.value);
+  });
+}
+
+function createRecurrenceGroupId() {
+  return (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`).replace(/-/g, "");
+}
+
+function buildPrivateRecurrenceOccurrences(payload, repeatValue) {
+  const rule = repeatValue || "none";
+  if (rule === "none") return [{ ...payload, recurrenceRule: "none", recurrenceGroupId: null }];
+  const groupId = createRecurrenceGroupId();
+  const counts = {
+    daily: 365,
+    weekly: 52,
+    biweekly: 26,
+    triweekly: 18,
+    monthly: 24,
+    quarterly: 12,
+    semiannual: 10,
+    yearly: 5
+  };
+  const stepDays = { daily: 1, weekly: 7, biweekly: 14, triweekly: 21 };
+  const stepMonths = { monthly: 1, quarterly: 3, semiannual: 6 };
+  const startDate = new Date(payload.date + "T00:00:00");
+  const total = counts[rule] || 1;
+  const endDate = new Date((payload.privateEndDate || payload.date) + "T00:00:00");
+  const rangeDays = Number.isNaN(endDate.getTime()) ? 0 : Math.max(0, Math.round((endDate - startDate) / 86400000));
+
+  return Array.from({ length: total }, (_, index) => {
+    const d = new Date(startDate);
+    if (rule === "yearly") d.setFullYear(startDate.getFullYear() + index);
+    else if (stepMonths[rule]) d.setMonth(startDate.getMonth() + (stepMonths[rule] * index));
+    else d.setDate(startDate.getDate() + (stepDays[rule] || 0) * index);
+
+    const shiftedEnd = new Date(d);
+    shiftedEnd.setDate(d.getDate() + rangeDays);
+
+    return {
+      ...payload,
+      date: formatDateInput(d),
+      privateEndDate: formatDateInput(shiftedEnd),
+      recurrenceRule: rule,
+      recurrenceGroupId: groupId
+    };
+  });
+}
+
+function findFirstOverlapForAppointments(payloads, appointments, breakMinutes = 0, excludeId = null) {
+  for (const payload of payloads) {
+    const overlap = findAppointmentOverlap(payload, appointments, breakMinutes, excludeId);
+    if (overlap) return { payload, overlap };
+  }
+  return null;
+}
+
+function syncFollowUpDisplays() {
+  const dateInput = document.getElementById("followUpAppointmentDate");
+  const timeInput = document.getElementById("followUpAppointmentTime");
+  const dateBtn = document.getElementById("followUpAppointmentDateDisplayBtn");
+  const timeBtn = document.getElementById("followUpAppointmentTimeDisplayBtn");
+  if (dateBtn && dateInput) dateBtn.textContent = formatAppointmentDateLabel(dateInput.value);
+  if (timeBtn && timeInput) timeBtn.textContent = formatAppointmentTimeLabel(timeInput.value);
+}
+
+function openFollowUpAppointmentDialog(sourceId) {
+  const data = getData();
+  const app = data.appointments.find(a => String(a.id) === String(sourceId));
+  if (!app || isPrivateAppointment(app)) return;
+  closeAppointmentActionPopover();
+  document.getElementById("followUpSourceAppointmentId").value = app.id;
+  document.getElementById("followUpAppointmentDate").value = app.date || state.selectedDate || todayStr;
+  document.getElementById("followUpAppointmentTime").value = app.time || "10:00";
+  const customer = customerById(data, app.customerId);
+  const service = serviceById(data, app.serviceId);
+  const info = document.getElementById("followUpAppointmentInfo");
+  if (info) info.textContent = `${customer ? fullName(customer) : "Klant"}${service ? ` · ${service.name}` : ""}`;
+  syncFollowUpDisplays();
+  document.getElementById("followUpAppointmentDialog")?.showModal();
+}
+
+async function saveFollowUpAppointmentFromForm(event) {
+  event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
+  const user = await getCurrentUser();
+  const data = getData();
+  const sourceId = document.getElementById("followUpSourceAppointmentId")?.value;
+  const source = data.appointments.find(a => String(a.id) === String(sourceId));
+  if (!source) return;
+  const payload = {
+    customerId: source.customerId,
+    date: document.getElementById("followUpAppointmentDate")?.value || state.selectedDate,
+    time: document.getElementById("followUpAppointmentTime")?.value || source.time || "10:00",
+    serviceId: source.serviceId,
+    duration: Number(source.duration || 0),
+    price: Number(source.price || 0),
+    status: "gepland",
+    remarks: source.remarks || "",
+    isPrivate: false,
+    privateTitle: "",
+    privateDetails: "",
+    privateEndTime: ""
+  };
+  const settings = getSettings();
+  if (settings.overlapWarningsEnabled) {
+    const overlapApp = findAppointmentOverlap(payload, data.appointments, settings.defaultBreakMinutes, null);
+    if (overlapApp) {
+      const confirmed = await appConfirm(buildOverlapMessage(payload, overlapApp, data.appointments, settings.defaultBreakMinutes, null), { title: "Overlap gedetecteerd", confirmText: t("save"), cancelText: t("cancel"), variant: "warning" });
+      if (!confirmed) return;
+    }
+  }
+  if (!user) {
+    data.appointments.push({ id: nextId(data.appointments), ...payload, paid: false, paymentMethodName: null, currency: source.currency || getCurrentCurrency() });
+    saveData(data);
+  } else {
+    const dbPayload = {
+      user_id: user.id,
+      customer_id: payload.customerId,
+      appointment_date: payload.date,
+      appointment_time: payload.time,
+      service_id: payload.serviceId,
+      duration: payload.duration,
+      price: payload.price,
+      status: payload.status,
+      paid: false,
+      payment_method_label: null,
+      currency: normalizeCurrency(source.currency || getCurrentCurrency()),
+      appointment_remarks: payload.remarks,
+      is_private: false,
+      private_title: null,
+      private_details: null,
+      private_end_time: null
+    };
+    const { error } = await supabaseClient.from("appointments").insert(dbPayload);
+    if (error) { await appAlert("Vervolgafspraak opslaan mislukt: " + error.message, { title: "Opslaan mislukt", variant: "danger" }); return; }
+    await loadAllDataFromSupabase();
+  }
+  closeDialog("followUpAppointmentDialog");
+  state.selectedDate = payload.date;
+  const picked = new Date(payload.date + "T00:00:00");
+  state.currentYear = picked.getFullYear();
+  state.currentMonth = picked.getMonth();
+  rerenderAll();
 }
 
 function getAppointmentPickerYears(selectedYear) {
@@ -3028,14 +5397,16 @@ function getAppointmentPickerYears(selectedYear) {
   return Array.from({ length: (maxYear - minYear + 7) }, (_, i) => minYear - 3 + i);
 }
 
-function openAppointmentWheelPicker(mode) {
+function openAppointmentWheelPicker(mode, targetInputId = null) {
   const dialog = document.getElementById("appointmentWheelPickerDialog");
   const title = document.getElementById("appointmentWheelPickerTitle");
   const columnsWrap = document.getElementById("appointmentWheelColumns");
   if (!dialog || !title || !columnsWrap) return;
 
-  const dateValue = document.getElementById("appointmentDate")?.value || state.selectedDate || todayStr;
-  const timeValue = document.getElementById("appointmentTime")?.value || "10:00";
+  const dateTargetId = mode === "date" ? (targetInputId || "appointmentDate") : "appointmentDate";
+  const dateValue = document.getElementById(dateTargetId)?.value || state.selectedDate || todayStr;
+  const timeTargetId = targetInputId || "appointmentTime";
+  const timeValue = document.getElementById(timeTargetId)?.value || "10:00";
   const date = new Date(dateValue + "T00:00:00");
   const selectedYear = date.getFullYear();
   const selectedMonthIndex = date.getMonth();
@@ -3045,6 +5416,7 @@ function openAppointmentWheelPicker(mode) {
   const selectedMinute = Math.max(0, Math.min(59, Number(rawMinute) || 0));
 
   appointmentPickerState.mode = mode;
+  appointmentPickerState.targetInputId = mode === "time" ? timeTargetId : dateTargetId;
   appointmentPickerState.selected = {};
 
   const shell = dialog.querySelector(".revenue-wheel-shell");
@@ -3091,15 +5463,32 @@ function applyAppointmentWheelPickerSelection() {
   if (appointmentPickerState.mode === "time") {
     const hour = Math.max(0, Math.min(23, Number(appointmentPickerState.selected.hour) || 0));
     const minute = Math.max(0, Math.min(59, Number(appointmentPickerState.selected.minute) || 0));
-    const timeInput = document.getElementById("appointmentTime");
+    const timeInput = document.getElementById(appointmentPickerState.targetInputId || "appointmentTime");
     if (timeInput) timeInput.value = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+    syncPrivateEndTimeWithStart();
     syncAppointmentDateTimeDisplays();
+    syncFollowUpDisplays();
     return;
   }
 
-  const dateInput = document.getElementById("appointmentDate");
+  const dateInput = document.getElementById(appointmentPickerState.targetInputId || "appointmentDate");
   if (dateInput) dateInput.value = appointmentPickerState.selected.date || dateInput.value || state.selectedDate || todayStr;
+
+  const startDateInput = document.getElementById("appointmentDate");
+  const endDateInput = document.getElementById("appointmentPrivateEndDate");
+  if (startDateInput && endDateInput) {
+    if (dateInput?.id === "appointmentDate" && (!endDateInput.value || endDateInput.value < startDateInput.value)) {
+      endDateInput.value = startDateInput.value;
+    }
+    if (dateInput?.id === "appointmentPrivateEndDate" && endDateInput.value < startDateInput.value) {
+      endDateInput.value = startDateInput.value;
+    }
+  }
+
   syncAppointmentDateTimeDisplays();
+  syncCostDateDisplay();
+  syncFollowUpDisplays();
+  updatePrivateRepeatWeeklyLabel();
 }
 
 function getRevenueMonthWeekStart(year, monthIndex) {
@@ -3147,109 +5536,25 @@ function buildCalendarPickerDayButton({ date, visibleMonthIndex, selectedDateStr
   const isOtherMonth = date.getMonth() !== visibleMonthIndex;
   const isSelectedDay = mode === "day" && value === selectedDateStr;
   const isSelectedWeek = mode === "week" && selectedBounds && value >= selectedBounds.start && value <= selectedBounds.end;
-  const appointmentCount = (getData().appointments || []).filter(appointment => appointment.date === value).length;
+  const dayAppointments = getAppointmentsForDate(value, getData());
+  const appointmentCount = dayAppointments.length;
   const maxDots = 4;
   const dots = appointmentCount
-    ? `<span class="revenue-calendar-dots" aria-hidden="true">${Array.from({ length: Math.min(appointmentCount, maxDots) }, () => "<i></i>").join("")}${appointmentCount > maxDots ? '<em>+</em>' : ''}</span>`
+    ? `<span class="revenue-calendar-dots" aria-hidden="true">${dayAppointments.slice(0, maxDots).map(appointment => `<i class="${isPrivateAppointment(appointment) ? "private-dot" : ""}"></i>`).join("")}${appointmentCount > maxDots ? '<em>+</em>' : ''}</span>`
     : "";
 
   return `<button class="revenue-calendar-day${isOtherMonth ? " is-other-month" : ""}${isSelectedDay ? " selected" : ""}${isSelectedWeek ? " selected-week" : ""}" type="button" data-${datasetName}="${value}"><span class="revenue-calendar-day-number">${date.getDate()}</span>${dots}</button>`;
 }
 
-function attachCalendarPickerSwipe(picker, goToMonth) {
-  if (!picker || picker.dataset.calendarPickerSwipeReady === "true") return;
-  picker.dataset.calendarPickerSwipeReady = "true";
-
-  let startX = 0;
-  let startY = 0;
-  let lastX = 0;
-  let tracking = false;
-  let horizontal = false;
-  let swiped = false;
-  const threshold = 44;
-  const intentThreshold = 10;
-
-  picker.addEventListener("touchstart", event => {
-    if (event.touches.length !== 1) return;
-    tracking = true;
-    horizontal = false;
-    startX = event.touches[0].clientX;
-    startY = event.touches[0].clientY;
-    lastX = startX;
-  }, { passive: true });
-
-  picker.addEventListener("touchmove", event => {
-    if (!tracking || event.touches.length !== 1) return;
-    const x = event.touches[0].clientX;
-    const y = event.touches[0].clientY;
-    const dx = x - startX;
-    const dy = y - startY;
-    const absX = Math.abs(dx);
-    const absY = Math.abs(dy);
-
-    if (!horizontal) {
-      if (absX < intentThreshold && absY < intentThreshold) return;
-      if (absY > absX) {
-        tracking = false;
-        return;
-      }
-      horizontal = true;
-      swiped = true;
-      picker.classList.add("is-swiping");
-    }
-
-    const limitedDx = Math.max(-90, Math.min(90, dx));
-    picker.style.setProperty("--picker-swipe-x", `${limitedDx}px`);
-    event.preventDefault();
-    lastX = x;
-  }, { passive: false });
-
-  const finish = () => {
-    if (!tracking || !horizontal) {
-      tracking = false;
-      horizontal = false;
-      picker.classList.remove("is-swiping");
-      picker.style.removeProperty("--picker-swipe-x");
-      return;
-    }
-
-    const dx = lastX - startX;
-    tracking = false;
-    horizontal = false;
-    picker.classList.remove("is-swiping");
-    picker.style.removeProperty("--picker-swipe-x");
-
-    if (Math.abs(dx) >= threshold) {
-      goToMonth(dx < 0 ? 1 : -1);
-    }
-  };
-
-  picker.addEventListener("touchend", finish, { passive: true });
-  picker.addEventListener("touchcancel", finish, { passive: true });
-  picker.addEventListener("click", event => {
-    if (!swiped) return;
-    swiped = false;
-    event.preventDefault();
-    event.stopPropagation();
-  }, true);
-}
-
-function renderSharedCalendarPicker({
-  columnsWrapId,
-  pickerState,
+function buildSharedCalendarPickerHtml({
   mode,
   year,
   monthIndex,
   selectedDateStr,
   datasetName,
   prevAttr,
-  nextAttr,
-  onMonthChange,
-  onDaySelect
+  nextAttr
 }) {
-  const columnsWrap = document.getElementById(columnsWrapId);
-  if (!columnsWrap) return;
-
   const first = new Date(year, monthIndex, 1);
   const last = new Date(year, monthIndex + 1, 0);
   const firstWeekdayIndex = (first.getDay() + 6) % 7;
@@ -3294,8 +5599,239 @@ function renderSharedCalendarPicker({
     </div>
   `;
 
+  return html;
+}
+
+function buildCalendarPickerSwipePreviewHtml({
+  mode,
+  year,
+  monthIndex,
+  delta,
+  selectedDateStr,
+  datasetName,
+  prevAttr,
+  nextAttr
+}) {
+  const next = new Date(year, monthIndex + delta, 1);
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = buildSharedCalendarPickerHtml({
+    mode,
+    year: next.getFullYear(),
+    monthIndex: next.getMonth(),
+    selectedDateStr,
+    datasetName,
+    prevAttr,
+    nextAttr
+  });
+
+  const picker = wrapper.querySelector(".revenue-calendar-picker");
+  if (!picker) return "";
+  picker.querySelectorAll("button").forEach(button => {
+    button.setAttribute("tabindex", "-1");
+    button.setAttribute("aria-hidden", "true");
+  });
+  return picker.innerHTML;
+}
+
+function attachCalendarPickerSwipe(picker, goToMonth, buildPreviewHtml) {
+  if (!picker || picker.dataset.calendarPickerSwipeReady === "true") return;
+  picker.dataset.calendarPickerSwipeReady = "true";
+
+  let startX = 0;
+  let startY = 0;
+  let lastX = 0;
+  let tracking = false;
+  let horizontal = false;
+  let swiped = false;
+  let dragPreview = null;
+  let dragStep = 0;
+  const threshold = 44;
+  const intentThreshold = 10;
+
+  const resetTracking = () => {
+    tracking = false;
+    horizontal = false;
+    startX = 0;
+    startY = 0;
+    lastX = 0;
+  };
+
+  const clearDragStyles = () => {
+    if (dragPreview) {
+      dragPreview.remove();
+      dragPreview = null;
+    }
+    dragStep = 0;
+    picker.classList.remove("is-swiping", "is-swipe-animating");
+    picker.style.removeProperty("--picker-current-x");
+    picker.style.removeProperty("--picker-preview-x");
+    picker.style.removeProperty("--picker-swipe-opacity");
+    delete picker.dataset.swipeAnimating;
+  };
+
+  const prepareDragPreview = dx => {
+    const step = dx < 0 ? 1 : -1;
+    if (dragPreview && dragStep === step) return true;
+
+    if (dragPreview) dragPreview.remove();
+    dragStep = step;
+
+    const previewHtml = typeof buildPreviewHtml === "function" ? buildPreviewHtml(step) : "";
+    if (!previewHtml) return false;
+
+    dragPreview = document.createElement("div");
+    dragPreview.className = "revenue-calendar-swipe-preview";
+    dragPreview.innerHTML = previewHtml;
+    picker.appendChild(dragPreview);
+
+    picker.dataset.swipeAnimating = "true";
+    picker.classList.remove("is-swipe-animating");
+    picker.classList.add("is-swiping");
+    return true;
+  };
+
+  const updateDragPosition = dx => {
+    if (!prepareDragPreview(dx)) return false;
+    const width = picker.clientWidth || window.innerWidth || 360;
+    const limitedDx = Math.max(-width, Math.min(width, dx));
+    const previewStart = dragStep > 0 ? width : -width;
+    const progress = Math.min(1, Math.abs(limitedDx) / Math.max(width, 1));
+
+    picker.style.setProperty("--picker-current-x", `${limitedDx}px`);
+    picker.style.setProperty("--picker-preview-x", `${previewStart + limitedDx}px`);
+    picker.style.setProperty("--picker-swipe-opacity", String(0.35 + (progress * 0.65)));
+    return true;
+  };
+
+  const finishInteractiveSwipe = commit => {
+    const step = dragStep;
+    const width = picker.clientWidth || window.innerWidth || 360;
+
+    if (!dragPreview || !step) {
+      clearDragStyles();
+      return;
+    }
+
+    picker.classList.remove("is-swiping");
+    picker.classList.add("is-swipe-animating");
+
+    if (commit) {
+      picker.style.setProperty("--picker-current-x", `${step > 0 ? -width : width}px`);
+      picker.style.setProperty("--picker-preview-x", "0px");
+      picker.style.setProperty("--picker-swipe-opacity", "1");
+    } else {
+      picker.style.setProperty("--picker-current-x", "0px");
+      picker.style.setProperty("--picker-preview-x", `${step > 0 ? width : -width}px`);
+      picker.style.setProperty("--picker-swipe-opacity", "0.35");
+    }
+
+    const finish = () => {
+      picker.removeEventListener("transitionend", onTransitionEnd);
+      if (commit) goToMonth(step);
+      clearDragStyles();
+    };
+
+    const onTransitionEnd = event => {
+      if (event.target !== dragPreview && !event.target.closest(".revenue-calendar-swipe-preview") && !event.target.closest(".revenue-calendar-picker")) return;
+      if (event.propertyName !== "transform") return;
+      finish();
+    };
+
+    picker.addEventListener("transitionend", onTransitionEnd);
+    window.setTimeout(() => {
+      if (picker.dataset.swipeAnimating === "true") finish();
+    }, 360);
+  };
+
+  picker.addEventListener("touchstart", event => {
+    if (event.touches.length !== 1) return;
+    if (event.target.closest(".revenue-calendar-nav")) return;
+    if (picker.dataset.swipeAnimating === "true") return;
+
+    tracking = true;
+    horizontal = false;
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+    lastX = startX;
+  }, { passive: true });
+
+  picker.addEventListener("touchmove", event => {
+    if (!tracking || event.touches.length !== 1) return;
+    const x = event.touches[0].clientX;
+    const y = event.touches[0].clientY;
+    const dx = x - startX;
+    const dy = y - startY;
+    const absX = Math.abs(dx);
+    const absY = Math.abs(dy);
+
+    if (!horizontal) {
+      if (absX < intentThreshold && absY < intentThreshold) return;
+      if (absY > absX) {
+        resetTracking();
+        clearDragStyles();
+        return;
+      }
+      horizontal = true;
+      swiped = true;
+    }
+
+    if (!updateDragPosition(dx)) return;
+    event.preventDefault();
+    lastX = x;
+  }, { passive: false });
+
+  picker.addEventListener("touchend", () => {
+    if (!tracking || !horizontal) {
+      resetTracking();
+      clearDragStyles();
+      return;
+    }
+
+    const dx = lastX - startX;
+    const commit = Math.abs(dx) >= threshold;
+    resetTracking();
+    finishInteractiveSwipe(commit);
+  }, { passive: true });
+
+  picker.addEventListener("touchcancel", () => {
+    resetTracking();
+    finishInteractiveSwipe(false);
+  }, { passive: true });
+
+  picker.addEventListener("click", event => {
+    if (!swiped) return;
+    swiped = false;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+}
+
+function renderSharedCalendarPicker({
+  columnsWrapId,
+  pickerState,
+  mode,
+  year,
+  monthIndex,
+  selectedDateStr,
+  datasetName,
+  prevAttr,
+  nextAttr,
+  onMonthChange,
+  onDaySelect
+}) {
+  const columnsWrap = document.getElementById(columnsWrapId);
+  if (!columnsWrap) return;
+
   columnsWrap.className = "revenue-wheel-columns revenue-calendar-mode";
-  columnsWrap.innerHTML = html;
+  columnsWrap.innerHTML = buildSharedCalendarPickerHtml({
+    mode,
+    year,
+    monthIndex,
+    selectedDateStr,
+    datasetName,
+    prevAttr,
+    nextAttr
+  });
 
   const picker = columnsWrap.querySelector(".revenue-calendar-picker");
   const goToMonth = (delta) => {
@@ -3305,7 +5841,20 @@ function renderSharedCalendarPicker({
 
   picker?.querySelector(`[${prevAttr}]`)?.addEventListener("click", () => goToMonth(-1));
   picker?.querySelector(`[${nextAttr}]`)?.addEventListener("click", () => goToMonth(1));
-  attachCalendarPickerSwipe(picker, goToMonth);
+  attachCalendarPickerSwipe(
+    picker,
+    goToMonth,
+    delta => buildCalendarPickerSwipePreviewHtml({
+      mode,
+      year,
+      monthIndex,
+      delta,
+      selectedDateStr: pickerState.selected.date || selectedDateStr,
+      datasetName,
+      prevAttr,
+      nextAttr
+    })
+  );
 
   picker?.querySelectorAll(`[data-${datasetName}]`).forEach(button => {
     button.addEventListener("click", () => {
@@ -3333,7 +5882,7 @@ function renderSharedCalendarPicker({
   });
 }
 
-function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr) {
+function renderRevenueCalendarPicker(mode, year, monthIndex, selectedDateStr = revenuePickerState.selected.date || getRevenuePickerAnchorDate()) {
   renderSharedCalendarPicker({
     columnsWrapId: "revenueWheelColumns",
     pickerState: revenuePickerState,
@@ -3363,17 +5912,13 @@ function renderAppointmentCalendarPicker(year, monthIndex, selectedDateStr = app
   });
 }
 
-function renderRevenueMonthPicker(year, selectedMonthIndex = new Date((revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr) + "T00:00:00").getMonth()) {
-  const columnsWrap = document.getElementById("revenueWheelColumns");
-  if (!columnsWrap) return;
-
-  const selectedDateStr = revenuePickerState.selected.date || document.getElementById("revenueDate")?.value || todayStr;
+function buildRevenueMonthPickerHtml(year, selectedMonthIndex = 0) {
+  const selectedDateStr = revenuePickerState.selected.date || getRevenuePickerAnchorDate();
   const selectedDate = new Date(selectedDateStr + "T00:00:00");
   const selectedYear = selectedDate.getFullYear();
   const currentMonthIndex = selectedDate.getMonth();
 
-  columnsWrap.className = "revenue-wheel-columns revenue-calendar-mode";
-  columnsWrap.innerHTML = `
+  return `
     <div class="revenue-month-picker" data-year="${year}">
       <div class="revenue-calendar-picker-head">
         <button class="icon-btn revenue-calendar-nav" type="button" data-revenue-month-prev aria-label="Vorig jaar">‹</button>
@@ -3389,10 +5934,39 @@ function renderRevenueMonthPicker(year, selectedMonthIndex = new Date((revenuePi
       </div>
     </div>
   `;
+}
+
+function buildRevenueMonthPickerPreviewHtml(year, delta, selectedMonthIndex = 0) {
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = buildRevenueMonthPickerHtml(year + delta, selectedMonthIndex);
+  const picker = wrapper.querySelector(".revenue-month-picker");
+  if (!picker) return "";
+  picker.querySelectorAll("button").forEach(button => {
+    button.setAttribute("tabindex", "-1");
+    button.setAttribute("aria-hidden", "true");
+  });
+  return picker.innerHTML;
+}
+
+function renderRevenueMonthPicker(year, selectedMonthIndex = new Date((revenuePickerState.selected.date || getRevenuePickerAnchorDate()) + "T00:00:00").getMonth()) {
+  const columnsWrap = document.getElementById("revenueWheelColumns");
+  if (!columnsWrap) return;
+
+  const selectedDateStr = revenuePickerState.selected.date || getRevenuePickerAnchorDate();
+  const selectedDate = new Date(selectedDateStr + "T00:00:00");
+
+  columnsWrap.className = "revenue-wheel-columns revenue-calendar-mode";
+  columnsWrap.innerHTML = buildRevenueMonthPickerHtml(year, selectedMonthIndex);
 
   const picker = columnsWrap.querySelector(".revenue-month-picker");
-  picker?.querySelector("[data-revenue-month-prev]")?.addEventListener("click", () => renderRevenueMonthPicker(year - 1, selectedMonthIndex));
-  picker?.querySelector("[data-revenue-month-next]")?.addEventListener("click", () => renderRevenueMonthPicker(year + 1, selectedMonthIndex));
+  const goToYear = delta => renderRevenueMonthPicker(year + delta, selectedMonthIndex);
+  picker?.querySelector("[data-revenue-month-prev]")?.addEventListener("click", () => goToYear(-1));
+  picker?.querySelector("[data-revenue-month-next]")?.addEventListener("click", () => goToYear(1));
+  attachCalendarPickerSwipe(
+    picker,
+    goToYear,
+    delta => buildRevenueMonthPickerPreviewHtml(year, delta, selectedMonthIndex)
+  );
 
   picker?.querySelectorAll("[data-revenue-picker-month]").forEach(button => {
     button.addEventListener("click", () => {
@@ -3407,13 +5981,14 @@ function renderRevenueMonthPicker(year, selectedMonthIndex = new Date((revenuePi
   });
 }
 
-function openRevenueWheelPicker(mode) {
+function openRevenueWheelPicker(mode, target = "revenue") {
   const dialog = document.getElementById("revenueWheelPickerDialog");
   const title = document.getElementById("revenueWheelPickerTitle");
   const columnsWrap = document.getElementById("revenueWheelColumns");
   const shell = dialog?.querySelector(".revenue-wheel-shell");
   const confirmBtn = document.getElementById("revenueWheelConfirmBtn");
-  const anchor = document.getElementById("revenueDate").value || todayStr;
+  revenuePickerState.target = target || "revenue";
+  const anchor = getRevenuePickerAnchorDate();
   const anchorDate = new Date(anchor + "T00:00:00");
   const selectedYear = anchorDate.getFullYear();
   const selectedMonthIndex = anchorDate.getMonth();
@@ -3469,7 +6044,7 @@ function openRevenueWheelPicker(mode) {
 }
 
 function applyRevenueWheelPickerSelection() {
-  const anchor = document.getElementById("revenueDate").value || todayStr;
+  const anchor = getRevenuePickerAnchorDate();
   const anchorDate = new Date(anchor + "T00:00:00");
   const currentDay = anchorDate.getDate();
 
@@ -3477,22 +6052,22 @@ function applyRevenueWheelPickerSelection() {
     const year = Number(revenuePickerState.selected.year || anchorDate.getFullYear());
     const monthIndex = anchorDate.getMonth();
     const day = clampRevenueDay(year, monthIndex, currentDay);
-    setRevenuePeriod("year", formatDateInput(new Date(year, monthIndex, day)));
+    setRevenuePickerPeriod("year", formatDateInput(new Date(year, monthIndex, day)));
     return;
   }
 
   if (revenuePickerState.mode === "month") {
     const selectedDate = new Date((revenuePickerState.selected.date || anchor) + "T00:00:00");
-    setRevenuePeriod("month", formatDateInput(selectedDate));
+    setRevenuePickerPeriod("month", formatDateInput(selectedDate));
     return;
   }
 
   if (revenuePickerState.mode === "week") {
-    setRevenuePeriod("week", revenuePickerState.selected.date || anchor);
+    setRevenuePickerPeriod("week", revenuePickerState.selected.date || anchor);
     return;
   }
 
-  setRevenuePeriod("day", revenuePickerState.selected.date || anchor);
+  setRevenuePickerPeriod("day", revenuePickerState.selected.date || anchor);
 }
 
 function openRevenueDatePicker(mode = "day") {
@@ -3579,26 +6154,23 @@ function renderRevenueChart(filtered, type, anchor) {
   if (!chartWrap) return;
 
   const chartData = buildRevenueChartData(filtered, type, anchor);
-  const visibleData = chartData.filter(item => item.paid > 0 || item.unpaid > 0);
-  const isMonthChart = type === "month";
+  const visibleData = chartData.filter(item => Number(item.paid || 0) > 0 || Number(item.unpaid || 0) > 0);
   const useFullPeriodWidth = ["week", "month", "year"].includes(type);
   const dataToRender = useFullPeriodWidth ? chartData : (visibleData.length ? visibleData : chartData);
-  const maxValue = Math.max(...dataToRender.map(item => item.paid + item.unpaid), 0);
+  const renderedBarCount = Math.max(dataToRender.length, 1);
+  const maxValue = Math.max(...dataToRender.map(item => Number(item.paid || 0) + Number(item.unpaid || 0)), 0);
   const scaleMax = maxValue > 0 ? maxValue : 1;
   const chartHeight = 220;
-  const isDayChart = type === "day";
-  const renderedBarCount = Math.max(dataToRender.length, 1);
-  const chartAvailableWidth = chartWrap.clientWidth || 320;
-  const dayGap = Math.max(6, Math.min(14, Math.round(chartAvailableWidth * 0.02)));
-  const calculatedDayColumnWidth = isDayChart
-    ? Math.max(32, Math.floor((chartAvailableWidth - ((renderedBarCount - 1) * dayGap) - 16) / renderedBarCount))
-    : null;
-  const dayColumnMinWidth = isDayChart
-    ? Math.max(32, Math.min(92, calculatedDayColumnWidth))
-    : null;
-  const dayStackWidth = isDayChart
-    ? Math.max(8, Math.min(48, Math.round(dayColumnMinWidth * 0.48)))
-    : null;
+  const chartAvailableWidth = Math.max(280, chartWrap.clientWidth || chartWrap.offsetWidth || 320);
+  const chartGap = type === "month" ? 2 : Math.max(3, Math.min(10, Math.round(chartAvailableWidth * 0.012)));
+  const columnWidth = useFullPeriodWidth
+    ? Math.max(7, Math.floor((chartAvailableWidth - ((renderedBarCount - 1) * chartGap) - 16) / renderedBarCount))
+    : Math.max(34, Math.min(92, Math.floor((chartAvailableWidth - ((renderedBarCount - 1) * chartGap) - 16) / renderedBarCount)));
+  const maxStackWidth = type === "week" ? 28 : type === "year" ? 18 : type === "month" ? 10 : 46;
+  const barGroupWidth = Math.max(4, Math.min(maxStackWidth, Math.round(columnWidth * 0.72)));
+  const singleBarWidth = Math.max(3, Math.min(barGroupWidth, Math.round(barGroupWidth * 0.82)));
+  const splitBarWidth = Math.max(3, Math.floor((barGroupWidth - 2) / 2));
+
   const formatAxisAmount = value => new Intl.NumberFormat(getCurrentLanguage(), {
     maximumFractionDigits: 0,
     minimumFractionDigits: 0
@@ -3609,30 +6181,36 @@ function renderRevenueChart(filtered, type, anchor) {
   const axisWidth = Math.max(18, Math.min(64, Math.ceil(longestAxisLabel * 6.2) + 4));
 
   chartWrap.innerHTML = `
-    <div class="revenue-chart-plot" style="--revenue-chart-height:${chartHeight}px;--revenue-y-axis-width:${axisWidth}px;">
+    <div class="revenue-chart-plot revenue-chart-plot-v2" style="--revenue-chart-height:${chartHeight}px;--revenue-y-axis-width:${axisWidth}px;">
       <div class="revenue-y-axis" aria-hidden="true">
         ${axisLabels.map(label => `<span>${label}</span>`).join("")}
       </div>
-      <div class="revenue-chart-area">
+      <div class="revenue-chart-area revenue-chart-area-v2">
         <div class="revenue-y-axis-line" aria-hidden="true"></div>
         <div class="revenue-x-axis-line" aria-hidden="true"></div>
-        <div class="revenue-bars ${useFullPeriodWidth ? `revenue-bars-even revenue-bars-${type}` : (isDayChart ? "revenue-bars-day-dynamic" : "")}" style="--revenue-bar-count:${renderedBarCount};${isDayChart ? `--revenue-day-gap:${dayGap}px;--revenue-day-col-width:${dayColumnMinWidth}px;--revenue-day-stack-width:${dayStackWidth}px;` : ""}">
+        <div class="revenue-bars revenue-bars-v2 revenue-bars-${type}" style="--revenue-bar-count:${renderedBarCount};--revenue-bar-gap:${chartGap}px;--revenue-bar-column-width:${columnWidth}px;--revenue-bar-group-width:${barGroupWidth}px;--revenue-bar-single-width:${singleBarWidth}px;--revenue-bar-split-width:${splitBarWidth}px;">
           ${dataToRender.map(item => {
-            const total = item.paid + item.unpaid;
+            const paid = Number(item.paid || 0);
+            const unpaid = Number(item.unpaid || 0);
+            const total = paid + unpaid;
+            const hasPaid = paid > 0;
+            const hasUnpaid = unpaid > 0;
+            const hasBoth = hasPaid && hasUnpaid;
             const hasRevenue = total > 0;
             const totalHeight = hasRevenue ? Math.max(8, (total / scaleMax) * chartHeight) : 0;
-            const paidHeight = hasRevenue ? (item.paid / total) * totalHeight : 0;
-            const unpaidHeight = hasRevenue ? totalHeight - paidHeight : 0;
+            const paidHeight = hasPaid ? Math.max(8, (paid / scaleMax) * chartHeight) : 0;
+            const unpaidHeight = hasUnpaid ? Math.max(8, (unpaid / scaleMax) * chartHeight) : 0;
             const title = hasRevenue ? `${item.label} · ${euro(total)}` : "";
 
             return `
               <div class="revenue-bar-col${hasRevenue ? "" : " is-empty"}" title="${title}">
-                ${hasRevenue ? `
-                  <div class="revenue-bar-stack" style="height:${totalHeight}px">
-                    ${unpaidHeight > 0 ? `<span class="revenue-bar-segment unpaid" style="height:${unpaidHeight}px"></span>` : ""}
-                    ${paidHeight > 0 ? `<span class="revenue-bar-segment paid" style="height:${paidHeight}px"></span>` : ""}
+                <div class="revenue-bar-cell" aria-hidden="true">
+                  ${hasBoth ? `<span class="revenue-bar-total-bg" style="height:${totalHeight}px"></span>` : ""}
+                  <div class="revenue-bar-pair${hasBoth ? " has-both" : ""}">
+                    ${hasPaid ? `<span class="revenue-bar-fill paid" style="height:${paidHeight}px"></span>` : ""}
+                    ${hasUnpaid ? `<span class="revenue-bar-fill unpaid" style="height:${unpaidHeight}px"></span>` : ""}
                   </div>
-                ` : `<div class="revenue-bar-stack revenue-bar-stack-empty" aria-hidden="true"></div>`}
+                </div>
                 <span class="revenue-bar-label">${hasRevenue ? item.label : ""}</span>
               </div>
             `;
@@ -3671,6 +6249,18 @@ function updateRevenueActionBar() {
   if (reportButton) reportButton.disabled = !shouldShow;
 }
 
+function updateCostsActionBar() {
+  const bar = document.getElementById('costsActionBar');
+  const csvButton = document.getElementById('costsExportCsvBtn');
+  const reportButton = document.getElementById('costsExportReportBtn');
+  if (!bar) return;
+
+  const shouldShow = state.currentScreen === 'costsScreen';
+  bar.classList.toggle('hidden', !shouldShow);
+  if (csvButton) csvButton.disabled = !shouldShow;
+  if (reportButton) reportButton.disabled = !shouldShow;
+}
+
 function getRevenueExportTitle() {
   const type = document.getElementById("revenuePeriodType")?.value || 'day';
   const anchor = document.getElementById("revenueDate")?.value || todayStr;
@@ -3695,8 +6285,7 @@ function downloadRevenueCsv() {
     .slice()
     .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
-  const paymentStatusFilter = document.getElementById('revenuePaymentStatusFilter')?.value || '';
-  const paymentFilter = document.getElementById('revenuePaymentFilter')?.value || '';
+  const paymentStatusFilter = getRevenueStatusFilterLabel();
   const periodType = document.getElementById('revenuePeriodType')?.value || 'day';
   const periodDate = document.getElementById('revenueDate')?.value || todayStr;
 
@@ -3712,8 +6301,7 @@ function downloadRevenueCsv() {
   const rows = [
     ['Periode type', periodType],
     ['Periode datum', periodDate],
-    ['Filter betaalstatus', paymentStatusFilter || 'alle'],
-    ['Filter betaalwijze', paymentFilter || 'alle'],
+    ['Filter betaalstatus', paymentStatusFilter],
     [],
     ['OVERZICHT'],
     ['Aantal afspraken', filtered.length],
@@ -3835,10 +6423,11 @@ function downloadRevenueCsv() {
   const link = document.createElement('a');
   link.href = url;
   link.download = `${getRevenueExportTitle()}.csv`;
+  link.dataset.allowBusyDownload = "true";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 
@@ -3857,8 +6446,7 @@ function getRevenueReportData() {
     .slice()
     .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
 
-  const paymentStatusFilter = document.getElementById('revenuePaymentStatusFilter')?.value || '';
-  const paymentFilter = document.getElementById('revenuePaymentFilter')?.value || '';
+  const paymentStatusFilter = getRevenueStatusFilterLabel();
   const periodType = document.getElementById('revenuePeriodType')?.value || 'day';
   const periodDate = document.getElementById('revenueDate')?.value || todayStr;
 
@@ -3927,7 +6515,6 @@ function getRevenueReportData() {
     data,
     filtered,
     paymentStatusFilter,
-    paymentFilter,
     periodType,
     periodDate,
     reportTitle,
@@ -3944,8 +6531,7 @@ function getRevenueReportData() {
 function downloadRevenueStyledReport() {
   const report = getRevenueReportData();
   const createdAt = new Date().toLocaleString('nl-BE');
-  const filterStatusLabel = report.paymentStatusFilter === 'paid' ? 'Betaald' : report.paymentStatusFilter === 'unpaid' ? 'Onbetaald' : 'Alle statussen';
-  const filterPaymentLabel = report.paymentFilter || 'Alle betaalwijzen';
+  const filterStatusLabel = report.paymentStatusFilter || 'Betaald + Onbetaald';
 
   const metricCard = (label, value) => `
     <article class="metric-card">
@@ -4341,7 +6927,6 @@ function downloadRevenueStyledReport() {
       <div class="meta">
         <span>Gemaakt op ${htmlEscape(createdAt)}</span>
         <span>${htmlEscape(filterStatusLabel)}</span>
-        <span>${htmlEscape(filterPaymentLabel)}</span>
       </div>
     </header>
 
@@ -4394,12 +6979,272 @@ function downloadRevenueStyledReport() {
   const link = document.createElement('a');
   link.href = url;
   link.download = `${getRevenueExportTitle()}_rapport.html`;
+  link.dataset.allowBusyDownload = "true";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+
+function getCostsExportTitle() {
+  const type = getCostsPeriodType();
+  const anchor = getCostsPeriodDate();
+
+  if (type === 'year') return `kosten_${anchor.slice(0, 4)}`;
+  if (type === 'month') return `kosten_${anchor.slice(0, 7)}`;
+  if (type === 'week') {
+    const bounds = weekBounds(anchor);
+    return `kosten_week_${bounds.start}_tot_${bounds.end}`;
+  }
+  return `kosten_${anchor}`;
+}
+
+function getCostsReportData() {
+  const filtered = getFilteredCosts(getData())
+    .slice()
+    .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || String(a.description || '').localeCompare(String(b.description || ''), 'nl-BE'));
+
+  const periodType = getCostsPeriodType();
+  const periodDate = getCostsPeriodDate();
+  const totalIncl = filtered.reduce((sum, cost) => sum + Number(cost.amountInclVat || 0), 0);
+  const vatTotal = filtered.reduce((sum, cost) => {
+    const amount = Number(cost.amountInclVat || 0);
+    const rate = Number(cost.vatRate || 0);
+    return sum + (rate > 0 ? amount - (amount / (1 + (rate / 100))) : 0);
+  }, 0);
+  const totalExcl = totalIncl - vatTotal;
+
+  const periodTotals = new Map();
+  filtered.forEach(cost => {
+    let key = cost.date || '';
+    let label = cost.date || '';
+
+    if (periodType === 'year') {
+      key = String(cost.date || '').slice(0, 7);
+      const monthNumber = Number(key.slice(5, 7));
+      label = monthNumber ? `${getMonthNameLong(monthNumber - 1)} ${key.slice(0, 4)}` : key;
+    } else {
+      label = cost.date ? formatLongDate(cost.date) : '';
+    }
+
+    const current = periodTotals.get(key) || { label, count: 0, totalIncl: 0, totalExcl: 0, vatTotal: 0 };
+    const amount = Number(cost.amountInclVat || 0);
+    const rate = Number(cost.vatRate || 0);
+    const vat = rate > 0 ? amount - (amount / (1 + (rate / 100))) : 0;
+    current.count += 1;
+    current.totalIncl += amount;
+    current.vatTotal += vat;
+    current.totalExcl += amount - vat;
+    periodTotals.set(key, current);
+  });
+
+  const periodTitle =
+    periodType === 'year' ? 'Totalen per maand' :
+    periodType === 'month' ? 'Totalen per dag' :
+    periodType === 'week' ? 'Totalen per dag' :
+    'Totalen per kost';
+
+  const periodColumnTitle = periodType === 'year' ? 'Maand' : periodType === 'day' ? 'Kost' : 'Datum';
+
+  let reportTitle = 'Kostenrapport';
+  if (periodType === 'day') reportTitle = `Kostenrapport · ${formatLongDate(periodDate)}`;
+  if (periodType === 'week') {
+    const bounds = weekBounds(periodDate);
+    reportTitle = `Kostenrapport · week ${formatLongDate(bounds.start)} t.e.m. ${formatLongDate(bounds.end)}`;
+  }
+  if (periodType === 'month') {
+    const d = new Date(periodDate + 'T00:00:00');
+    reportTitle = `Kostenrapport · ${getMonthNameLong(d.getMonth())} ${d.getFullYear()}`;
+  }
+  if (periodType === 'year') reportTitle = `Kostenrapport · ${periodDate.slice(0, 4)}`;
+
+  return {
+    filtered,
+    periodType,
+    periodDate,
+    reportTitle,
+    totalIncl,
+    totalExcl,
+    vatTotal,
+    periodTotals: Array.from(periodTotals.entries()).sort(([a], [b]) => a.localeCompare(b, 'nl-BE')).map(([, values]) => values),
+    periodTitle,
+    periodColumnTitle
+  };
+}
+
+function downloadCostsCsv() {
+  const report = getCostsReportData();
+  const amountForCsv = (value) => Number(value || 0).toFixed(2).replace('.', ',');
+  const rows = [
+    ['Periode type', report.periodType],
+    ['Periode datum', report.periodDate],
+    [],
+    ['OVERZICHT'],
+    ['Aantal kosten', report.filtered.length],
+    ['Totaal incl. btw', amountForCsv(report.totalIncl)],
+    ['Totaal excl. btw', amountForCsv(report.totalExcl)],
+    ['Btw', amountForCsv(report.vatTotal)],
+    [],
+    [report.periodTitle.toUpperCase()],
+    [report.periodColumnTitle, 'Aantal kosten', 'Totaal incl. btw', 'Totaal excl. btw', 'Btw']
+  ];
+
+  if (report.periodTotals.length) {
+    report.periodTotals.forEach(item => {
+      rows.push([item.label, item.count, amountForCsv(item.totalIncl), amountForCsv(item.totalExcl), amountForCsv(item.vatTotal)]);
+    });
+  } else {
+    rows.push(['Geen gegevens', 0, amountForCsv(0), amountForCsv(0), amountForCsv(0)]);
+  }
+
+  rows.push([]);
+  rows.push(['DETAIL KOSTEN']);
+  rows.push(['Datum', 'Omschrijving', 'Bedrag incl. btw', 'Btw %', 'Bedrag excl. btw', 'Btw']);
+
+  report.filtered.forEach(cost => {
+    const amount = Number(cost.amountInclVat || 0);
+    const rate = Number(cost.vatRate || 0);
+    const vat = rate > 0 ? amount - (amount / (1 + (rate / 100))) : 0;
+    rows.push([
+      cost.date || '',
+      cost.description || '',
+      amountForCsv(amount),
+      rate,
+      amountForCsv(amount - vat),
+      amountForCsv(vat)
+    ]);
+  });
+
+  const csv = rows.map(row => row.map(value => csvEscape(value)).join(';')).join('\r\n');
+  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${getCostsExportTitle()}.csv`;
+  link.dataset.allowBusyDownload = "true";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadCostsStyledReport() {
+  const report = getCostsReportData();
+  const createdAt = new Date().toLocaleString('nl-BE');
+
+  const metricCard = (label, value) => `
+    <article class="metric-card">
+      <span>${htmlEscape(label)}</span>
+      <strong>${htmlEscape(value)}</strong>
+    </article>
+  `;
+
+  const moneyCells = item => `
+    <td>${htmlEscape(item.count)}</td>
+    <td class="money">${htmlEscape(euro(item.totalIncl))}</td>
+    <td class="money">${htmlEscape(euro(item.totalExcl))}</td>
+    <td class="money">${htmlEscape(euro(item.vatTotal))}</td>
+  `;
+
+  const periodRows = report.periodTotals.length
+    ? report.periodTotals.map(item => `<tr><td>${htmlEscape(item.label)}</td>${moneyCells(item)}</tr>`).join('')
+    : `<tr><td>Geen gegevens</td><td>0</td><td class="money">${htmlEscape(euro(0))}</td><td class="money">${htmlEscape(euro(0))}</td><td class="money">${htmlEscape(euro(0))}</td></tr>`;
+
+  const costRows = report.filtered.length
+    ? report.filtered.map(cost => {
+        const amount = Number(cost.amountInclVat || 0);
+        const rate = Number(cost.vatRate || 0);
+        const vat = rate > 0 ? amount - (amount / (1 + (rate / 100))) : 0;
+        return `
+          <tr>
+            <td>${htmlEscape(cost.date || '')}</td>
+            <td>${htmlEscape(cost.description || '')}</td>
+            <td class="money">${htmlEscape(euro(amount))}</td>
+            <td>${htmlEscape(rate)}%</td>
+            <td class="money">${htmlEscape(euro(amount - vat))}</td>
+            <td class="money">${htmlEscape(euro(vat))}</td>
+          </tr>
+        `;
+      }).join('')
+    : `<tr><td colspan="6" class="empty-row">Geen kosten voor deze selectie.</td></tr>`;
+
+  const html = `<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${htmlEscape(report.reportTitle)}</title>
+  <style>
+    :root { --bg:#fbf7f9; --card:#fff; --line:#eddfe6; --primary:#d991ab; --primary-dark:#b86d87; --primary-soft:#f8e8ee; --text:#4e4650; --muted:#8c838d; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:linear-gradient(180deg,#fff 0%,var(--bg) 100%); color:var(--text); font-family:Arial, Helvetica, sans-serif; line-height:1.45; }
+    .page { width:min(1180px, calc(100% - 32px)); margin:0 auto; padding:34px 0 48px; }
+    .report-header { background:linear-gradient(135deg,var(--primary-soft),#fff); border:1px solid var(--line); border-radius:28px; padding:26px; margin-bottom:18px; box-shadow:0 12px 30px rgba(170,120,145,.10); }
+    .eyebrow { margin:0 0 6px; color:var(--primary-dark); font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    h1 { margin:0; font-size:clamp(28px,5vw,46px); line-height:1.05; color:var(--primary-dark); }
+    .meta { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; color:var(--muted); font-size:14px; }
+    .meta span { background:#fff; border:1px solid var(--line); border-radius:999px; padding:8px 12px; }
+    .metric-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+    .metric-card,.report-section { background:var(--card); border:1px solid var(--line); box-shadow:0 10px 24px rgba(170,120,145,.09); }
+    .metric-card { border-radius:22px; padding:18px; }
+    .metric-card span { display:block; color:var(--muted); font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; margin-bottom:8px; }
+    .metric-card strong { font-size:24px; color:var(--text); }
+    .report-section { border-radius:24px; overflow:hidden; margin-bottom:18px; }
+    .section-title { display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--primary-soft); border-bottom:1px solid var(--line); padding:16px 18px; }
+    .section-title h2 { margin:0; color:var(--primary-dark); font-size:18px; }
+    .section-title span { color:var(--muted); font-size:13px; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:720px; }
+    th,td { padding:13px 16px; border-bottom:1px solid #f2e8ed; text-align:left; vertical-align:top; font-size:14px; }
+    th { color:var(--muted); font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:#fffafd; }
+    tbody tr:nth-child(even) td { background:#fffbfd; }
+    tbody tr:last-child td { border-bottom:none; }
+    .money { text-align:right; white-space:nowrap; font-weight:700; }
+    .empty-row { text-align:center; color:var(--muted); padding:26px; }
+    .print-actions { position:sticky; bottom:18px; display:flex; justify-content:flex-end; pointer-events:none; margin-top:20px; }
+    .print-actions button { pointer-events:auto; border:none; border-radius:999px; background:var(--primary-dark); color:#fff; min-height:48px; padding:0 18px; font-weight:700; box-shadow:0 12px 24px rgba(184,109,135,.22); cursor:pointer; }
+    @media (max-width:780px) { .page{width:min(100% - 18px,1180px); padding-top:12px;} .report-header{border-radius:22px; padding:20px;} .metric-grid{grid-template-columns:1fr 1fr;} .metric-card strong{font-size:20px;} }
+    @media print { @page{size:A4 portrait; margin:12mm;} html,body{width:210mm; min-height:297mm; background:#fff!important; color:#2f2a31; font-size:10.5px; line-height:1.28; -webkit-print-color-adjust:exact; print-color-adjust:exact;} .page{width:100%!important; max-width:none!important; margin:0!important; padding:0!important;} .report-header{border-radius:0; padding:0 0 8mm; margin:0 0 7mm; background:#fff!important; border:0; border-bottom:2px solid var(--primary);} .eyebrow{font-size:9px; margin-bottom:3px;} h1{font-size:22px; line-height:1.12;} .meta{gap:5px; margin-top:6mm; font-size:9.5px;} .meta span{padding:4px 7px;} .metric-grid{grid-template-columns:repeat(4,1fr); gap:4mm; margin-bottom:6mm;} .metric-card,.report-section{box-shadow:none; break-inside:avoid; page-break-inside:avoid;} .metric-card{border-radius:8px; padding:4mm;} .metric-card span{font-size:8px; margin-bottom:3px;} .metric-card strong{font-size:14px;} .report-section{border-radius:8px; margin-bottom:6mm; overflow:visible;} .section-title{padding:4mm;} .section-title h2{font-size:13px;} .section-title span{font-size:9px;} .table-wrap{overflow:visible;} table{width:100%; min-width:0; table-layout:fixed; page-break-inside:auto;} thead{display:table-header-group;} tr{page-break-inside:avoid; break-inside:avoid;} th,td{padding:5px 6px; font-size:8.7px; line-height:1.25; overflow-wrap:anywhere;} th{font-size:7.8px;} .money{white-space:nowrap;} .print-actions{display:none!important;} }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="report-header">
+      <p class="eyebrow">NailBooker</p>
+      <h1>${htmlEscape(report.reportTitle)}</h1>
+      <div class="meta"><span>Gemaakt op ${htmlEscape(createdAt)}</span><span>${report.filtered.length} kosten</span></div>
+    </header>
+    <section class="metric-grid">
+      ${metricCard('Aantal kosten', report.filtered.length)}
+      ${metricCard('Totaal incl. btw', euro(report.totalIncl))}
+      ${metricCard('Totaal excl. btw', euro(report.totalExcl))}
+      ${metricCard('Btw', euro(report.vatTotal))}
+    </section>
+    <section class="report-section">
+      <div class="section-title"><h2>${htmlEscape(report.periodTitle)}</h2><span>${htmlEscape(report.periodColumnTitle)}</span></div>
+      <div class="table-wrap"><table><thead><tr><th>${htmlEscape(report.periodColumnTitle)}</th><th>Aantal</th><th class="money">Incl. btw</th><th class="money">Excl. btw</th><th class="money">Btw</th></tr></thead><tbody>${periodRows}</tbody></table></div>
+    </section>
+    <section class="report-section">
+      <div class="section-title"><h2>Detail kosten</h2><span>${report.filtered.length} kosten</span></div>
+      <div class="table-wrap"><table><thead><tr><th>Datum</th><th>Omschrijving</th><th class="money">Incl. btw</th><th>Btw %</th><th class="money">Excl. btw</th><th class="money">Btw</th></tr></thead><tbody>${costRows}</tbody></table></div>
+    </section>
+    <div class="print-actions"><button type="button" onclick="window.print()">Printen / bewaren als PDF</button></div>
+  </main>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${getCostsExportTitle()}_rapport.html`;
+  link.dataset.allowBusyDownload = "true";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 function groupRevenueByCurrency(items, predicate = () => true) {
   return items.filter(predicate).reduce((map, app) => {
@@ -4421,7 +7266,16 @@ function renderRevenue() {
 
   const renderSignature = getRevenueRenderSignature();
   const chartWrapForSignature = document.getElementById("revenueChart");
-  if (renderSignature && state.revenueLastRenderSignature === renderSignature && chartWrapForSignature?.children?.length) {
+  const chartHasVisibleBars = Boolean(
+    chartWrapForSignature?.querySelector(
+      ".revenue-bar-col:not(.is-empty) .revenue-bar-fill.paid, .revenue-bar-col:not(.is-empty) .revenue-bar-fill.unpaid"
+    )
+  );
+
+  // Alleen overslaan als de bestaande grafiek effectief zichtbare staven bevat.
+  // Na accountwissel / data-herlaad kan de signature gelijk lijken terwijl de grafiek
+  // nog leeg opgebouwd werd; dan moet Omzet opnieuw renderen.
+  if (renderSignature && state.revenueLastRenderSignature === renderSignature && chartHasVisibleBars) {
     return;
   }
   state.revenueLastRenderSignature = renderSignature;
@@ -4451,6 +7305,17 @@ function renderRevenue() {
   const total = groupRevenueByCurrency(filtered);
   const open = groupRevenueByCurrency(filtered, a => !a.paid);
   const totalNumeric = filtered.reduce((sum, a) => sum + Number(a.price || 0), 0);
+  const appointmentCount = filtered.length;
+  const completedCount = filtered.filter(a => String(a.status || "").toLowerCase() === "afgerond").length;
+  const plannedCount = filtered.filter(a => String(a.status || "").toLowerCase() !== "afgerond").length;
+
+  const appointmentCountEl = document.getElementById("revenueAppointmentCount");
+  const completedCountEl = document.getElementById("revenueCompletedCount");
+  const plannedCountEl = document.getElementById("revenuePlannedCount");
+
+  if (appointmentCountEl) appointmentCountEl.textContent = String(appointmentCount);
+  if (completedCountEl) completedCountEl.textContent = String(completedCount);
+  if (plannedCountEl) plannedCountEl.textContent = String(plannedCount);
 
   document.getElementById("plannedRevenue").textContent = formatCurrencyTotals(total);
   document.getElementById("paidRevenue").textContent = formatCurrencyTotals(paid);
@@ -4831,7 +7696,7 @@ async function showAppointmentNotification(appointment) {
     body,
     tag: `appointment-${appointment.id}`,
     renotify: false,
-    badge: 'icons/icon-192.png',
+    badge: 'icons/notification-badge.png',
     icon: 'icons/icon-192.png',
     data: { appointmentId: appointment.id, screen: 'agendaScreen', date: appointment.date }
   };
@@ -4935,20 +7800,126 @@ async function syncNotificationState(options = {}) {
   return true;
 }
 
+
+function getSettingsFormSnapshot() {
+  const form = document.getElementById("settingsForm");
+  if (!form) return "";
+  const ids = [
+    "settingsDefaultBreakMinutes",
+    "settingsNotificationsEnabled",
+    "settingsReminderMinutes",
+    "settingsOverlapWarningsEnabled",
+    "settingsAgendaFabMenuEnabled",
+    "settingsShowTipsOnOpen",
+    "settingsLanguage",
+    "settingsCurrency",
+    "settingsPaymentBeneficiaryName",
+    "settingsPaymentAccountNumber",
+    "settingsPaymentReferencePrefix"
+  ];
+
+  const snapshot = ids.reduce((acc, id) => {
+    const el = document.getElementById(id);
+    if (!el) return acc;
+    acc[id] = el.type === "checkbox" ? Boolean(el.checked) : String(el.value || "");
+    return acc;
+  }, {});
+
+  return JSON.stringify(snapshot);
+}
+
+function updateSettingsDirtyState(isDirty = null) {
+  const form = document.getElementById("settingsForm");
+  const badge = document.getElementById("settingsDirtyBadge");
+  const saveHint = document.getElementById("settingsSaveHint");
+  const dirty = isDirty === null
+    ? Boolean(state.settingsInitialSignature && getSettingsFormSnapshot() !== state.settingsInitialSignature)
+    : Boolean(isDirty);
+
+  state.settingsDirty = dirty;
+  if (form) form.classList.toggle("is-dirty", dirty);
+  if (badge) badge.classList.toggle("hidden", !dirty);
+  if (saveHint && dirty && !state.settingsSavePending) {
+    saveHint.textContent = "Je hebt niet-opgeslagen wijzigingen.";
+  }
+}
+
+function markSettingsCleanFromCurrentForm() {
+  state.settingsInitialSignature = getSettingsFormSnapshot();
+  updateSettingsDirtyState(false);
+}
+
+function hasUnsavedSettingsChanges() {
+  return state.currentScreen === "settingsScreen" && Boolean(state.settingsDirty);
+}
+
+function confirmLeaveSettingsIfDirty() {
+  if (!hasUnsavedSettingsChanges()) return true;
+  return window.confirm("Je hebt wijzigingen in Instellingen die nog niet opgeslagen zijn.\n\nWil je deze pagina verlaten zonder op te slaan?");
+}
+
+function hardenPaymentAutocompleteFields() {
+  const fields = [
+    ["settingsPaymentBeneficiaryName", "settings_qr_beneficiary_ref", "off"],
+    ["settingsPaymentAccountNumber", "settings_qr_reference_code", "off"]
+  ];
+
+  fields.forEach(([id, safeName, autocomplete]) => {
+    const input = document.getElementById(id);
+    if (!input) return;
+    input.setAttribute("name", safeName);
+    input.setAttribute("autocomplete", autocomplete);
+    input.setAttribute("autocorrect", "off");
+    input.setAttribute("spellcheck", "false");
+    input.setAttribute("data-lpignore", "true");
+    input.setAttribute("data-1p-ignore", "true");
+    input.setAttribute("data-form-type", "other");
+    if (id === "settingsPaymentAccountNumber") {
+      input.setAttribute("aria-autocomplete", "none");
+      input.setAttribute("enterkeyhint", "done");
+    }
+  });
+}
+
+function setupSettingsDirtyTracking() {
+  hardenPaymentAutocompleteFields();
+  const form = document.getElementById("settingsForm");
+  if (!form || form.dataset.dirtyTrackingReady === "true") return;
+  form.dataset.dirtyTrackingReady = "true";
+
+  form.addEventListener("input", event => {
+    const target = event.target;
+    if (target && target.id !== "calendarFeedUrl") updateSettingsDirtyState();
+  });
+
+  form.addEventListener("change", event => {
+    const target = event.target;
+    if (target && target.id !== "calendarFeedUrl") updateSettingsDirtyState();
+  });
+
+  window.addEventListener("beforeunload", event => {
+    if (!hasUnsavedSettingsChanges()) return;
+    event.preventDefault();
+    event.returnValue = "";
+  });
+}
+
 function renderSettings() {
+  hardenPaymentAutocompleteFields();
   const settings = getSettings();
 
   const breakInput = document.getElementById("settingsDefaultBreakMinutes");
   const notificationsToggle = document.getElementById("settingsNotificationsEnabled");
   const reminderSelect = document.getElementById("settingsReminderMinutes");
   const overlapToggle = document.getElementById("settingsOverlapWarningsEnabled");
+  const agendaFabMenuToggle = document.getElementById("settingsAgendaFabMenuEnabled");
+  const tipsToggle = document.getElementById("settingsShowTipsOnOpen");
   const reminderWrap = document.getElementById("settingsReminderWrap");
   const saveHint = document.getElementById("settingsSaveHint");
   const languageSelect = document.getElementById("settingsLanguage");
   const currencySelect = document.getElementById("settingsCurrency");
   const paymentBeneficiaryNameInput = document.getElementById("settingsPaymentBeneficiaryName");
-  const paymentIbanInput = document.getElementById("settingsPaymentIban");
-  const paymentBicInput = document.getElementById("settingsPaymentBic");
+  const paymentAccountNumberInput = document.getElementById("settingsPaymentAccountNumber");
   const paymentReferencePrefixInput = document.getElementById("settingsPaymentReferencePrefix");
 
   rebuildSettingsSelectOptions();
@@ -4959,14 +7930,16 @@ function renderSettings() {
   notificationsToggle.checked = Boolean(settings.notificationsEnabled);
   reminderSelect.value = String(settings.reminderMinutes || 30);
   overlapToggle.checked = settings.overlapWarningsEnabled !== false;
+  if (agendaFabMenuToggle) agendaFabMenuToggle.checked = settings.agendaFabMenuEnabled !== false;
+  if (tipsToggle) tipsToggle.checked = settings.showTipsOnOpen !== false;
   if (paymentBeneficiaryNameInput) paymentBeneficiaryNameInput.value = settings.paymentBeneficiaryName || "";
-  if (paymentIbanInput) paymentIbanInput.value = settings.paymentIban || "";
-  if (paymentBicInput) paymentBicInput.value = settings.paymentBic || "";
-  if (paymentReferencePrefixInput) paymentReferencePrefixInput.value = settings.paymentReferencePrefix || "Idle & Ease";
+  if (paymentAccountNumberInput) paymentAccountNumberInput.value = settings.paymentAccountNumber || "";
+  if (paymentReferencePrefixInput) paymentReferencePrefixInput.value = settings.paymentReferencePrefix || "";
 
   refreshAppSelect(reminderSelect);
   refreshAppSelect(languageSelect);
   refreshAppSelect(currencySelect);
+  renderCalendarFeedSettings();
   const notificationsEnabled = Boolean(settings.notificationsEnabled);
   const permissionState = notificationsPermissionState();
 
@@ -4985,8 +7958,103 @@ function renderSettings() {
   } else {
     saveHint.textContent = t("notificationsPermissionHint");
   }
+
+
+  markSettingsCleanFromCurrentForm();
 }
 
+function getWelcomeGuideStorageKey() {
+  try {
+    const email = document.getElementById("accountProfileEmail")?.textContent || "local";
+    return `nailbooker_welcome_guide_seen_${String(email || "local").trim().toLowerCase() || "local"}`;
+  } catch (error) {
+    return "nailbooker_welcome_guide_seen_local";
+  }
+}
+
+function shouldShowWelcomeGuide() {
+  const settings = getSettings();
+  if (settings.showTipsOnOpen === false) return false;
+  if (sessionStorage.getItem("nailbooker_welcome_guide_shown_this_session") === "true") return false;
+
+  const data = getData();
+  const hasClient = Array.isArray(data.customers) && data.customers.length > 0;
+  const hasService = Array.isArray(data.services) && data.services.some(service => service?.isActive !== false);
+  return !hasClient || !hasService;
+}
+
+function setWelcomeGuideVisible(visible) {
+  const overlay = document.getElementById("welcomeGuideOverlay");
+  if (!overlay) return;
+  overlay.classList.toggle("hidden", !visible);
+  overlay.setAttribute("aria-hidden", visible ? "false" : "true");
+  if (visible) {
+    sessionStorage.setItem("nailbooker_welcome_guide_shown_this_session", "true");
+  }
+}
+
+function closeWelcomeGuide({ remember = false } = {}) {
+  if (remember) {
+    try { localStorage.setItem(getWelcomeGuideStorageKey(), "true"); } catch (error) {}
+  }
+  setWelcomeGuideVisible(false);
+}
+
+function openWelcomeGuide(force = false) {
+  if (!force && !shouldShowWelcomeGuide()) return;
+  const data = getData();
+  const clientDone = Array.isArray(data.customers) && data.customers.length > 0;
+  const serviceDone = Array.isArray(data.services) && data.services.some(service => service?.isActive !== false);
+  const appointmentReady = clientDone && serviceDone;
+  const guideToggle = document.getElementById("welcomeGuideTipsToggle");
+  if (guideToggle) guideToggle.checked = getSettings().showTipsOnOpen !== false;
+
+  document.getElementById("welcomeGuideClientCheck")?.classList.toggle("done", clientDone);
+  document.getElementById("welcomeGuideServiceCheck")?.classList.toggle("done", serviceDone);
+  document.getElementById("welcomeGuideAppointmentCheck")?.classList.toggle("done", appointmentReady);
+
+  setWelcomeGuideVisible(true);
+}
+
+function scheduleWelcomeGuideCheck() {
+  window.setTimeout(() => openWelcomeGuide(false), 450);
+}
+
+async function setTipsOnOpenPreference(enabled) {
+  const data = getData();
+  data.settings = { ...getSettings(), showTipsOnOpen: Boolean(enabled) };
+  saveData(data);
+}
+
+
+async function loadSecurePaymentAccountNumber() {
+  try {
+    const { data, error } = await supabaseClient.functions.invoke("secure-payment-" + "iban", {
+      method: "GET"
+    });
+
+    if (error) {
+      console.warn("Beveiligd rekeningnummer laden mislukt:", error.message || error);
+      return "";
+    }
+
+    return normalizeBankAccountNumber(data?.["payment" + "Iban"] || data?.paymentAccountNumber || "");
+  } catch (error) {
+    console.warn("Beveiligd rekeningnummer laden mislukt:", error?.message || error);
+    return "";
+  }
+}
+
+async function saveSecurePaymentAccountNumber(paymentAccountNumber) {
+  const { error } = await supabaseClient.functions.invoke("secure-payment-" + "iban", {
+    method: "POST",
+    body: { ["payment" + "Iban"]: normalizeBankAccountNumber(paymentAccountNumber || "") }
+  });
+
+  if (error) {
+    throw new Error(error.message || "Beveiligd opslaan van het bankrekeningnummer is mislukt.");
+  }
+}
 
 async function loadSettingsFromSupabase() {
   const user = await getCurrentUser();
@@ -4994,7 +8062,7 @@ async function loadSettingsFromSupabase() {
 
   const { data, error } = await supabaseClient
     .from("user_settings")
-    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled, language, currency, payment_beneficiary_name, payment_iban, payment_bic, payment_reference_prefix")
+    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled, language, currency, payment_beneficiary_name, payment_reference_prefix, calendar_feed_token")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -5008,40 +8076,47 @@ async function loadSettingsFromSupabase() {
     notificationsEnabled: Boolean(data?.notifications_enabled ?? false),
     reminderMinutes: Number(data?.reminder_minutes ?? 30),
     overlapWarningsEnabled: data?.overlap_warnings_enabled !== false,
+    agendaFabMenuEnabled: readAgendaFabMenuEnabledPreference(),
+    showTipsOnOpen: getData()?.settings?.showTipsOnOpen !== false,
     language: normalizeLanguage(data?.language || DEFAULT_LANGUAGE),
     currency: normalizeCurrency(data?.currency || DEFAULT_CURRENCY),
     paymentBeneficiaryName: String(data?.payment_beneficiary_name || ""),
-    paymentIban: normalizeIban(data?.payment_iban || ""),
-    paymentBic: String(data?.payment_bic || "").trim().toUpperCase(),
-    paymentReferencePrefix: String(data?.payment_reference_prefix || "Idle & Ease").trim() || "Idle & Ease"
+    paymentAccountNumber: await loadSecurePaymentAccountNumber(),
+    paymentBic: "",
+    paymentReferencePrefix: normalizePaymentReferencePrefix(data?.payment_reference_prefix),
+    calendarFeedToken: String(data?.calendar_feed_token || "")
   };
 }
 
 async function saveSettingsFromForm(event) {
   if (event) event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
 
   const settings = {
     defaultBreakMinutes: Math.max(0, Number(document.getElementById("settingsDefaultBreakMinutes")?.value || 0)),
     notificationsEnabled: Boolean(document.getElementById("settingsNotificationsEnabled")?.checked),
     reminderMinutes: Number(document.getElementById("settingsReminderMinutes")?.value || 30),
     overlapWarningsEnabled: Boolean(document.getElementById("settingsOverlapWarningsEnabled")?.checked),
+    agendaFabMenuEnabled: Boolean(document.getElementById("settingsAgendaFabMenuEnabled")?.checked),
+    showTipsOnOpen: document.getElementById("settingsShowTipsOnOpen")?.checked !== false,
     language: normalizeLanguage(document.getElementById("settingsLanguage")?.value || getCurrentLanguage()),
     currency: normalizeCurrency(document.getElementById("settingsCurrency")?.value || getCurrentCurrency()),
     paymentBeneficiaryName: String(document.getElementById("settingsPaymentBeneficiaryName")?.value || "").trim(),
-    paymentIban: normalizeIban(document.getElementById("settingsPaymentIban")?.value || ""),
-    paymentBic: String(document.getElementById("settingsPaymentBic")?.value || "").trim().toUpperCase(),
-    paymentReferencePrefix: String(document.getElementById("settingsPaymentReferencePrefix")?.value || "Idle & Ease").trim() || "Idle & Ease"
+    paymentAccountNumber: normalizeBankAccountNumber(document.getElementById("settingsPaymentAccountNumber")?.value || ""),
+    paymentBic: "",
+    paymentReferencePrefix: String(document.getElementById("settingsPaymentReferencePrefix")?.value || "").trim(),
+    calendarFeedToken: getSettings().calendarFeedToken || ""
   };
 
-  if (settings.paymentIban && !isValidIban(settings.paymentIban)) {
-    await appAlert("Het bankrekeningnummer is niet geldig. Controleer het IBAN-nummer en probeer opnieuw.", {
+  if (settings.paymentAccountNumber && !isValidBankAccountNumber(settings.paymentAccountNumber)) {
+    await appAlert("Het rekeningnummer is niet geldig. Controleer het rekeningnummer en probeer opnieuw.", {
       title: "Ongeldig bankrekeningnummer",
       variant: "warning"
     });
-    const paymentIbanInput = document.getElementById("settingsPaymentIban");
-    if (paymentIbanInput) {
-      paymentIbanInput.focus();
-      paymentIbanInput.select?.();
+    const paymentAccountNumberInput = document.getElementById("settingsPaymentAccountNumber");
+    if (paymentAccountNumberInput) {
+      paymentAccountNumberInput.focus();
+      paymentAccountNumberInput.select?.();
     }
     return;
   }
@@ -5051,9 +8126,12 @@ async function saveSettingsFromForm(event) {
   if (!user) {
     const data = getData();
     data.settings = settings;
+    writeAgendaFabMenuEnabledPreference(settings.agendaFabMenuEnabled);
     currentProfilePreferences = { language: settings.language, currency: settings.currency };
     saveData(data);
     state.settingsSavePending = false;
+    state.settingsDirty = false;
+    markSettingsCleanFromCurrentForm();
     await syncNotificationState({ requestPermission: settings.notificationsEnabled });
     rerenderAll();
     await appAlert(t("settingsSavedDevice"), { title: t("settingsSaved"), variant: "success" });
@@ -5073,9 +8151,8 @@ async function saveSettingsFromForm(event) {
     language: settings.language,
     currency: settings.currency,
     payment_beneficiary_name: settings.paymentBeneficiaryName || null,
-    payment_iban: settings.paymentIban || null,
-    payment_bic: settings.paymentBic || null,
-    payment_reference_prefix: settings.paymentReferencePrefix || "Idle & Ease",
+    payment_reference_prefix: settings.paymentReferencePrefix || null,
+    calendar_feed_token: settings.calendarFeedToken || null,
     updated_at: new Date().toISOString()
   };
 
@@ -5098,10 +8175,21 @@ async function saveSettingsFromForm(event) {
     return;
   }
 
+  try {
+    await saveSecurePaymentAccountNumber(settings.paymentAccountNumber);
+  } catch (secureError) {
+    renderSettings();
+    await appAlert("Bankrekeningnummer beveiligd opslaan mislukt: " + (secureError.message || secureError), { title: "Opslaan mislukt", variant: "danger" });
+    return;
+  }
+
   const data = getData();
   data.settings = settings;
+  writeAgendaFabMenuEnabledPreference(settings.agendaFabMenuEnabled);
   currentProfilePreferences = { language: settings.language, currency: settings.currency };
   saveData(data);
+  state.settingsDirty = false;
+  markSettingsCleanFromCurrentForm();
   await syncNotificationState({ requestPermission: settings.notificationsEnabled });
   rerenderAll();
   await appAlert(t("settingsSaved"), { title: t("settingsSaved"), variant: "success" });
@@ -5139,7 +8227,16 @@ function updateClientActionBar(client = null) {
 
   const hasPhone = Boolean(phoneValue);
   const hasEmail = Boolean(emailValue);
-  const shouldShowBar = state.currentScreen === 'clientDetailScreen' && (hasPhone || hasEmail);
+  const clientDetailDialog = document.getElementById('clientDetailDialog');
+  const isClientDetailVisible = state.currentScreen === 'clientDetailScreen' || Boolean(clientDetailDialog?.open);
+  const shouldShowBar = isClientDetailVisible && (hasPhone || hasEmail);
+
+  // Als klantdetail als <dialog>.showModal() opent, zitten elementen buiten het dialog
+  // achter de browser-backdrop/top-layer. Verplaats de contactbalk daarom tijdelijk
+  // IN het dialogvenster, zodat bellen/sms/mail zichtbaar en klikbaar blijven.
+  if (clientDetailDialog?.open && bar.parentElement !== clientDetailDialog) {
+    clientDetailDialog.appendChild(bar);
+  }
 
   callBtn.classList.toggle('hidden', !hasPhone);
   smsBtn.classList.toggle('hidden', !hasPhone);
@@ -5180,7 +8277,7 @@ function openClientDetail(clientId) {
 
   const data = getData();
   const client = customerById(data, clientId);
-  const content = document.getElementById("clientDetailContent");
+  const content = document.getElementById("clientDetailModalContent") || document.getElementById("clientDetailContent");
 
   if (!client || !content) return;
 
@@ -5324,7 +8421,10 @@ function openClientDetail(clientId) {
     });
   });
 
-  switchScreen("clientDetailScreen", "Klant");
+  const dialog = document.getElementById("clientDetailDialog");
+  if (dialog && typeof dialog.showModal === "function" && !dialog.open) {
+    dialog.showModal();
+  }
   updateClientActionBar(client);
 }
 
@@ -5453,12 +8553,26 @@ function setupAppointmentCustomerSearch() {
 
   searchInput.addEventListener("input", () => {
     customerSelect.value = "";
-    rebuildCustomerDropdown();
+    refreshAppSelect(customerSelect);
+    renderAppointmentCustomerResults(searchInput.value, true);
   });
 
   searchInput.addEventListener("focus", () => {
-    if (resultsWrap) resultsWrap.classList.add("hidden");
+    renderAppointmentCustomerResults(searchInput.value, true);
   });
+
+  if (resultsWrap && resultsWrap.dataset.ready !== "true") {
+    resultsWrap.dataset.ready = "true";
+    resultsWrap.addEventListener("click", event => {
+      const button = event.target.closest("[data-customer-id]");
+      if (!button) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setAppointmentCustomer(button.dataset.customerId);
+      hideAppointmentCustomerResults();
+      if (typeof updateAppointmentOpenCustomerButton === "function") updateAppointmentOpenCustomerButton();
+    });
+  }
 
   customerSelect.addEventListener("change", () => {
     const customer = customerById(getData(), customerSelect.value);
@@ -5586,24 +8700,37 @@ function setupAppointmentServiceSearch() {
       if (currentService) services.unshift(currentService);
     }
 
-    serviceSelect.innerHTML = services.map(service => {
+    serviceSelect.innerHTML = `<option value="">${t("chooseService")}</option>` + services.map(service => {
       const suffix = service.isActive === false ? ` (${t("inactive")})` : "";
       return `<option value="${service.id}">${htmlEscape((service.name || "Naamloze dienst") + suffix)}</option>`;
     }).join("");
     serviceSelect.value = currentValue && Array.from(serviceSelect.options).some(option => option.value === String(currentValue))
       ? String(currentValue)
-      : (serviceSelect.options[0]?.value || "");
+      : "";
     refreshAppSelect(serviceSelect);
   };
 
   searchInput.addEventListener("input", () => {
     serviceSelect.value = "";
-    rebuildServiceDropdown();
+    refreshAppSelect(serviceSelect);
+    renderAppointmentServiceResults(searchInput.value, true);
   });
 
   searchInput.addEventListener("focus", () => {
-    if (resultsWrap) resultsWrap.classList.add("hidden");
+    renderAppointmentServiceResults(searchInput.value, true);
   });
+
+  if (resultsWrap && resultsWrap.dataset.ready !== "true") {
+    resultsWrap.dataset.ready = "true";
+    resultsWrap.addEventListener("click", event => {
+      const button = event.target.closest("[data-service-id]");
+      if (!button) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setAppointmentService(button.dataset.serviceId);
+      hideAppointmentServiceResults();
+    });
+  }
 
   serviceSelect.addEventListener("change", () => {
     const service = serviceById(getData(), serviceSelect.value);
@@ -5616,6 +8743,74 @@ function setupAppointmentServiceSearch() {
 }
 
 
+
+function setAppointmentPrivateMode(isPrivate) {
+  const privateMode = Boolean(isPrivate);
+  const form = document.getElementById("appointmentForm");
+  const checkbox = document.getElementById("appointmentIsPrivate");
+  if (checkbox) checkbox.checked = privateMode;
+  if (form) form.classList.toggle("appointment-private-mode", privateMode);
+
+  // Belangrijk: naast CSS ook expliciet met .hidden werken.
+  // Zo kunnen gewone klantvelden en privévelden niet opnieuw tegelijk zichtbaar worden
+  // door latere CSS-wijzigingen of browser-cache.
+  document.querySelectorAll("#appointmentForm .appointment-normal-field").forEach(field => {
+    field.classList.toggle("hidden", privateMode);
+    field.setAttribute("aria-hidden", String(privateMode));
+    field.querySelectorAll("input, select, textarea, button").forEach(control => {
+      if (control.id !== "appointmentOpenCustomerBtn") control.disabled = privateMode;
+    });
+  });
+
+  document.querySelectorAll("#appointmentForm .appointment-private-field").forEach(field => {
+    field.classList.toggle("hidden", !privateMode);
+    field.setAttribute("aria-hidden", String(!privateMode));
+    field.querySelectorAll("input, select, textarea, button").forEach(control => {
+      control.disabled = !privateMode;
+    });
+  });
+
+  ["appointmentCustomer", "appointmentService", "appointmentDuration", "appointmentPrice"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.required = !privateMode;
+  });
+
+  const title = document.getElementById("appointmentPrivateTitle");
+  const startTime = document.getElementById("appointmentTime");
+  const endTime = document.getElementById("appointmentPrivateEndTime");
+  const repeat = document.getElementById("appointmentPrivateRepeat");
+  const details = document.getElementById("appointmentPrivateDetails");
+  const timeLabel = document.getElementById("appointmentTimeLabel") || document.querySelector('label[for="appointmentTime"]');
+
+  if (title) {
+    title.required = privateMode;
+    title.disabled = !privateMode;
+  }
+  if (startTime) {
+    startTime.required = true;
+    startTime.disabled = false;
+  }
+  if (endTime) {
+    endTime.required = privateMode;
+    endTime.disabled = !privateMode;
+  }
+  if (repeat) repeat.disabled = !privateMode;
+  if (details) details.disabled = !privateMode;
+  if (timeLabel) timeLabel.textContent = privateMode ? "Tijd van" : t("time");
+
+  updatePrivateRepeatWeeklyLabel();
+  if (privateMode) syncPrivateEndTimeWithStart();
+  updateAppointmentOpenCustomerButton();
+}
+
+function updateAppointmentOpenCustomerButton() {
+  const btn = document.getElementById("appointmentOpenCustomerBtn");
+  if (!btn) return;
+  const isPrivate = document.getElementById("appointmentIsPrivate")?.checked;
+  const hasCustomer = Boolean(document.getElementById("appointmentCustomer")?.value);
+  btn.classList.toggle("hidden", Boolean(isPrivate) || !hasCustomer);
+}
+
 function populateAppointmentForm(customerId = null) {
   const data = getData();
   const customerSelect = document.getElementById("appointmentCustomer");
@@ -5624,10 +8819,12 @@ function populateAppointmentForm(customerId = null) {
   customerSelect.innerHTML = `<option value="">${t("chooseCustomer")}</option>` +
     data.customers.map(c => `<option value="${c.id}">${fullName(c)}</option>`).join("");
   const activeServices = (data.services || []).filter(service => service.isActive !== false);
-  serviceSelect.innerHTML = activeServices.map(s => `<option value="${s.id}">${s.name}</option>`).join("");
+  serviceSelect.innerHTML = `<option value="">${t("chooseService")}</option>` +
+    activeServices.map(s => `<option value="${s.id}">${htmlEscape(s.name || "Naamloze dienst")}</option>`).join("");
 
   setupAppointmentCustomerSearch();
   setupAppointmentServiceSearch();
+  setAppointmentPrivateMode(false);
 
   if (customerId) {
     setAppointmentCustomer(customerId);
@@ -5656,10 +8853,19 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
   populateAppointmentForm(prefillCustomerId);
 
   document.getElementById("appointmentForm")?.classList.remove("appointment-form-edit");
+  setAppointmentPrivateMode(false);
   document.getElementById("appointmentModalTitle").textContent = t("newAppointment");
   document.getElementById("appointmentId").value = "";
   document.getElementById("appointmentDate").value = state.selectedDate;
-  document.getElementById("appointmentTime").value = "10:00";
+  const defaultStartTime = getRoundedCurrentAppointmentTime();
+  document.getElementById("appointmentTime").value = defaultStartTime;
+  document.getElementById("appointmentPrivateEndTime").value = getAppointmentTimePlusMinutes(defaultStartTime, 60);
+  const privateEndDateInput = document.getElementById("appointmentPrivateEndDate");
+  if (privateEndDateInput) privateEndDateInput.value = state.selectedDate;
+  document.getElementById("appointmentPrivateTitle").value = "";
+  document.getElementById("appointmentPrivateDetails").value = "";
+  document.getElementById("appointmentPrivateRepeat").value = "none";
+  updatePrivateRepeatWeeklyLabel();
   document.getElementById("appointmentStatus").value = "gepland";
   document.getElementById("appointmentStatusWrap").style.display = "none";
   document.getElementById("appointmentOpenCustomerBtn")?.classList.add("hidden");
@@ -5667,22 +8873,21 @@ function openNewAppointmentDialog(prefillCustomerId = null) {
   if (remarksInput) remarksInput.value = "";
   syncAppointmentDateTimeDisplays();
 
-  const serviceSelect = document.getElementById("appointmentService");
-  if (serviceSelect.options.length) {
-    setAppointmentService(serviceSelect.options[0].value, { updateSearch: true, updateDefaults: false });
-  } else {
-    setAppointmentService("", { updateSearch: true, updateDefaults: false });
-  }
+  setAppointmentService("", { updateSearch: true, updateDefaults: false });
 
-  syncServiceDefaults();
+  const durationInput = document.getElementById("appointmentDuration");
+  const priceInput = document.getElementById("appointmentPrice");
+  if (durationInput) durationInput.value = "";
+  if (priceInput) priceInput.value = "";
   hideAppointmentServiceResults();
-  document.getElementById("deleteAppointmentBtn").style.visibility = "hidden";
+  document.getElementById("deleteAppointmentBtn")?.classList.add("hidden");
   document.getElementById("appointmentDialog").showModal();
 }
 
 function openEditAppointmentDialog(id) {
   const data = getData();
-  const app = data.appointments.find(a => String(a.id) === String(id));
+  const sourceId = String(id || "").split("__")[0];
+  const app = data.appointments.find(a => String(a.id) === String(sourceId));
   if (!app) return;
 
   populateAppointmentForm(app.customerId);
@@ -5698,11 +8903,19 @@ function openEditAppointmentDialog(id) {
 
   document.getElementById("appointmentForm")?.classList.add("appointment-form-edit");
   document.getElementById("appointmentModalTitle").textContent = t("editAppointment");
+  setAppointmentPrivateMode(isPrivateAppointment(app));
   document.getElementById("appointmentId").value = app.id;
   setAppointmentCustomer(app.customerId);
   hideAppointmentCustomerResults();
   document.getElementById("appointmentDate").value = app.date;
   document.getElementById("appointmentTime").value = app.time;
+  document.getElementById("appointmentPrivateEndTime").value = app.privateEndTime || getAppointmentDisplayEndTime(app, 0) || "";
+  const privateEndDateInput = document.getElementById("appointmentPrivateEndDate");
+  if (privateEndDateInput) privateEndDateInput.value = getStoredPrivateEndDate(app, app.date);
+  document.getElementById("appointmentPrivateTitle").value = app.privateTitle || "";
+  document.getElementById("appointmentPrivateDetails").value = app.privateDetails || "";
+  document.getElementById("appointmentPrivateRepeat").value = app.recurrenceRule || "none";
+  updatePrivateRepeatWeeklyLabel();
   setAppointmentService(app.serviceId, { updateSearch: true, updateDefaults: false });
   hideAppointmentServiceResults();
   document.getElementById("appointmentDuration").value = app.duration;
@@ -5710,11 +8923,11 @@ function openEditAppointmentDialog(id) {
   document.getElementById("appointmentStatus").value = app.status;
   const remarksInput = document.getElementById("appointmentRemarks");
   if (remarksInput) remarksInput.value = app.remarks || "";
-  document.getElementById("appointmentStatusWrap").style.display = "block";
-  document.getElementById("appointmentOpenCustomerBtn")?.classList.remove("hidden");
+  document.getElementById("appointmentStatusWrap").style.display = isPrivateAppointment(app) ? "none" : "block";
+  updateAppointmentOpenCustomerButton();
   syncAppointmentDateTimeDisplays();
 
-  document.getElementById("deleteAppointmentBtn").style.visibility = "visible";
+  document.getElementById("deleteAppointmentBtn")?.classList.remove("hidden");
   document.getElementById("appointmentDialog").showModal();
 }
 
@@ -5724,6 +8937,29 @@ function openAppointmentCustomerDetailFromDialog() {
   if (!customerId) return;
   closeDialog("appointmentDialog");
   openClientDetail(customerId);
+}
+
+
+function getFloatingPopoverElements() {
+  return [
+    document.getElementById("appointmentActionPopover"),
+    document.getElementById("paymentPopover"),
+    document.getElementById("paymentQrPopover")
+  ].filter(Boolean);
+}
+
+function moveFloatingPopoversToClientDetailDialog() {
+  const dialog = document.getElementById("clientDetailDialog");
+  if (!dialog || !dialog.open) return;
+  getFloatingPopoverElements().forEach(el => {
+    if (el.parentElement !== dialog) dialog.appendChild(el);
+  });
+}
+
+function restoreFloatingPopoversToBody() {
+  getFloatingPopoverElements().forEach(el => {
+    if (el.parentElement !== document.body) document.body.appendChild(el);
+  });
 }
 
 function positionAppointmentActionPopover() {
@@ -5841,6 +9077,11 @@ function openAppointmentActionPopover(id, anchorEl = null) {
   const app = data.appointments.find(a => String(a.id) === String(id));
   if (!app) return;
 
+  if (isPrivateAppointment(app)) {
+    openEditAppointmentDialog(id);
+    return;
+  }
+
   closePaymentPopover();
 
   const popover = document.getElementById("appointmentActionPopover");
@@ -5849,7 +9090,11 @@ function openAppointmentActionPopover(id, anchorEl = null) {
     return;
   }
 
+  moveFloatingPopoversToClientDetailDialog();
+
   const detailsBtn = document.getElementById("appointmentActionDetailsBtn");
+  const deleteBtn = document.getElementById("appointmentActionDeleteBtn");
+  const followUpBtn = document.getElementById("appointmentActionFollowUpBtn");
   const customerBtn = document.getElementById("appointmentActionCustomerBtn");
   const customer = customerById(data, app.customerId);
 
@@ -5860,6 +9105,24 @@ function openAppointmentActionPopover(id, anchorEl = null) {
       event.stopPropagation();
       closeAppointmentActionPopover();
       openEditAppointmentDialog(id);
+    };
+  }
+
+  if (deleteBtn) {
+    deleteBtn.onclick = async event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const appointmentIdInput = document.getElementById("appointmentId");
+      if (appointmentIdInput) appointmentIdInput.value = id;
+      await deleteCurrentAppointment();
+      closeAppointmentActionPopover();
+    };
+  }
+
+  if (followUpBtn) {
+    followUpBtn.onclick = event => {
+      event.stopPropagation();
+      openFollowUpAppointmentDialog(id);
     };
   }
 
@@ -5975,15 +9238,15 @@ function closePaymentPopover() {
   paymentPopoverState.anchorRect = null;
 }
 
-function normalizeIban(value) {
+function normalizeBankAccountNumber(value) {
   return String(value || "").replace(/\s+/g, "").toUpperCase();
 }
 
-function isValidIban(value) {
-  const iban = normalizeIban(value);
-  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(iban)) return false;
+function isValidBankAccountNumber(value) {
+  const accountNumber = normalizeBankAccountNumber(value);
+  if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(accountNumber)) return false;
 
-  const rearranged = `${iban.slice(4)}${iban.slice(0, 4)}`;
+  const rearranged = `${accountNumber.slice(4)}${accountNumber.slice(0, 4)}`;
   let remainder = 0;
 
   for (const char of rearranged) {
@@ -6003,15 +9266,15 @@ function buildPaymentReference(app, data = getData()) {
   const settings = getSettings();
   const service = serviceById(data, app?.serviceId);
   const treatmentName = service?.name || app?.serviceName || "behandeling";
-  const prefix = String(settings.paymentReferencePrefix || "Idle & Ease").trim() || "Idle & Ease";
-  return `${prefix} - ${treatmentName}`.slice(0, 140);
+  const prefix = String(settings.paymentReferencePrefix || "").trim();
+  return (prefix ? `${prefix} - ${treatmentName}` : treatmentName).slice(0, 140);
 }
 
 function buildEpcQrPayload(app, data = getData()) {
   const settings = getSettings();
-  const iban = normalizeIban(settings.paymentIban || "");
+  const accountNumber = normalizeBankAccountNumber(settings.paymentAccountNumber || "");
   const beneficiary = String(settings.paymentBeneficiaryName || "").trim();
-  if (!isValidIban(iban) || !beneficiary) return "";
+  if (!isValidBankAccountNumber(accountNumber) || !beneficiary) return "";
 
   const amount = Number(app?.price || 0);
   const safeAmount = Number.isFinite(amount) && amount > 0 ? amount.toFixed(2) : "0.00";
@@ -6025,7 +9288,7 @@ function buildEpcQrPayload(app, data = getData()) {
     "SCT",
     bic,
     beneficiary.slice(0, 70),
-    iban,
+    accountNumber,
     `EUR${safeAmount}`,
     "",
     "",
@@ -6061,7 +9324,7 @@ function renderPaymentQrTooltip(app, data = getData()) {
   button.disabled = false;
   button.dataset.qrPayload = payload;
   button.dataset.appointmentId = app?.id ? String(app.id) : "";
-  hint.textContent = "Toon bank-QR";
+  hint.textContent = "";
 }
 
 function openPaymentQrModal(event = null) {
@@ -6084,7 +9347,7 @@ function openPaymentQrModal(event = null) {
 
   if (!payload || !app) {
     image.removeAttribute("src");
-    text.textContent = "Vul eerst naam en IBAN in bij Instellingen om een bank-QR te tonen.";
+    text.textContent = "Vul eerst naam en rekeningnummer in bij Instellingen om een bank-QR te tonen.";
     amount.textContent = "";
   } else {
     image.src = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=14&data=${encodeURIComponent(payload)}`;
@@ -6130,7 +9393,7 @@ function renderPaymentPopoverOptions(app, data = getData()) {
   }).join("");
 
   list.querySelectorAll(".payment-method-popup-item").forEach(button => {
-    button.addEventListener("click", async event => {
+    button.addEventListener("click", withActionLock(async event => {
       event.stopPropagation();
       const methodName = button.dataset.paymentValue || "";
       const type = button.dataset.paymentType || "payment";
@@ -6143,7 +9406,7 @@ function renderPaymentPopoverOptions(app, data = getData()) {
         return;
       }
       await confirmPaymentSelection(methodName);
-    });
+    }));
   });
 }
 
@@ -6154,6 +9417,8 @@ function openPaymentDialog(id, anchorEl = null) {
 
   const popover = document.getElementById("paymentPopover");
   if (!popover) return;
+
+  moveFloatingPopoversToClientDetailDialog();
 
   document.getElementById("paymentAppointmentId").value = id;
   document.getElementById("paymentAmount").textContent = euro(app.price, app.currency);
@@ -6212,7 +9477,7 @@ function openNewPaymentMethodDialog() {
   document.getElementById("paymentMethodModalTitle").textContent = t("newPaymentMethod");
   document.getElementById("paymentMethodId").value = "";
   document.getElementById("paymentMethodName").value = "";
-  document.getElementById("deletePaymentMethodBtn").style.visibility = "hidden";
+  document.getElementById("deletePaymentMethodBtn")?.classList.add("hidden");
   document.getElementById("paymentMethodDialog").showModal();
 }
 
@@ -6224,7 +9489,7 @@ function openEditPaymentMethodDialog(id) {
   document.getElementById("paymentMethodModalTitle").textContent = t("editPaymentMethod");
   document.getElementById("paymentMethodId").value = method.id;
   document.getElementById("paymentMethodName").value = method.name;
-  document.getElementById("deletePaymentMethodBtn").style.visibility = "visible";
+  document.getElementById("deletePaymentMethodBtn")?.classList.remove("hidden");
   document.getElementById("paymentMethodDialog").showModal();
 }
 
@@ -6256,19 +9521,57 @@ function openEditClientDialog(id) {
   document.getElementById("clientDialog").showModal();
 }
 
+
+function selectNumericFieldContent(event) {
+  const input = event.currentTarget;
+  if (!input) return;
+  window.setTimeout(() => {
+    try { input.select(); } catch (_) {}
+  }, 0);
+}
+
+function normalizeDecimalInput(value) {
+  let clean = String(value || "").replace(/[^0-9,.]/g, "");
+  const firstSeparatorIndex = clean.search(/[,.]/);
+  if (firstSeparatorIndex >= 0) {
+    const before = clean.slice(0, firstSeparatorIndex + 1);
+    const after = clean.slice(firstSeparatorIndex + 1).replace(/[,.]/g, "");
+    clean = before + after;
+  }
+  return clean;
+}
+
+function normalizeDurationInput(value) {
+  return String(value || "").replace(/[^0-9]/g, "");
+}
+
+function parseDecimalInput(value) {
+  const normalized = String(value || "").trim().replace(",", ".");
+  const number = Number(normalized);
+  return Number.isFinite(number) ? number : 0;
+}
+
+function normalizeServicePriceInput(value) {
+  return normalizeDecimalInput(value);
+}
+
+function parseServicePrice(value) {
+  return parseDecimalInput(value);
+}
+
 function openNewServiceDialog() {
   document.getElementById("serviceModalTitle").textContent = t("newService");
   document.getElementById("serviceId").value = "";
   document.getElementById("serviceName").value = "";
   document.getElementById("serviceDuration").value = 60;
-  document.getElementById("servicePrice").value = 65;
+  document.getElementById("servicePrice").value = "";
 
   const reactivateWrap = document.getElementById("serviceReactivateWrap");
   const reactivateCheckbox = document.getElementById("serviceReactivateCheckbox");
   if (reactivateWrap) reactivateWrap.classList.add("hidden");
   if (reactivateCheckbox) reactivateCheckbox.checked = false;
 
-  document.getElementById("deleteServiceBtn").style.visibility = "hidden";
+  document.getElementById("deleteServiceBtn")?.classList.add("hidden");
   document.getElementById("serviceDialog").showModal();
 }
 
@@ -6290,7 +9593,7 @@ function openEditServiceDialog(id) {
   if (reactivateWrap) reactivateWrap.classList.toggle("hidden", !isInactive);
   if (reactivateCheckbox) reactivateCheckbox.checked = false;
 
-  document.getElementById("deleteServiceBtn").style.visibility = isInactive ? "hidden" : "visible";
+  document.getElementById("deleteServiceBtn")?.classList.toggle("hidden", isInactive);
   document.getElementById("serviceDialog").showModal();
 }
 
@@ -6300,6 +9603,7 @@ function openEditServiceDialog(id) {
 
 async function savePaymentMethodFromForm(event) {
   event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
 
   const user = await getCurrentUser();
   const data = getData();
@@ -6361,6 +9665,7 @@ async function savePaymentMethodFromForm(event) {
 }
 
 async function deleteCurrentPaymentMethod() {
+  if (!(await ensureDataWriteAccess())) return;
   const id = document.getElementById("paymentMethodId").value;
   if (!id) return;
 
@@ -6464,6 +9769,7 @@ async function resolveServiceNameBeforeSave(data, requestedName, excludeId = nul
 
 async function saveClientFromForm(event) {
   event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
 
   const user = await getCurrentUser();
   const data = getData();
@@ -6553,6 +9859,7 @@ async function saveClientFromForm(event) {
 
 async function saveServiceFromForm(event) {
   event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
 
   const user = await getCurrentUser();
   const data = getData();
@@ -6572,7 +9879,7 @@ async function saveServiceFromForm(event) {
     const payload = {
       name: serviceName,
       duration: Number(document.getElementById("serviceDuration").value),
-      price: Number(document.getElementById("servicePrice").value),
+      price: parseServicePrice(document.getElementById("servicePrice").value),
       isActive: nextIsActive
     };
 
@@ -6597,7 +9904,7 @@ async function saveServiceFromForm(event) {
     user_id: user.id,
     name: serviceName,
     duration: Number(document.getElementById("serviceDuration").value),
-    price: Number(document.getElementById("servicePrice").value),
+    price: parseServicePrice(document.getElementById("servicePrice").value),
     is_active: nextIsActive
   };
 
@@ -6625,8 +9932,23 @@ async function saveServiceFromForm(event) {
   rerenderAll();
 }
 
+
+function getRoundedCurrentAppointmentTime() {
+  const now = new Date();
+  const rounded = new Date(now);
+  const minutes = rounded.getMinutes();
+  const add = minutes === 0 ? 0 : 60 - minutes;
+  rounded.setMinutes(minutes + add, 0, 0);
+  return timeStringFromMinutes((rounded.getHours() * 60) + rounded.getMinutes());
+}
+
+function getAppointmentTimePlusMinutes(timeStr, minutesToAdd = 60) {
+  return timeStringFromMinutes(minutesFromTimeString(timeStr || "00:00") + Number(minutesToAdd || 0));
+}
+
 async function saveAppointmentFromForm(event) {
   event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
 
   const user = await getCurrentUser();
   const data = getData();
@@ -6635,22 +9957,59 @@ async function saveAppointmentFromForm(event) {
   const settings = getSettings();
 
   const selectedCustomerId = document.getElementById("appointmentCustomer").value;
+  const isPrivate = Boolean(document.getElementById("appointmentIsPrivate")?.checked);
+  if (isPrivate) syncPrivateEndTimeWithStart();
 
-  if (!selectedCustomerId) {
+  if (!isPrivate && !selectedCustomerId) {
     await appAlert("Kies eerst een klant uit de zoekresultaten.", { title: "Klant kiezen", variant: "warning" });
     document.getElementById("appointmentCustomerSearch")?.focus();
     return;
   }
 
+  const selectedServiceId = document.getElementById("appointmentService")?.value || "";
+  if (!isPrivate && !selectedServiceId) {
+    await appAlert("Kies eerst een dienst uit de zoekresultaten.", { title: "Dienst kiezen", variant: "warning" });
+    document.getElementById("appointmentServiceSearch")?.focus();
+    return;
+  }
+
+  const privateStartTime = document.getElementById("appointmentTime")?.value || "";
+  const privateEndTime = document.getElementById("appointmentPrivateEndTime")?.value || "";
+  const privateEndDate = document.getElementById("appointmentPrivateEndDate")?.value || document.getElementById("appointmentDate")?.value || todayStr;
+  const privateTitle = String(document.getElementById("appointmentPrivateTitle")?.value || "").trim();
+  if (isPrivate && (!privateTitle || !privateStartTime || !privateEndTime)) {
+    await appAlert("Vul voor een privé-afspraak minstens Tijd van, Tijd tot en een titel in.", { title: "Privé-afspraak", variant: "warning" });
+    return;
+  }
+  if (isPrivate && privateEndDate < document.getElementById("appointmentDate").value) {
+    await appAlert("Datum tot mag niet vroeger zijn dan Datum van.", { title: "Privé-afspraak", variant: "warning" });
+    return;
+  }
+  if (isPrivate && privateEndDate === document.getElementById("appointmentDate").value && minutesFromTimeString(privateEndTime) < minutesFromTimeString(privateStartTime)) {
+    await appAlert("Tijd tot mag niet vroeger zijn dan Tijd van.", { title: "Privé-afspraak", variant: "warning" });
+    return;
+  }
+
+  const existingStoredApp = id ? data.appointments.find(a => String(a.id) === String(id)) : null;
+  const existingRecurrenceGroupId = getAppointmentRecurrenceGroupId(existingStoredApp);
+  const existingRecurrenceRule = existingStoredApp?.recurrenceRule || "none";
+
   const localPayload = {
-    customerId: Number(selectedCustomerId),
+    customerId: isPrivate ? null : Number(selectedCustomerId),
     date: document.getElementById("appointmentDate").value,
     time: document.getElementById("appointmentTime").value,
-    serviceId: Number(document.getElementById("appointmentService").value),
-    duration: Number(document.getElementById("appointmentDuration").value),
-    price: Number(document.getElementById("appointmentPrice").value),
-    status: id ? document.getElementById("appointmentStatus").value : "gepland",
-    remarks: String(document.getElementById("appointmentRemarks")?.value || "").trim()
+    serviceId: isPrivate ? null : Number(selectedServiceId),
+    duration: isPrivate ? calculatePrivateDuration(privateStartTime, privateEndTime) : Number(document.getElementById("appointmentDuration").value),
+    price: isPrivate ? 0 : parseDecimalInput(document.getElementById("appointmentPrice").value),
+    status: isPrivate ? "gepland" : (id ? document.getElementById("appointmentStatus").value : "gepland"),
+    remarks: isPrivate ? "" : String(document.getElementById("appointmentRemarks")?.value || "").trim(),
+    isPrivate,
+    privateTitle: isPrivate ? privateTitle : "",
+    privateDetails: isPrivate ? String(document.getElementById("appointmentPrivateDetails")?.value || "").trim() : "",
+    privateEndTime: isPrivate ? privateEndTime : "",
+    privateEndDate: isPrivate ? privateEndDate : "",
+    recurrenceRule: isPrivate ? (document.getElementById("appointmentPrivateRepeat")?.value || existingRecurrenceRule || "none") : "none",
+    recurrenceGroupId: existingRecurrenceGroupId || null
   };
 
   if (isAppointmentInPast(localPayload)) {
@@ -6663,10 +10022,26 @@ async function saveAppointmentFromForm(event) {
     if (!confirmedPast) return;
   }
 
+  let recurrenceEditScope = "single";
+  if (id && isRecurringAppointment(existingStoredApp)) {
+    recurrenceEditScope = await chooseRecurringAppointmentScope("update");
+    if (!recurrenceEditScope) return;
+  }
+
+  const recurringAffectedAppointments = id && isRecurringAppointment(existingStoredApp)
+    ? getRecurringAffectedAppointments(data, existingStoredApp, recurrenceEditScope)
+    : [];
+
+  const recurrenceOccurrences = (isPrivate && !id)
+    ? buildPrivateRecurrenceOccurrences(localPayload, localPayload.recurrenceRule)
+    : (recurringAffectedAppointments.length
+        ? recurringAffectedAppointments.map(appointment => applyRecurringEditToAppointment(appointment, localPayload, existingStoredApp, recurrenceEditScope))
+        : [localPayload]);
+
   if (settings.overlapWarningsEnabled) {
-    const overlapApp = findAppointmentOverlap(localPayload, data.appointments, settings.defaultBreakMinutes, id);
-    if (overlapApp) {
-      const confirmed = await appConfirm(buildOverlapMessage(localPayload, overlapApp, data.appointments, settings.defaultBreakMinutes, id), {
+    const foundOverlap = findFirstOverlapForAppointments(recurrenceOccurrences, data.appointments, settings.defaultBreakMinutes, id);
+    if (foundOverlap) {
+      const confirmed = await appConfirm(buildOverlapMessage(foundOverlap.payload, foundOverlap.overlap, data.appointments, settings.defaultBreakMinutes, id), {
         title: "Overlap gedetecteerd",
         confirmText: t("save"),
         cancelText: t("cancel"),
@@ -6678,15 +10053,27 @@ async function saveAppointmentFromForm(event) {
 
   if (!user) {
     if (id) {
-      const existingApp = data.appointments.find(a => Number(a.id) === id);
-      Object.assign(existingApp, { ...localPayload, currency: existingApp.currency || getCurrentCurrency() });
+      if (recurringAffectedAppointments.length) {
+        recurringAffectedAppointments.forEach(appointment => {
+          const index = data.appointments.findIndex(a => String(a.id) === String(appointment.id));
+          if (index >= 0) {
+            data.appointments[index] = applyRecurringEditToAppointment(data.appointments[index], localPayload, existingStoredApp, recurrenceEditScope);
+          }
+        });
+      } else {
+        const existingApp = data.appointments.find(a => Number(a.id) === id);
+        if (existingApp) Object.assign(existingApp, { ...localPayload, currency: existingApp.currency || getCurrentCurrency() });
+      }
     } else {
-      data.appointments.push({
-        id: nextId(data.appointments),
-        ...localPayload,
-        paid: false,
-        paymentMethodName: null,
-        currency: getCurrentCurrency()
+      let nextLocalId = nextId(data.appointments);
+      recurrenceOccurrences.forEach(item => {
+        data.appointments.push({
+          id: nextLocalId++,
+          ...item,
+          paid: false,
+          paymentMethodName: null,
+          currency: getCurrentCurrency()
+        });
       });
     }
 
@@ -6702,7 +10089,7 @@ async function saveAppointmentFromForm(event) {
     return;
   }
 
-  const existingApp = data.appointments.find(a => String(a.id) === String(id));
+  const existingApp = existingStoredApp;
   const isPaid = existingApp ? Boolean(existingApp.paid) : false;
   const existingPaymentMethodName = paymentMethodNameForAppointment(existingApp, data) || null;
   const appointmentCurrency = normalizeCurrency(existingApp?.currency || getCurrentCurrency());
@@ -6716,30 +10103,77 @@ async function saveAppointmentFromForm(event) {
     duration: localPayload.duration,
     price: localPayload.price,
     status: localPayload.status,
-    paid: isPaid,
-    payment_method_label: isPaid ? existingPaymentMethodName : null,
+    paid: localPayload.isPrivate ? false : isPaid,
+    payment_method_label: localPayload.isPrivate ? null : (isPaid ? existingPaymentMethodName : null),
     currency: appointmentCurrency,
-    appointment_remarks: localPayload.remarks
+    appointment_remarks: localPayload.isPrivate ? withPrivateEndDateMeta(localPayload.remarks, localPayload.privateEndDate || localPayload.date) : localPayload.remarks,
+    is_private: localPayload.isPrivate,
+    private_title: localPayload.privateTitle || null,
+    private_details: localPayload.privateDetails || null,
+    private_end_time: localPayload.privateEndTime || null,
+    recurrence_group_id: localPayload.recurrenceGroupId || null,
+    recurrence_rule: localPayload.recurrenceRule || "none"
   };
 
   let error;
 
   if (id) {
-    ({ error } = await supabaseClient
-      .from("appointments")
-      .update(payload)
-      .eq("id", Number(id))
-      .eq("user_id", user.id));
+    if (recurringAffectedAppointments.length) {
+      for (const item of recurrenceOccurrences) {
+        const rowPayload = {
+          ...payload,
+          appointment_date: item.date,
+          appointment_time: item.time,
+          duration: item.duration,
+          price: item.price,
+          status: item.status,
+          appointment_remarks: item.isPrivate ? withPrivateEndDateMeta(item.remarks, item.privateEndDate || item.date) : item.remarks,
+          is_private: item.isPrivate,
+          private_title: item.privateTitle || null,
+          private_details: item.privateDetails || null,
+          private_end_time: item.privateEndTime || null,
+          recurrence_group_id: item.recurrenceGroupId || null,
+          recurrence_rule: item.recurrenceRule || "none"
+        };
+        const result = await supabaseClient
+          .from("appointments")
+          .update(rowPayload)
+          .eq("id", Number(item.id))
+          .eq("user_id", user.id);
+        if (result.error) {
+          error = result.error;
+          break;
+        }
+      }
+    } else {
+      ({ error } = await supabaseClient
+        .from("appointments")
+        .update(payload)
+        .eq("id", Number(id))
+        .eq("user_id", user.id));
+    }
   } else {
-    ({ error } = await supabaseClient
+    const rows = (isPrivate && recurrenceOccurrences.length > 1)
+      ? recurrenceOccurrences.map(item => ({
+          ...payload,
+          appointment_date: item.date,
+          recurrence_group_id: item.recurrenceGroupId || null,
+          recurrence_rule: item.recurrenceRule || "none"
+        }))
+      : payload;
+
+    const insertResult = await supabaseClient
       .from("appointments")
-      .insert(payload));
+      .insert(rows);
+
+    error = insertResult.error;
   }
 
   if (error) {
     await appAlert("Opslaan afspraak mislukt: " + error.message, { title: "Opslaan mislukt", variant: "danger" });
     return;
   }
+
 
   await loadAllDataFromSupabase();
   closeDialog("appointmentDialog");
@@ -6753,46 +10187,234 @@ async function saveAppointmentFromForm(event) {
 }
 
 async function deleteCurrentAppointment() {
+  if (!(await ensureDataWriteAccess())) return;
   const id = document.getElementById("appointmentId").value;
   if (!id) return;
 
-  const confirmed = await appConfirm("Deze afspraak wordt definitief verwijderd.", {
-    title: "Afspraak verwijderen",
-    confirmText: t("delete"),
-    cancelText: t("cancel"),
-    variant: "danger"
+  const data = getData();
+  const existingApp = data.appointments.find(a => String(a.id) === String(id));
+  const recurring = isRecurringAppointment(existingApp);
+  let deleteScope = "single";
+
+  if (recurring) {
+    deleteScope = await chooseRecurringAppointmentScope("delete");
+    if (!deleteScope) return;
+  } else {
+    const confirmed = await appConfirm("Deze afspraak wordt verplaatst naar Verwijderde afspraken. Je kunt ze later herstellen via Instellingen.", {
+      title: "Afspraak verwijderen",
+      confirmText: t("delete"),
+      cancelText: t("cancel"),
+      variant: "danger"
+    });
+    if (!confirmed) return;
+  }
+
+  // Sluit eerst het afspraakvenster. Een <dialog> staat in de browser top-layer
+  // en kan daardoor de globale busy-overlay visueel afdekken, ook met hoge z-index.
+  // Vooral bij privé-afspraken werd "Even geduld" daardoor niet zichtbaar.
+  closeDialog("appointmentDialog");
+  await waitForBusyOverlayPaint();
+
+  const errorMessage = await runWithGlobalActionBusy(async () => {
+    setGlobalActionBusyVisible(true);
+    await waitForBusyOverlayPaint();
+    const deleteBusyStartedAt = Date.now();
+    const freshData = getData();
+    const freshExistingApp = freshData.appointments.find(a => String(a.id) === String(id)) || existingApp;
+    const affectedAppointments = recurring
+      ? getRecurringAffectedAppointments(freshData, freshExistingApp, deleteScope)
+      : [freshExistingApp].filter(Boolean);
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+      const affectedIdSet = new Set(affectedAppointments.map(appointment => String(appointment.id)));
+      freshData.appointments = freshData.appointments.filter(a => !affectedIdSet.has(String(a.id)));
+      saveData(freshData);
+      rerenderAll();
+      await keepBusyOverlayVisibleSince(deleteBusyStartedAt, 750);
+      return "";
+    }
+
+    let query = supabaseClient
+      .from("appointments")
+      .update({ deleted_at: new Date().toISOString(), deleted_by: user.id })
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    if (recurring && deleteScope === "series") {
+      query = query.eq("recurrence_group_id", getAppointmentRecurrenceGroupId(freshExistingApp));
+    } else if (recurring && deleteScope === "following") {
+      query = query
+        .eq("recurrence_group_id", getAppointmentRecurrenceGroupId(freshExistingApp))
+        .gte("appointment_date", freshExistingApp.date);
+    } else {
+      query = query.eq("id", Number(id));
+    }
+
+    const { error } = await query;
+
+    if (error) {
+      return "Verwijderen afspraak mislukt: " + error.message;
+    }
+
+    await loadAllDataFromSupabase();
+    rerenderAll();
+    await keepBusyOverlayVisibleSince(deleteBusyStartedAt, 750);
+    return "";
   });
 
+  if (errorMessage) {
+    await appAlert(errorMessage, { title: "Verwijderen mislukt", variant: "danger" });
+  }
+}
+
+async function openDeletedAppointmentsDialog() {
+  const dialog = document.getElementById("deletedAppointmentsDialog");
+  if (!dialog) return;
+  const searchInput = document.getElementById("deletedAppointmentsSearch");
+  if (searchInput) searchInput.value = "";
+  dialog.showModal();
+  await renderDeletedAppointmentsDialog();
+}
+
+function buildDeletedAppointmentSearchText(appointment) {
+  const data = getData();
+  const customer = customerById(data, appointment.customerId);
+  const service = serviceById(data, appointment.serviceId);
+  return [
+    customer ? fullName(customer) : "Onbekende klant",
+    service ? service.name : "Onbekende dienst",
+    appointment.date,
+    appointment.time,
+    appointment.status,
+    appointment.remarks,
+    appointment.privateTitle,
+    appointment.privateDetails
+  ].join(" ").toLowerCase();
+}
+
+async function renderDeletedAppointmentsDialog() {
+  const list = document.getElementById("deletedAppointmentsList");
+  const count = document.getElementById("deletedAppointmentsCount");
+  if (!list) return;
+  list.innerHTML = '<div class="deleted-appointments-empty">Even geduld...</div>';
+
+  const deletedAppointments = await loadDeletedAppointmentsFromSupabase();
+  const query = String(document.getElementById("deletedAppointmentsSearch")?.value || "").trim().toLowerCase();
+  const filtered = query
+    ? deletedAppointments.filter(appointment => buildDeletedAppointmentSearchText(appointment).includes(query))
+    : deletedAppointments;
+
+  if (count) count.textContent = `${filtered.length} van ${deletedAppointments.length} verwijderde afspraak${deletedAppointments.length === 1 ? "" : "en"}`;
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="deleted-appointments-empty">Geen verwijderde afspraken gevonden.</div>';
+    return;
+  }
+
+  const data = getData();
+  list.innerHTML = filtered.map(appointment => {
+    const customer = customerById(data, appointment.customerId);
+    const service = serviceById(data, appointment.serviceId);
+    const title = appointment.isPrivate
+      ? (appointment.privateTitle || "Privé")
+      : (customer ? fullName(customer) : "Onbekende klant");
+    const serviceName = appointment.isPrivate ? "Privé-afspraak" : (service ? service.name : "Onbekende dienst");
+    const remarks = appointment.isPrivate ? (appointment.privateDetails || appointment.remarks || "") : (appointment.remarks || "");
+    return `
+      <article class="deleted-appointment-card" data-appointment-id="${htmlEscape(String(appointment.id))}">
+        <div class="deleted-appointment-main">
+          <strong>${htmlEscape(title)}</strong>
+          <span>${htmlEscape(formatLongDate(appointment.date))} · ${htmlEscape(appointment.time || "--:--")} · ${htmlEscape(serviceName)}</span>
+          ${remarks ? `<p>${htmlEscape(remarks)}</p>` : '<p class="deleted-appointment-muted">Geen opmerkingen.</p>'}
+          <small>Verwijderd op ${htmlEscape(appointment.deletedAt ? new Date(appointment.deletedAt).toLocaleString("nl-BE") : "onbekend")}</small>
+        </div>
+        <div class="deleted-appointment-actions">
+          <button class="btn btn-secondary action-btn deleted-appointment-restore-btn" type="button" data-restore-appointment-id="${htmlEscape(String(appointment.id))}">Herstellen</button>
+          <button class="btn btn-danger action-btn deleted-appointment-delete-btn" type="button" data-delete-appointment-id="${htmlEscape(String(appointment.id))}">Definitief verwijderen</button>
+        </div>
+      </article>`;
+  }).join("");
+
+  list.querySelectorAll("[data-restore-appointment-id]").forEach(button => {
+    button.addEventListener("click", async event => {
+      const restoreId = event.currentTarget.getAttribute("data-restore-appointment-id");
+      await restoreDeletedAppointment(restoreId);
+    });
+  });
+
+  list.querySelectorAll("[data-delete-appointment-id]").forEach(button => {
+    button.addEventListener("click", async event => {
+      const deleteId = event.currentTarget.getAttribute("data-delete-appointment-id");
+      await permanentlyDeleteAppointment(deleteId);
+    });
+  });
+}
+
+async function restoreDeletedAppointment(id) {
+  if (!(await ensureDataWriteAccess())) return;
+  if (!id) return;
+  const confirmed = await appConfirm("Deze afspraak wordt opnieuw zichtbaar in de agenda, omzet en statistieken.", {
+    title: "Afspraak herstellen",
+    confirmText: "Herstellen",
+    cancelText: t("cancel")
+  });
   if (!confirmed) return;
 
   const user = await getCurrentUser();
+  if (!user) return;
 
-  if (!user) {
-    const data = getData();
-    data.appointments = data.appointments.filter(a => String(a.id) !== String(id));
-    saveData(data);
-    closeDialog("appointmentDialog");
-    rerenderAll();
+  const { error } = await supabaseClient
+    .from("appointments")
+    .update({ deleted_at: null, deleted_by: null })
+    .eq("id", Number(id))
+    .eq("user_id", user.id);
+
+  if (error) {
+    await appAlert("Afspraak herstellen mislukt: " + error.message, { title: "Herstellen mislukt", variant: "danger" });
     return;
   }
+
+  await loadAllDataFromSupabase();
+  rerenderAll();
+  await renderDeletedAppointmentsDialog();
+}
+
+async function permanentlyDeleteAppointment(id) {
+  if (!(await ensureDataWriteAccess())) return;
+  if (!id) return;
+
+  const confirmed = await appConfirm("Deze afspraak wordt definitief verwijderd. Dit kan niet ongedaan gemaakt worden.", {
+    title: "Definitief verwijderen",
+    confirmText: "Definitief verwijderen",
+    cancelText: t("cancel"),
+    variant: "danger"
+  });
+  if (!confirmed) return;
+
+  const user = await getCurrentUser();
+  if (!user) return;
 
   const { error } = await supabaseClient
     .from("appointments")
     .delete()
     .eq("id", Number(id))
-    .eq("user_id", user.id);
+    .eq("user_id", user.id)
+    .not("deleted_at", "is", null);
 
   if (error) {
-    await appAlert("Verwijderen afspraak mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
+    await appAlert("Afspraak definitief verwijderen mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
     return;
   }
 
   await loadAllDataFromSupabase();
-  closeDialog("appointmentDialog");
   rerenderAll();
+  await renderDeletedAppointmentsDialog();
 }
 
 async function deleteCurrentService() {
+  if (!(await ensureDataWriteAccess())) return;
   const id = document.getElementById("serviceId").value;
   if (!id) return;
 
@@ -6834,6 +10456,7 @@ async function deleteCurrentService() {
 }
 
 async function confirmPaymentSelection(methodName) {
+  if (!(await ensureDataWriteAccess())) return;
   const id = document.getElementById("paymentAppointmentId").value;
   const safeMethodName = String(methodName || "").trim();
   const user = await getCurrentUser();
@@ -6879,6 +10502,7 @@ async function confirmPaymentSelection(methodName) {
 }
 
 async function markUnpaid() {
+  if (!(await ensureDataWriteAccess())) return;
   const id = document.getElementById("paymentAppointmentId").value;
   const user = await getCurrentUser();
 
@@ -6918,6 +10542,7 @@ async function markUnpaid() {
 }
 
 async function markNoShow() {
+  if (!(await ensureDataWriteAccess())) return;
   const id = document.getElementById("paymentAppointmentId").value;
   const user = await getCurrentUser();
 
@@ -6966,7 +10591,12 @@ function openMonthPicker() {
   monthSelect.value = String(state.currentMonth);
   document.getElementById("yearSelect").value = state.currentYear;
 
+  closeAllAppSelectDropdowns();
+  refreshAppSelect(monthSelect);
+
   document.getElementById("monthPickerDialog").showModal();
+
+  window.requestAnimationFrame(() => refreshAppSelect(monthSelect));
 }
 
 function saveMonthPicker(event) {
@@ -7003,6 +10633,7 @@ function rerenderAll() {
   renderPaymentMethods();
   renderStatistics();
   renderRevenue();
+  renderCosts();
   renderTodos();
 
   if (state.selectedClientId && state.currentScreen === "clientDetailScreen") {
@@ -7051,7 +10682,8 @@ function applyNavStyleActionButtons(root = document) {
 
     if (!action) return;
 
-    const label = t(action.key);
+    const explicitLabel = String(button.dataset.actionLabel || "").trim();
+    const label = explicitLabel || t(action.key);
     button.dataset.actionLabel = label;
     button.dataset.actionType = action.type;
     button.dataset.actionKey = action.key;
@@ -7065,6 +10697,644 @@ function applyNavStyleActionButtons(root = document) {
   });
 }
 
+
+
+/* =========================
+   KOSTEN
+========================= */
+function getCosts(data = getData()) {
+  return Array.isArray(data.costs) ? data.costs : [];
+}
+
+function getStandardCosts(data = getData()) {
+  return Array.isArray(data.standardCosts) ? data.standardCosts : [];
+}
+
+function costById(data, id) {
+  return getCosts(data).find(cost => String(cost.id) === String(id));
+}
+
+function getCostsPeriodType() {
+  return state.costsPeriodType || "month";
+}
+
+function getCostsPeriodDate() {
+  return state.costsPeriodDate || state.selectedDate || todayStr;
+}
+
+function setCostsPeriod(type, dateStr) {
+  state.costsPeriodType = type || getCostsPeriodType();
+  state.costsPeriodDate = dateStr || getCostsPeriodDate();
+  renderCosts();
+}
+
+function getFilteredCosts(data = getData()) {
+  const type = getCostsPeriodType();
+  const anchor = getCostsPeriodDate();
+  let costs = getCosts(data);
+
+  if (type === "day") {
+    costs = costs.filter(cost => cost.date === anchor);
+  } else if (type === "week") {
+    const bounds = weekBounds(anchor);
+    costs = costs.filter(cost => cost.date >= bounds.start && cost.date <= bounds.end);
+  } else if (type === "month") {
+    const prefix = anchor.slice(0, 7);
+    costs = costs.filter(cost => String(cost.date || "").startsWith(prefix));
+  } else if (type === "year") {
+    const prefix = anchor.slice(0, 4);
+    costs = costs.filter(cost => String(cost.date || "").startsWith(prefix));
+  }
+
+  return costs;
+}
+
+function syncCostsPeriodChips() {
+  const type = getCostsPeriodType();
+  const anchor = getCostsPeriodDate();
+  const anchorDate = new Date(anchor + "T00:00:00");
+
+  const yearBtn = document.getElementById("costsYearBtn");
+  const monthBtn = document.getElementById("costsMonthBtn");
+  const weekBtn = document.getElementById("costsWeekBtn");
+  const dayBtn = document.getElementById("costsDayBtn");
+
+  const yearLabel = document.getElementById("costsYearLabel");
+  const monthLabel = document.getElementById("costsMonthLabel");
+  const weekLabel = document.getElementById("costsWeekLabel");
+  const dayLabel = document.getElementById("costsDayLabel");
+
+  if (yearLabel) yearLabel.textContent = String(anchorDate.getFullYear());
+  if (monthLabel) monthLabel.innerHTML = formatRevenueMonthTile(anchor);
+  if (weekLabel) weekLabel.innerHTML = formatRevenueWeekTile(anchor);
+  if (dayLabel) dayLabel.innerHTML = formatRevenueDayTile(anchor);
+
+  if (yearBtn) yearBtn.classList.toggle("active", type === "year");
+  if (monthBtn) monthBtn.classList.toggle("active", type === "month");
+  if (weekBtn) weekBtn.classList.toggle("active", type === "week");
+  if (dayBtn) dayBtn.classList.toggle("active", type === "day");
+}
+
+function openCostsWheelPicker(mode = "day") {
+  openRevenueWheelPicker(mode, "costs");
+}
+
+function openCostsDatePicker(mode = "day") {
+  openCostsWheelPicker(mode);
+}
+
+function standardCostExists(data, description) {
+  const key = String(description || "").trim().toLocaleLowerCase();
+  return getStandardCosts(data).find(item => String(item.description || "").trim().toLocaleLowerCase() === key) || null;
+}
+
+function buildVatOptions(selected = 21) {
+  return [0, 6, 12, 19, 21].map(rate => `<option value="${rate}"${Number(selected) === rate ? " selected" : ""}>${rate}%</option>`).join("");
+}
+
+function renderCostStandardSuggestions(filter = "", showAllWhenEmpty = true) {
+  const wrap = document.getElementById("costStandardSuggestions");
+  const searchInput = document.getElementById("costDescription");
+  const select = document.getElementById("costStandardCostSelect");
+  if (!wrap) return;
+
+  const data = getData();
+  const safeFilter = String(filter || "").trim().toLocaleLowerCase();
+  const currentValue = document.getElementById("costStandardCostId")?.value || "";
+
+  let items = getStandardCosts(data)
+    .slice()
+    .sort((a, b) => String(a.description || "").localeCompare(String(b.description || ""), "nl-BE"));
+
+  if (safeFilter) {
+    items = items.filter(item => String(item.description || "").toLocaleLowerCase().includes(safeFilter));
+  } else if (!showAllWhenEmpty) {
+    items = [];
+  }
+
+  items = items.slice(0, 30);
+
+  if (select) {
+    select.innerHTML = `<option value="">${t("chooseStandardCost")}</option>` + getStandardCosts(data)
+      .slice()
+      .sort((a, b) => String(a.description || "").localeCompare(String(b.description || ""), "nl-BE"))
+      .map(item => `<option value="${item.id}">${escapeHtml(item.description || "")}</option>`)
+      .join("");
+    select.value = currentValue && Array.from(select.options).some(option => String(option.value) === String(currentValue)) ? String(currentValue) : "";
+    refreshAppSelect(select);
+  }
+
+  if (!items.length) {
+    wrap.innerHTML = safeFilter ? `<div class="appointment-service-empty">${t("noStandardCosts")}</div>` : "";
+    wrap.classList.toggle("hidden", !safeFilter);
+    if (searchInput) searchInput.setAttribute("aria-expanded", safeFilter ? "true" : "false");
+    return;
+  }
+
+  wrap.innerHTML = items.map(item => {
+    const activeClass = String(item.id) === String(currentValue) ? " active" : "";
+    return `
+      <button class="appointment-service-result cost-standard-suggestion${activeClass}" type="button" role="option" data-standard-cost-id="${item.id}" aria-selected="${activeClass ? "true" : "false"}">
+        <span class="appointment-service-result-name">${escapeHtml(item.description || "")}</span>
+        <span class="appointment-service-result-meta">${Number(item.vatRate || 21)}% btw</span>
+      </button>
+    `;
+  }).join("");
+
+  wrap.classList.remove("hidden");
+  if (searchInput) searchInput.setAttribute("aria-expanded", "true");
+
+  wrap.querySelectorAll("[data-standard-cost-id]").forEach(btn => {
+    btn.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      const item = getStandardCosts(getData()).find(standard => String(standard.id) === String(btn.dataset.standardCostId));
+      if (!item) return;
+      document.getElementById("costDescription").value = item.description || "";
+      document.getElementById("costVatRate").innerHTML = buildVatOptions(item.vatRate || 21);
+      document.getElementById("costStandardCostId").value = item.id || "";
+      if (select) select.value = String(item.id || "");
+      wrap.classList.add("hidden");
+      document.getElementById("costDescription")?.setAttribute("aria-expanded", "false");
+      document.getElementById("costDescription")?.blur();
+      refreshAppSelect(document.getElementById("costVatRate"));
+      refreshAppSelect(select);
+    });
+  });
+}
+
+function getCostsPeriodTitle() {
+  const type = getCostsPeriodType();
+  const anchor = getCostsPeriodDate();
+
+  if (type === "day") return `${t("costs")} ${formatLongDate(anchor)}`;
+  if (type === "week") {
+    const bounds = weekBounds(anchor);
+    return `${t("costs")} ${formatLongDate(bounds.start)} - ${formatLongDate(bounds.end)}`;
+  }
+  if (type === "month") {
+    const d = new Date(anchor + "T00:00:00");
+    return `${t("costs")} ${getMonthNameLong(d.getMonth())} ${d.getFullYear()}`;
+  }
+  if (type === "year") return `${t("costs")} ${anchor.slice(0, 4)}`;
+
+  return t("costs");
+}
+
+function renderCosts() {
+  const list = document.getElementById("costsList");
+  const totalInclEl = document.getElementById("costsTotalInclAmount");
+  const totalExclEl = document.getElementById("costsTotalExclAmount");
+  const vatEl = document.getElementById("costsVatAmount");
+  if (!list) return;
+
+  const data = getData();
+  syncCostsPeriodChips();
+
+  const titleEl = document.getElementById("costsTitle");
+  if (titleEl) titleEl.textContent = getCostsPeriodTitle();
+
+  const costs = getFilteredCosts(data).slice().sort((a, b) => {
+    const dateSort = String(b.date || "").localeCompare(String(a.date || ""));
+    if (dateSort) return dateSort;
+    return String(b.updatedAt || b.createdAt || b.id || "").localeCompare(String(a.updatedAt || a.createdAt || a.id || ""));
+  });
+
+  const totalIncl = costs.reduce((sum, cost) => sum + Number(cost.amountInclVat || 0), 0);
+  const vatTotal = costs.reduce((sum, cost) => {
+    const amount = Number(cost.amountInclVat || 0);
+    const rate = Number(cost.vatRate || 0);
+    return sum + (rate > 0 ? amount - (amount / (1 + (rate / 100))) : 0);
+  }, 0);
+  const totalExcl = totalIncl - vatTotal;
+
+  if (totalInclEl) totalInclEl.textContent = euro(totalIncl);
+  if (totalExclEl) totalExclEl.textContent = euro(totalExcl);
+  if (vatEl) vatEl.textContent = euro(vatTotal);
+  updateTopbar(state.currentScreen, getScreenTitle(state.currentScreen));
+  refreshStandardCostsButton();
+
+  if (!costs.length) {
+    list.innerHTML = `<div class="empty-state">${t("noCosts")}</div>`;
+    return;
+  }
+
+  list.innerHTML = costs.map(cost => `
+    <article class="cost-card">
+      <button class="cost-main-btn" type="button" data-cost-edit="${cost.id}">
+        <div class="cost-row-top">
+          <strong>${escapeHtml(cost.description || t("costDescription"))}</strong>
+          <span>${euro(cost.amountInclVat)}</span>
+        </div>
+        <div class="cost-row-meta">
+          <span>${formatLongDate(cost.date || todayStr)}</span>
+          <span>${Number(cost.vatRate || 21)}% btw</span>
+        </div>
+      </button>
+    </article>
+  `).join("");
+
+  list.querySelectorAll("[data-cost-edit]").forEach(btn => {
+    btn.addEventListener("click", () => openEditCostDialog(btn.dataset.costEdit));
+  });
+}
+
+function openNewCostDialog() {
+  const form = document.getElementById("costForm");
+  if (form) form.reset();
+  document.getElementById("costId").value = "";
+  document.getElementById("costStandardCostId").value = "";
+  const standardCheckbox = document.getElementById("costSaveAsStandardCost");
+  if (standardCheckbox) standardCheckbox.checked = false;
+  document.getElementById("costDate").value = todayStr;
+  syncCostDateDisplay();
+  document.getElementById("costVatRate").innerHTML = buildVatOptions(21);
+  document.getElementById("costModalTitle").textContent = t("newCost");
+  document.getElementById("deleteCostBtn")?.classList.add("hidden");
+  renderCostStandardSuggestions("");
+  document.getElementById("costDialog")?.showModal();
+  refreshAppSelect(document.getElementById("costVatRate"));
+}
+
+function openEditCostDialog(id) {
+  const data = getData();
+  const cost = costById(data, id);
+  if (!cost) return;
+  document.getElementById("costId").value = cost.id;
+  document.getElementById("costStandardCostId").value = cost.standardCostId || "";
+  const standardCheckbox = document.getElementById("costSaveAsStandardCost");
+  if (standardCheckbox) standardCheckbox.checked = Boolean(cost.standardCostId);
+  document.getElementById("costDescription").value = cost.description || "";
+  document.getElementById("costDate").value = cost.date || todayStr;
+  syncCostDateDisplay();
+  document.getElementById("costAmountInclVat").value = Number(cost.amountInclVat || 0).toFixed(2);
+  document.getElementById("costVatRate").innerHTML = buildVatOptions(cost.vatRate || 21);
+  document.getElementById("costModalTitle").textContent = t("editCost");
+  document.getElementById("deleteCostBtn")?.classList.remove("hidden");
+  renderCostStandardSuggestions(cost.description || "");
+  document.getElementById("costDialog")?.showModal();
+  refreshAppSelect(document.getElementById("costVatRate"));
+}
+
+async function saveStandardCost(description, vatRate, existingId = null) {
+  if (!(await ensureDataWriteAccess())) return;
+  const user = await getCurrentUser();
+  const data = getData();
+  const cleanDescription = String(description || "").trim();
+  if (!cleanDescription) return null;
+
+  if (!user) {
+    data.standardCosts = getStandardCosts(data);
+    const existing = standardCostExists(data, cleanDescription);
+    if (existing) return existing;
+    const item = { id: nextId(data.standardCosts), description: cleanDescription, vatRate: Number(vatRate || 21), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    data.standardCosts.push(item);
+    saveData(data);
+    refreshStandardCostsButton();
+    return item;
+  }
+
+  if (existingId) return { id: existingId, description: cleanDescription, vatRate: Number(vatRate || 21) };
+
+  const { data: inserted, error } = await supabaseClient
+    .from("standard_costs")
+    .insert({ user_id: user.id, description: cleanDescription, vat_rate: Number(vatRate || 21) })
+    .select("id, description, vat_rate")
+    .maybeSingle();
+
+  if (error) {
+    console.error("Standaardkost opslaan mislukt:", error.message);
+    return null;
+  }
+
+  await loadAllDataFromSupabase();
+  return inserted ? { id: inserted.id, description: inserted.description, vatRate: inserted.vat_rate } : null;
+}
+
+async function saveCostFromForm(event) {
+  event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
+  const rawId = document.getElementById("costId")?.value;
+  const id = rawId ? Number(rawId) || rawId : null;
+  const description = String(document.getElementById("costDescription")?.value || "").trim();
+  const date = document.getElementById("costDate")?.value || todayStr;
+  const amountInclVat = parseDecimalInput(document.getElementById("costAmountInclVat")?.value);
+  const vatRate = Number(document.getElementById("costVatRate")?.value || 21);
+  let standardCostId = document.getElementById("costStandardCostId")?.value || null;
+  const saveAsStandardCost = Boolean(document.getElementById("costSaveAsStandardCost")?.checked);
+  const now = new Date().toISOString();
+
+  if (!description) {
+    await appAlert("Geef een omschrijving voor de kost in.", { title: t("costs"), variant: "warning" });
+    return;
+  }
+  if (!date) {
+    await appAlert("Kies een datum voor de kost.", { title: t("costs"), variant: "warning" });
+    return;
+  }
+  if (!Number.isFinite(amountInclVat) || amountInclVat < 0) {
+    await appAlert("Geef een geldig bedrag in.", { title: t("costs"), variant: "warning" });
+    return;
+  }
+
+  let saveFailed = false;
+  const costDialog = document.getElementById("costDialog");
+  const reopenCostDialogOnFailure = Boolean(costDialog?.open);
+
+  // Sluit de dialog vóór de databasebewerking. Een native <dialog> zit in de top layer
+  // en kan de globale "Even geduld"-overlay visueel afdekken.
+  closeDialog("costDialog");
+
+  await runWithGlobalActionBusy(async () => {
+    const user = await getCurrentUser();
+    const data = getData();
+
+    if (!id && saveAsStandardCost && !standardCostId) {
+      const standard = await saveStandardCost(description, vatRate);
+      if (standard?.id) standardCostId = standard.id;
+    }
+
+    const payload = { description, date, amountInclVat, vatRate, standardCostId, updatedAt: now };
+
+    if (!user) {
+      data.costs = getCosts(data);
+      if (id) {
+        const existing = costById(data, id);
+        if (existing) Object.assign(existing, payload);
+      } else {
+        data.costs.push({ id: nextId(data.costs), ...payload, createdAt: now });
+      }
+      saveData(data);
+      return;
+    }
+
+    const dbPayload = {
+      user_id: user.id,
+      description,
+      cost_date: date,
+      amount_incl_vat: amountInclVat,
+      vat_rate: vatRate,
+      standard_cost_id: standardCostId ? Number(standardCostId) || standardCostId : null,
+      updated_at: now
+    };
+
+    let error;
+    if (id) {
+      ({ error } = await supabaseClient.from("costs").update(dbPayload).eq("id", id).eq("user_id", user.id));
+    } else {
+      ({ error } = await supabaseClient.from("costs").insert({ ...dbPayload, created_at: now }));
+    }
+
+    if (error) {
+      saveFailed = true;
+      await appAlert("Opslaan kost mislukt: " + error.message, { title: t("saveFailed"), variant: "danger" });
+      return;
+    }
+
+    await loadAllDataFromSupabase();
+  });
+
+  if (saveFailed) {
+    if (reopenCostDialogOnFailure) document.getElementById("costDialog")?.showModal();
+    return;
+  }
+
+  renderCosts();
+  refreshStandardCostsButton();
+  updateCostsActionBar();
+}
+
+async function deleteCurrentCost() {
+  if (!(await ensureDataWriteAccess())) return;
+  const id = document.getElementById("costId")?.value;
+  if (!id) return;
+  const confirmed = await appConfirm("Deze kost verwijderen?", {
+    title: t("delete"),
+    confirmText: t("delete"),
+    cancelText: t("cancel"),
+    variant: "warning"
+  });
+  if (!confirmed) return;
+
+  let deleteFailed = false;
+  const costDialog = document.getElementById("costDialog");
+  const reopenCostDialogOnFailure = Boolean(costDialog?.open);
+  closeDialog("costDialog");
+
+  await runWithGlobalActionBusy(async () => {
+    const user = await getCurrentUser();
+    const data = getData();
+
+    if (!user) {
+      data.costs = getCosts(data).filter(cost => String(cost.id) !== String(id));
+      saveData(data);
+      return;
+    }
+
+    const { error } = await supabaseClient.from("costs").delete().eq("id", id).eq("user_id", user.id);
+    if (error) {
+      deleteFailed = true;
+      await appAlert("Verwijderen kost mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
+      return;
+    }
+    await loadAllDataFromSupabase();
+  });
+
+  if (deleteFailed) {
+    if (reopenCostDialogOnFailure) document.getElementById("costDialog")?.showModal();
+    return;
+  }
+  renderCosts();
+}
+
+
+function refreshStandardCostsButton() {
+  const btn = document.getElementById("standardCostsBtn");
+  if (!btn) return;
+  btn.classList.toggle("hidden", !(state.currentScreen === "costsScreen" && getStandardCosts(getData()).length > 0));
+}
+
+function getStandardCostSearchText(item) {
+  return [item?.description, `${Number(item?.vatRate || 21)}% btw`].join(" ").toLocaleLowerCase(getCurrentLanguage());
+}
+
+function renderStandardCostAlphabetFilter(items = getStandardCosts(getData())) {
+  const wrap = document.getElementById("standardCostsAlphabetFilter");
+  if (!wrap) return;
+  const letters = Array.from(new Set(items
+    .map(item => String(item.description || "").trim().charAt(0).toLocaleUpperCase(getCurrentLanguage()))
+    .filter(letter => /^[A-ZÀ-ÖØ-Þ]/i.test(letter))
+  )).sort((a, b) => a.localeCompare(b, getCurrentLanguage()));
+  const active = state.standardCostLetter || "";
+  wrap.innerHTML = [`<button class="alphabet-btn${active === "" ? " active" : ""}" type="button" data-standard-cost-letter="">Alle</button>`]
+    .concat(letters.map(letter => `<button class="alphabet-btn${active === letter ? " active" : ""}" type="button" data-standard-cost-letter="${escapeHtml(letter)}">${escapeHtml(letter)}</button>`))
+    .join("");
+  wrap.querySelectorAll("[data-standard-cost-letter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.standardCostLetter = btn.dataset.standardCostLetter || "";
+      renderStandardCostsManager();
+    });
+  });
+}
+
+function renderStandardCostsManager() {
+  const list = document.getElementById("standardCostsManagerList");
+  if (!list) return;
+  const searchInput = document.getElementById("standardCostsSearch");
+  if (searchInput && searchInput.value !== state.standardCostSearch) searchInput.value = state.standardCostSearch || "";
+
+  const allItems = getStandardCosts(getData()).slice().sort((a, b) => String(a.description || "").localeCompare(String(b.description || ""), getCurrentLanguage()));
+  renderStandardCostAlphabetFilter(allItems);
+
+  const filter = String(state.standardCostSearch || "").trim().toLocaleLowerCase(getCurrentLanguage());
+  let items = allItems;
+  if (state.standardCostLetter) {
+    items = items.filter(item => String(item.description || "").trim().charAt(0).toLocaleUpperCase(getCurrentLanguage()) === state.standardCostLetter);
+  }
+  if (filter) {
+    items = items.filter(item => getStandardCostSearchText(item).includes(filter));
+  }
+
+  if (!items.length) {
+    list.innerHTML = `<div class="empty-state">${t("noStandardCosts")}</div>`;
+    refreshStandardCostsButton();
+    return;
+  }
+
+  list.innerHTML = items.map(item => `
+    <article class="standard-cost-manager-item standard-cost-manager-row">
+      <button class="standard-cost-manager-main standard-cost-manager-btn" type="button" data-standard-cost-edit="${item.id}">
+        <strong>${escapeHtml(item.description || "")}</strong>
+        <small>${Number(item.vatRate || 21)}% btw</small>
+      </button>
+    </article>
+  `).join("");
+  list.querySelectorAll("[data-standard-cost-edit]").forEach(btn => {
+    btn.addEventListener("click", () => openEditStandardCostDialog(btn.dataset.standardCostEdit));
+  });
+  refreshStandardCostsButton();
+}
+
+function openStandardCostsPopover() {
+  state.standardCostSearch = "";
+  state.standardCostLetter = "";
+  const searchInput = document.getElementById("standardCostsSearch");
+  if (searchInput) searchInput.value = "";
+  renderStandardCostsManager();
+  const title = document.querySelector("#standardCostsDialog h3");
+  if (title) title.textContent = t("standardCosts");
+  document.getElementById("standardCostsDialog")?.showModal();
+}
+
+function openEditStandardCostDialog(id) {
+  const item = getStandardCosts(getData()).find(standard => String(standard.id) === String(id));
+  if (!item) return;
+  closeDialog("standardCostsDialog");
+  document.getElementById("standardCostEditId").value = item.id;
+  document.getElementById("standardCostEditDescription").value = item.description || "";
+  document.getElementById("standardCostEditVatRate").innerHTML = buildVatOptions(item.vatRate || 21);
+  const title = document.querySelector("#standardCostEditDialog h3");
+  if (title) title.textContent = t("editStandardCost");
+  document.getElementById("standardCostEditDialog")?.showModal();
+  refreshAppSelect(document.getElementById("standardCostEditVatRate"));
+}
+
+async function saveStandardCostEditFromForm(event) {
+  event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
+  const id = document.getElementById("standardCostEditId")?.value;
+  const description = String(document.getElementById("standardCostEditDescription")?.value || "").trim();
+  const vatRate = Number(document.getElementById("standardCostEditVatRate")?.value || 21);
+  if (!id || !description) return;
+
+  let saveFailed = false;
+  const standardCostEditDialog = document.getElementById("standardCostEditDialog");
+  const reopenStandardCostDialogOnFailure = Boolean(standardCostEditDialog?.open);
+  closeDialog("standardCostEditDialog");
+
+  await runWithGlobalActionBusy(async () => {
+    const user = await getCurrentUser();
+    const data = getData();
+    if (!user) {
+      const item = getStandardCosts(data).find(standard => String(standard.id) === String(id));
+      if (item) {
+        item.description = description;
+        item.vatRate = vatRate;
+        item.updatedAt = new Date().toISOString();
+        saveData(data);
+      }
+      return;
+    }
+
+    const { error } = await supabaseClient
+      .from("standard_costs")
+      .update({ description, vat_rate: vatRate, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .eq("user_id", user.id);
+    if (error) {
+      saveFailed = true;
+      await appAlert("Standaardkost aanpassen mislukt: " + error.message, { title: t("saveFailed"), variant: "danger" });
+      return;
+    }
+    await loadAllDataFromSupabase();
+  });
+
+  if (saveFailed) {
+    if (reopenStandardCostDialogOnFailure) document.getElementById("standardCostEditDialog")?.showModal();
+    return;
+  }
+  renderCostStandardSuggestions(document.getElementById("costDescription")?.value || "");
+  renderCosts();
+  openStandardCostsPopover();
+}
+
+async function deleteStandardCost(id) {
+  if (!(await ensureDataWriteAccess())) return;
+  if (!id) return;
+  const confirmed = await appConfirm(t("deleteStandardCostConfirm"), {
+    title: t("delete"),
+    confirmText: t("delete"),
+    cancelText: "Nee",
+    variant: "warning"
+  });
+  if (!confirmed) return;
+
+  let deleteFailed = false;
+  const standardCostEditDialog = document.getElementById("standardCostEditDialog");
+  const reopenStandardCostDialogOnFailure = Boolean(standardCostEditDialog?.open);
+  closeDialog("standardCostEditDialog");
+
+  await runWithGlobalActionBusy(async () => {
+    const user = await getCurrentUser();
+    const data = getData();
+    if (!user) {
+      data.standardCosts = getStandardCosts(data).filter(item => String(item.id) !== String(id));
+      data.costs = getCosts(data).map(cost => String(cost.standardCostId) === String(id) ? { ...cost, standardCostId: null } : cost);
+      saveData(data);
+      return;
+    }
+
+    const { error } = await supabaseClient.from("standard_costs").delete().eq("id", id).eq("user_id", user.id);
+    if (error) {
+      deleteFailed = true;
+      await appAlert("Standaardkost verwijderen mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
+      return;
+    }
+    await loadAllDataFromSupabase();
+  });
+
+  if (deleteFailed) {
+    if (reopenStandardCostDialogOnFailure) document.getElementById("standardCostEditDialog")?.showModal();
+    return;
+  }
+  renderCosts();
+  renderStandardCostsManager();
+  renderCostStandardSuggestions(document.getElementById("costDescription")?.value || "");
+  if (getStandardCosts(getData()).length) {
+    const managerDialog = document.getElementById("standardCostsDialog");
+    if (managerDialog && !managerDialog.open) openStandardCostsPopover();
+  }
+}
 
 
 /* =========================
@@ -7222,6 +11492,7 @@ function addTodoBulletLine() {
 
 async function saveTodoFromForm(event) {
   event.preventDefault();
+  if (!(await ensureDataWriteAccess())) return;
 
   const user = await getCurrentUser();
   const data = getData();
@@ -7287,6 +11558,7 @@ async function saveTodoFromForm(event) {
 }
 
 async function toggleTodoCompleted(id) {
+  if (!(await ensureDataWriteAccess())) return;
   const data = getData();
   const todo = todoById(data, id);
   if (!todo) return;
@@ -7316,6 +11588,7 @@ async function toggleTodoCompleted(id) {
 }
 
 async function deleteCurrentTodo() {
+  if (!(await ensureDataWriteAccess())) return;
   const id = document.getElementById("todoId")?.value;
   if (!id) return;
 
@@ -7416,6 +11689,73 @@ function registerEvents() {
 
   document.getElementById("jumpToTodayBtn")?.addEventListener("click", jumpToToday);
 
+  document.getElementById("costForm")?.addEventListener("submit", withActionLock(saveCostFromForm));
+  document.getElementById("costDateDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date", "costDate"));
+  document.getElementById("deleteCostBtn")?.addEventListener("click", withActionLock(deleteCurrentCost));
+  document.getElementById("deleteStandardCostBtn")?.addEventListener("click", withActionLock(() => deleteStandardCost(document.getElementById("standardCostEditId")?.value)));
+  document.getElementById("standardCostsBtn")?.addEventListener("click", openStandardCostsPopover);
+  document.getElementById("standardCostEditForm")?.addEventListener("submit", withActionLock(saveStandardCostEditFromForm));
+
+  const attachCostsPeriodButton = (id, mode) => {
+    const button = document.getElementById(id);
+    if (!button) return;
+
+    attachRevenuePeriodSwipe(button, mode, "costs");
+    button.addEventListener("contextmenu", event => event.preventDefault());
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      if (button.dataset.revenueSwipeSuppressClick === "1") return;
+      const currentMode = getCostsPeriodType();
+      const anchor = getCostsPeriodDate();
+      if (currentMode === mode) {
+        openCostsWheelPicker(mode);
+        return;
+      }
+      setCostsPeriod(mode, anchor);
+    });
+  };
+
+  attachCostsPeriodButton("costsYearBtn", "year");
+  attachCostsPeriodButton("costsMonthBtn", "month");
+  attachCostsPeriodButton("costsWeekBtn", "week");
+  attachCostsPeriodButton("costsDayBtn", "day");
+
+  const costsNativeDatePicker = document.getElementById("costsNativeDatePicker");
+  if (costsNativeDatePicker) {
+    costsNativeDatePicker.addEventListener("change", event => {
+      const pickedDate = event.target.value;
+      if (!pickedDate) return;
+      setCostsPeriod(event.target.dataset.mode || "day", pickedDate);
+    });
+  }
+  document.getElementById("standardCostsSearch")?.addEventListener("input", event => {
+    state.standardCostSearch = event.target.value || "";
+    renderStandardCostsManager();
+  });
+  document.getElementById("costDescription")?.addEventListener("focus", event => renderCostStandardSuggestions(event.target.value, true));
+  document.getElementById("costDescription")?.addEventListener("input", event => {
+    document.getElementById("costStandardCostId").value = "";
+    const select = document.getElementById("costStandardCostSelect");
+    if (select) select.value = "";
+    renderCostStandardSuggestions(event.target.value, true);
+  });
+  document.getElementById("costStandardCostSelect")?.addEventListener("change", event => {
+    const item = getStandardCosts(getData()).find(standard => String(standard.id) === String(event.target.value));
+    if (!item) return;
+    document.getElementById("costDescription").value = item.description || "";
+    document.getElementById("costVatRate").innerHTML = buildVatOptions(item.vatRate || 21);
+    document.getElementById("costStandardCostId").value = item.id || "";
+    refreshAppSelect(document.getElementById("costVatRate"));
+  });
+  document.addEventListener("click", event => {
+    const picker = event.target.closest(".cost-standard-picker");
+    const wrap = document.getElementById("costStandardSuggestions");
+    if (!picker && wrap) {
+      wrap.classList.add("hidden");
+      document.getElementById("costDescription")?.setAttribute("aria-expanded", "false");
+    }
+  });
+
   document.getElementById("todoForm")?.addEventListener("submit", withActionLock(saveTodoFromForm));
   document.getElementById("deleteTodoBtn")?.addEventListener("click", withActionLock(deleteCurrentTodo));
   document.getElementById("todoAddBulletBtn")?.addEventListener("click", addTodoBulletLine);
@@ -7438,7 +11778,7 @@ function registerEvents() {
     });
   });
 
-  document.getElementById("backBtn").addEventListener("click", () => {
+  document.getElementById("backBtn")?.addEventListener("click", () => {
     const map = {
       agendaScreen: "Agenda",
       clientsScreen: "Klanten",
@@ -7446,6 +11786,7 @@ function registerEvents() {
       paymentMethodsScreen: "Betaalwijze",
       statisticsScreen: "Statistieken",
       revenueScreen: "Omzet",
+      costsScreen: "Kosten",
       todoScreen: "To Do",
       settingsScreen: "Instellingen",
       accountScreen: "Account"
@@ -7457,7 +11798,14 @@ function registerEvents() {
   document.getElementById("clientSearch").addEventListener("input", renderClients);
   document.getElementById("serviceSearch")?.addEventListener("input", renderServices);
   document.getElementById("appointmentService").addEventListener("change", syncServiceDefaults);
-  document.getElementById("settingsForm")?.addEventListener("submit", withActionLock(saveSettingsFromForm));
+  const settingsForm = document.getElementById("settingsForm");
+  const settingsSaveBtn = document.getElementById("settingsSaveBtn");
+  settingsForm?.addEventListener("submit", withActionLock(saveSettingsFromForm));
+  settingsSaveBtn?.addEventListener("click", withActionLock(saveSettingsFromForm));
+  setupSettingsDirtyTracking();
+  document.getElementById("copyCalendarFeedUrlBtn")?.addEventListener("click", withActionLock(createOrCopyCalendarFeedUrl));
+  document.getElementById("openGoogleCalendarSubscribeBtn")?.addEventListener("click", withActionLock(openGoogleCalendarSubscribePage));
+  document.getElementById("regenerateCalendarFeedUrlBtn")?.addEventListener("click", withActionLock(regenerateCalendarFeedUrl));
   document.getElementById("settingsLanguage")?.addEventListener("change", event => {
     currentProfilePreferences.language = normalizeLanguage(event.target.value);
     const data = getData();
@@ -7472,6 +11820,11 @@ function registerEvents() {
     saveData(data);
     rerenderAll();
   });
+  document.getElementById("settingsShowTipsOnOpen")?.addEventListener("change", event => {
+    setTipsOnOpenPreference(event.target.checked !== false);
+    updateSettingsDirtyState();
+  });
+
   document.getElementById("settingsNotificationsEnabled")?.addEventListener("change", async event => {
     const checked = Boolean(event.target.checked);
     const data = getData();
@@ -7486,9 +11839,38 @@ function registerEvents() {
   });
 
   document.getElementById("appointmentDateDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date"));
-  document.getElementById("appointmentTimeDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("time"));
-  document.getElementById("appointmentDate")?.addEventListener("change", syncAppointmentDateTimeDisplays);
+  document.getElementById("appointmentTimeDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("time", "appointmentTime"));
+  document.getElementById("appointmentPrivateEndDateDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date", "appointmentPrivateEndDate"));
+  document.getElementById("appointmentPrivateEndTimeDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("time", "appointmentPrivateEndTime"));
+  document.getElementById("appointmentPrivateEndDate")?.addEventListener("change", () => {
+    const startDateInput = document.getElementById("appointmentDate");
+    const endDateInput = document.getElementById("appointmentPrivateEndDate");
+    if (startDateInput && endDateInput && endDateInput.value < startDateInput.value) {
+      endDateInput.value = startDateInput.value;
+    }
+    syncAppointmentDateTimeDisplays();
+  });
+  ["appointmentTime", "appointmentPrivateEndTime"].forEach(id => {
+    document.getElementById(id)?.addEventListener("change", syncPrivateEndTimeWithStart);
+    document.getElementById(id)?.addEventListener("input", syncPrivateEndTimeWithStart);
+  });
+  document.getElementById("appointmentIsPrivate")?.addEventListener("change", event => setAppointmentPrivateMode(event.target.checked));
+  document.getElementById("appointmentDate")?.addEventListener("change", () => {
+    const startDateInput = document.getElementById("appointmentDate");
+    const endDateInput = document.getElementById("appointmentPrivateEndDate");
+    if (startDateInput && endDateInput && (!endDateInput.value || endDateInput.value < startDateInput.value)) {
+      endDateInput.value = startDateInput.value;
+    }
+    syncAppointmentDateTimeDisplays();
+    updatePrivateRepeatWeeklyLabel();
+  });
+  document.getElementById("appointmentPrivateRepeat")?.addEventListener("change", updatePrivateRepeatWeeklyLabel);
   document.getElementById("appointmentTime")?.addEventListener("change", syncAppointmentDateTimeDisplays);
+  document.getElementById("followUpAppointmentDateDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date", "followUpAppointmentDate"));
+  document.getElementById("followUpAppointmentTimeDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("time", "followUpAppointmentTime"));
+  document.getElementById("followUpAppointmentDate")?.addEventListener("change", syncFollowUpDisplays);
+  document.getElementById("followUpAppointmentTime")?.addEventListener("change", syncFollowUpDisplays);
+  document.getElementById("followUpAppointmentForm")?.addEventListener("submit", withActionLock(saveFollowUpAppointmentFromForm));
 
   const appointmentWheelPickerForm = document.getElementById("appointmentWheelPickerForm");
   if (appointmentWheelPickerForm) {
@@ -7496,16 +11878,42 @@ function registerEvents() {
       event.preventDefault();
       applyAppointmentWheelPickerSelection();
       closeDialog("appointmentWheelPickerDialog");
+      window.setTimeout(() => {
+        const appointmentDialog = document.getElementById("appointmentDialog");
+        if (appointmentDialog?.open) moveSharedHeaderToDialog(appointmentDialog);
+      }, 0);
     });
   }
 
   document.getElementById("appointmentForm").addEventListener("submit", withActionLock(saveAppointmentFromForm));
   document.getElementById("appointmentOpenCustomerBtn")?.addEventListener("click", openAppointmentCustomerDetailFromDialog);
   document.getElementById("deleteAppointmentBtn").addEventListener("click", withActionLock(deleteCurrentAppointment));
+  document.getElementById("openDeletedAppointmentsBtn")?.addEventListener("click", openDeletedAppointmentsDialog);
+  document.getElementById("deletedAppointmentsSearch")?.addEventListener("input", () => renderDeletedAppointmentsDialog());
 
   document.getElementById("clientForm").addEventListener("submit", withActionLock(saveClientFromForm));
 
   document.getElementById("serviceForm").addEventListener("submit", withActionLock(saveServiceFromForm));
+  ["appointmentDuration", "appointmentPrice", "serviceDuration", "servicePrice", "costAmountInclVat"].forEach(id => {
+    const input = document.getElementById(id);
+    input?.addEventListener("focus", selectNumericFieldContent);
+    input?.addEventListener("click", selectNumericFieldContent);
+  });
+  ["appointmentDuration", "serviceDuration"].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", event => {
+      const input = event.currentTarget;
+      const clean = normalizeDurationInput(input.value);
+      if (input.value !== clean) input.value = clean;
+    });
+  });
+
+  ["appointmentPrice", "servicePrice", "costAmountInclVat"].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", event => {
+      const input = event.currentTarget;
+      const clean = normalizeDecimalInput(input.value);
+      if (input.value !== clean) input.value = clean;
+    });
+  });
   document.getElementById("deleteServiceBtn").addEventListener("click", withActionLock(deleteCurrentService));
 
   document.getElementById("paymentMethodForm").addEventListener("submit", withActionLock(savePaymentMethodFromForm));
@@ -7542,14 +11950,25 @@ function registerEvents() {
 
   document.getElementById("agendaList")?.addEventListener("scroll", () => { closePaymentPopover(); closeAppointmentActionPopover(); }, { passive: true });
   document.querySelector(".calendar-panel")?.addEventListener("scroll", () => { closePaymentPopover(); closeAppointmentActionPopover(); }, { passive: true });
+  document.querySelector(".calendar-panel")?.addEventListener("click", () => { closeAgendaFabMenu(); }, { passive: true });
 
   document.querySelectorAll("[data-close]").forEach(btn => {
     btn.addEventListener("click", () => closeDialog(btn.dataset.close));
   });
 
+  const clientDetailDialog = document.getElementById("clientDetailDialog");
+  if (clientDetailDialog) {
+    clientDetailDialog.addEventListener("close", () => {
+      updateClientActionBar(null);
+      closePaymentPopover();
+      closeAppointmentActionPopover();
+      restoreFloatingPopoversToBody();
+    });
+  }
+
   document.getElementById("revenueDate").value = todayStr;
 
-  ["revenuePeriodType", "revenueDate", "revenuePaymentStatusFilter", "revenuePaymentFilter"].forEach(id => {
+  ["revenuePeriodType", "revenueDate"].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.addEventListener("change", renderRevenue);
   });
@@ -7558,9 +11977,11 @@ function registerEvents() {
     const button = document.getElementById(id);
     if (!button) return;
 
+    attachRevenuePeriodSwipe(button, mode);
     button.addEventListener("contextmenu", event => event.preventDefault());
     button.addEventListener("click", event => {
       event.preventDefault();
+      if (button.dataset.revenueSwipeSuppressClick === "1") return;
 
       const currentMode = document.getElementById("revenuePeriodType")?.value || "day";
       const anchor = document.getElementById("revenueDate")?.value || todayStr;
@@ -7585,6 +12006,10 @@ function registerEvents() {
       event.preventDefault();
       applyRevenueWheelPickerSelection();
       closeDialog("revenueWheelPickerDialog");
+      window.setTimeout(() => {
+        const costDialog = document.getElementById("costDialog");
+        if (costDialog?.open) moveSharedHeaderToDialog(costDialog);
+      }, 0);
     });
   }
 
@@ -7600,12 +12025,22 @@ function registerEvents() {
 
   const revenueExportCsvBtn = document.getElementById("revenueExportCsvBtn");
   if (revenueExportCsvBtn) {
-    revenueExportCsvBtn.addEventListener("click", downloadRevenueCsv);
+    revenueExportCsvBtn.addEventListener("click", withActionLock(downloadRevenueCsv));
   }
 
   const revenueExportReportBtn = document.getElementById("revenueExportReportBtn");
   if (revenueExportReportBtn) {
-    revenueExportReportBtn.addEventListener("click", downloadRevenueStyledReport);
+    revenueExportReportBtn.addEventListener("click", withActionLock(downloadRevenueStyledReport));
+  }
+
+  const costsExportCsvBtn = document.getElementById("costsExportCsvBtn");
+  if (costsExportCsvBtn) {
+    costsExportCsvBtn.addEventListener("click", withActionLock(downloadCostsCsv));
+  }
+
+  const costsExportReportBtn = document.getElementById("costsExportReportBtn");
+  if (costsExportReportBtn) {
+    costsExportReportBtn.addEventListener("click", withActionLock(downloadCostsStyledReport));
   }
 
   const registerBtn = document.getElementById("registerBtn");
@@ -7614,17 +12049,32 @@ function registerEvents() {
   const loginBtn = document.getElementById("loginBtn");
   const logoutBtn = document.getElementById("logoutBtn");
   const headerAccountBtn = document.getElementById("headerAccountBtn");
+  const headerSupportBtn = document.getElementById("headerSupportBtn");
+  const headerLanguageBtn = document.getElementById("headerLanguageBtn");
+  const headerLanguageOverlay = document.getElementById("headerLanguageOverlay");
+  const headerTrialBadge = document.getElementById("headerTrialBadge");
 
   const editProfileBtn = document.getElementById("editProfileBtn");
   const changePasswordBtn = document.getElementById("changePasswordBtn");
   const editProfileForm = document.getElementById("editProfileForm");
   const passwordForm = document.getElementById("passwordForm");
 
-  if (registerBtn) registerBtn.addEventListener("click", withActionLock(registerAccount));
   if (registerForm) registerForm.addEventListener("submit", withActionLock(registerAccount));
+  document.getElementById("registerNextBtn")?.addEventListener("click", withActionLock(goToNextRegisterStep));
+  document.getElementById("registerBackBtn")?.addEventListener("click", goToPreviousRegisterStep);
+  document.getElementById("registerLanguage")?.addEventListener("change", handleRegisterLanguageChange);
+  document.getElementById("registerCountry")?.addEventListener("change", syncRegisterRegionOptions);
+  document.getElementById("registerRegion")?.addEventListener("change", syncRegisterRegionOptions);
+  ["registerPassword", "registerPasswordConfirm", "registerTermsAccepted"].forEach(id => {
+    document.getElementById(id)?.addEventListener("input", updateRegisterSubmitState);
+    document.getElementById(id)?.addEventListener("change", updateRegisterSubmitState);
+  });
+  document.getElementById("editCountry")?.addEventListener("change", syncEditProfileRegionOptions);
+  document.getElementById("editRegion")?.addEventListener("change", syncEditProfileRegionOptions);
 
   if (openRegisterBtn) {
     openRegisterBtn.addEventListener("click", () => {
+      resetRegisterWizard();
       document.getElementById("registerDialog").showModal();
       setupPasswordToggleButtons();
     });
@@ -7637,14 +12087,83 @@ function registerEvents() {
   if (editProfileForm) editProfileForm.addEventListener("submit", withActionLock(saveProfileFromForm));
   if (passwordForm) passwordForm.addEventListener("submit", withActionLock(savePasswordFromForm));
 
+  document.getElementById("welcomeGuideCloseBtn")?.addEventListener("click", () => closeWelcomeGuide());
+  document.getElementById("welcomeGuideStartClientBtn")?.addEventListener("click", () => {
+    closeWelcomeGuide();
+    switchScreen("clientsScreen", t("clients"));
+    window.setTimeout(openNewClientDialog, 180);
+  });
+  document.getElementById("welcomeGuideStartServiceBtn")?.addEventListener("click", () => {
+    closeWelcomeGuide();
+    switchScreen("servicesScreen", t("services"));
+    window.setTimeout(openNewServiceDialog, 180);
+  });
+  document.getElementById("welcomeGuideTipsToggle")?.addEventListener("change", event => {
+    setTipsOnOpenPreference(event.target.checked !== false);
+  });
+
   setupPasswordToggleButtons();
   setupAppSelectDropdowns();
+  ensureModalAppHeaders();
+  syncHeaderLanguageSelect();
+
+  if (headerLanguageBtn) {
+    headerLanguageBtn.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleHeaderLanguageOverlay();
+    });
+  }
+
+  if (headerLanguageOverlay) {
+    headerLanguageOverlay.addEventListener("click", event => {
+      const option = event.target.closest("[data-header-language]");
+      if (!option) return;
+      event.preventDefault();
+      event.stopPropagation();
+      saveHeaderLanguagePreference(option.dataset.headerLanguage);
+    });
+  }
+
+  const closeLanguageMenuOnOutsideInteraction = (event) => {
+    if (!event.target?.closest?.("#headerLanguageMenu")) closeHeaderLanguageOverlay();
+  };
+
+  document.addEventListener("pointerdown", closeLanguageMenuOnOutsideInteraction, { capture: true });
+  document.addEventListener("touchstart", closeLanguageMenuOnOutsideInteraction, { capture: true, passive: true });
+  document.addEventListener("click", closeLanguageMenuOnOutsideInteraction, { capture: true });
+
+
+  if (headerTrialBadge) {
+    headerTrialBadge.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+      closeHeaderLanguageOverlay();
+      switchScreen("subscriptionScreen", t("subscription"));
+    });
+  }
+
+  document.getElementById("subscriptionCancelBtn")?.addEventListener("click", withActionLock(handleSubscriptionCancelRequest));
+
+  document.getElementById("openSubscriptionBtn")?.addEventListener("click", () => {
+    closeHeaderLanguageOverlay();
+    switchScreen("subscriptionScreen", t("subscription"));
+  });
 
   if (headerAccountBtn) {
     headerAccountBtn.addEventListener("click", () => {
       switchScreen("accountScreen", t("account"));
     });
   }
+
+  if (headerSupportBtn) {
+    headerSupportBtn.addEventListener("click", () => {
+      switchScreen("supportScreen", t("support"));
+    });
+  }
+
+  document.getElementById("supportForm")?.addEventListener("submit", submitSupportForm);
+  document.getElementById("supportCopyDiagnosticsBtn")?.addEventListener("click", copySupportDiagnostics);
 
 	supabaseClient.auth.onAuthStateChange(() => {
 		scheduleAuthUiRefresh();
@@ -7730,6 +12249,10 @@ async function loadPaymentMethodsFromSupabase() {
   }
 
   if (!data || !data.length) {
+    const profile = await getCurrentProfile();
+    const accessState = getSubscriptionAccessState(profile, user);
+    if (!accessState.canWrite) return [];
+
     const seedPayload = defaultPaymentMethods.map((method, index) => ({
       user_id: user.id,
       name: method.name,
@@ -7788,6 +12311,7 @@ async function loadAppointmentsFromSupabase() {
     .from("appointments")
     .select("*")
     .eq("user_id", user.id)
+    .is("deleted_at", null)
     .order("appointment_date", { ascending: true })
     .order("appointment_time", { ascending: true });
 
@@ -7796,7 +12320,15 @@ async function loadAppointmentsFromSupabase() {
     return [];
   }
 
-  return (data || []).map(a => ({
+  return (data || [])
+    .map(mapSupabaseAppointmentRow)
+    .filter(appointment => !appointmentHasHiddenPaymentMethod(appointment));
+}
+
+
+function mapSupabaseAppointmentRow(a) {
+  const rawRemarks = String(a.appointment_remarks || a.remarks || "").trim();
+  return {
     id: a.id,
     customerId: a.customer_id,
     serviceId: a.service_id,
@@ -7808,7 +12340,85 @@ async function loadAppointmentsFromSupabase() {
     paid: Boolean(a.paid),
     paymentMethodName: a.payment_method_label ?? null,
     currency: normalizeCurrency(a.currency || DEFAULT_CURRENCY),
-    remarks: String(a.appointment_remarks || a.remarks || "").trim()
+    remarks: stripPrivateEndDateMeta(rawRemarks),
+    isPrivate: Boolean(a.is_private),
+    privateTitle: String(a.private_title || "").trim(),
+    privateDetails: String(a.private_details || "").trim(),
+    privateEndTime: a.private_end_time ? String(a.private_end_time).slice(0, 5) : "",
+    privateEndDate: getStoredPrivateEndDate({ ...a, appointment_remarks: rawRemarks }, a.appointment_date),
+    recurrenceGroupId: a.recurrence_group_id || null,
+    recurrenceRule: a.recurrence_rule || "none",
+    deletedAt: a.deleted_at || null,
+    deletedBy: a.deleted_by || null
+  };
+}
+
+async function loadDeletedAppointmentsFromSupabase() {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const { data, error } = await supabaseClient
+    .from("appointments")
+    .select("*")
+    .eq("user_id", user.id)
+    .not("deleted_at", "is", null)
+    .order("deleted_at", { ascending: false });
+
+  if (error) {
+    console.error("Fout bij laden verwijderde afspraken:", error.message);
+    await appAlert("Verwijderde afspraken laden mislukt: " + error.message, { title: "Laden mislukt", variant: "danger" });
+    return [];
+  }
+
+  return (data || [])
+    .map(mapSupabaseAppointmentRow)
+    .filter(appointment => !appointmentHasHiddenPaymentMethod(appointment));
+}
+
+
+async function loadStandardCostsFromSupabase() {
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const { data, error } = await supabaseClient
+    .from("standard_costs")
+    .select("id, description, vat_rate, created_at, updated_at")
+    .eq("user_id", user.id)
+    .order("description", { ascending: true });
+  if (error) {
+    console.error("Fout bij laden standaardkosten:", error.message);
+    return [];
+  }
+  return (data || []).map(item => ({
+    id: item.id,
+    description: item.description || "",
+    vatRate: Number(item.vat_rate || 21),
+    createdAt: item.created_at,
+    updatedAt: item.updated_at
+  }));
+}
+
+async function loadCostsFromSupabase() {
+  const user = await getCurrentUser();
+  if (!user) return [];
+  const { data, error } = await supabaseClient
+    .from("costs")
+    .select("id, description, cost_date, amount_incl_vat, vat_rate, standard_cost_id, created_at, updated_at")
+    .eq("user_id", user.id)
+    .order("cost_date", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("Fout bij laden kosten:", error.message);
+    return [];
+  }
+  return (data || []).map(cost => ({
+    id: cost.id,
+    description: cost.description || "",
+    date: cost.cost_date,
+    amountInclVat: Number(cost.amount_incl_vat || 0),
+    vatRate: Number(cost.vat_rate || 21),
+    standardCostId: cost.standard_cost_id || null,
+    createdAt: cost.created_at,
+    updatedAt: cost.updated_at
   }));
 }
 
@@ -7818,6 +12428,8 @@ async function loadAllDataFromSupabase() {
   const paymentMethods = await loadPaymentMethodsFromSupabase();
   const appointments = await loadAppointmentsFromSupabase();
   const todos = await loadTodosFromSupabase();
+  const standardCosts = await loadStandardCostsFromSupabase();
+  const costs = await loadCostsFromSupabase();
   const settings = await loadSettingsFromSupabase();
 
   saveData({
@@ -7826,9 +12438,12 @@ async function loadAllDataFromSupabase() {
     paymentMethods,
     appointments,
     todos,
+    standardCosts,
+    costs,
     settings
   });
 
+  state.revenueLastRenderSignature = "";
   await syncNotificationState();
 }
 
@@ -8032,6 +12647,10 @@ function refreshAppSelect(select) {
 
 function enhanceAppSelect(select) {
   if (!select || select.dataset.appSelectReady === 'true') return;
+  if (isAppointmentPickerFallbackSelect(select)) {
+    unwrapHiddenAppointmentPickerSelect(select);
+    return;
+  }
   if (select.multiple) return;
 
   select.dataset.appSelectReady = 'true';
@@ -8113,13 +12732,63 @@ function rebuildSettingsSelectOptions() {
   }
 }
 
+function isAppointmentPickerFallbackSelect(select) {
+  return Boolean(select?.classList?.contains("appointment-customer-select-fallback") || select?.classList?.contains("appointment-service-select-fallback"));
+}
+
+function unwrapHiddenAppointmentPickerSelect(select) {
+  if (!isAppointmentPickerFallbackSelect(select)) return;
+
+  const wrap = select.closest(".app-select-wrap");
+  if (wrap) {
+    wrap.parentNode.insertBefore(select, wrap);
+    wrap.remove();
+  }
+
+  delete select.dataset.appSelectReady;
+  select.tabIndex = -1;
+  select.setAttribute("aria-hidden", "true");
+}
+
+function setupAppointmentPickerOutsideClose() {
+  if (document.body.dataset.appointmentPickerOutsideCloseReady === "true") return;
+  document.body.dataset.appointmentPickerOutsideCloseReady = "true";
+
+  document.addEventListener("pointerdown", event => {
+    if (!event.target.closest(".appointment-customer-picker")) {
+      hideAppointmentCustomerResults();
+    }
+    if (!event.target.closest(".appointment-service-picker")) {
+      hideAppointmentServiceResults();
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+    hideAppointmentCustomerResults();
+    hideAppointmentServiceResults();
+  });
+}
+
 function setupAppSelectDropdowns() {
   rebuildSettingsSelectOptions();
 
   document.querySelectorAll('select').forEach(select => {
     select.removeAttribute('size');
-    enhanceAppSelect(select);
+    if (select.classList.contains("header-language-select")) {
+      const wrap = select.closest(".app-select-wrap");
+      if (wrap) {
+        wrap.parentNode.insertBefore(select, wrap);
+        wrap.remove();
+      }
+    } else if (isAppointmentPickerFallbackSelect(select)) {
+      unwrapHiddenAppointmentPickerSelect(select);
+    } else {
+      enhanceAppSelect(select);
+    }
   });
+
+  setupAppointmentPickerOutsideClose();
 
   if (appSelectsReady) return;
   appSelectsReady = true;
@@ -8142,6 +12811,144 @@ function setupAppSelectDropdowns() {
 }
 
 
+let globalActionLockDepth = 0;
+let globalActionBusyTimer = null;
+let globalActionBusyHideTimer = null;
+let globalActionBusyVisibleSince = 0;
+const GLOBAL_ACTION_BUSY_MIN_VISIBLE_MS = 650;
+let globalActionBusyWaitingForSplash = false;
+
+function isStartupSplashVisible() {
+  const splash = document.getElementById("customSplash");
+  return Boolean(splash && document.body.contains(splash) && !splash.classList.contains("fade-out"));
+}
+
+function showBusyAfterStartupSplash() {
+  if (globalActionBusyWaitingForSplash) return;
+  const splash = document.getElementById("customSplash");
+  if (!splash) return;
+  globalActionBusyWaitingForSplash = true;
+
+  const showIfStillBusy = () => {
+    globalActionBusyWaitingForSplash = false;
+    if (globalActionLockDepth > 0) setGlobalActionBusyVisible(true);
+  };
+
+  splash.addEventListener("transitionend", showIfStillBusy, { once: true });
+  window.setTimeout(showIfStillBusy, 3800);
+}
+
+function getAppBusyOverlay() {
+  return document.getElementById("appBusyOverlay");
+}
+
+function setGlobalActionBusyVisible(visible) {
+  if (visible && isStartupSplashVisible()) {
+    showBusyAfterStartupSplash();
+    return;
+  }
+
+  const overlay = getAppBusyOverlay();
+
+  if (globalActionBusyHideTimer) {
+    clearTimeout(globalActionBusyHideTimer);
+    globalActionBusyHideTimer = null;
+  }
+
+  if (visible) {
+    globalActionBusyVisibleSince = Date.now();
+  }
+
+  document.body?.classList.toggle("app-is-busy", Boolean(visible));
+  if (!overlay) return;
+  overlay.classList.toggle("hidden", !visible);
+  overlay.setAttribute("aria-hidden", visible ? "false" : "true");
+}
+
+function suspendGlobalActionBusyForDialog() {
+  const suspendedDepth = globalActionLockDepth;
+
+  if (globalActionBusyTimer) {
+    clearTimeout(globalActionBusyTimer);
+    globalActionBusyTimer = null;
+  }
+  if (globalActionBusyHideTimer) {
+    clearTimeout(globalActionBusyHideTimer);
+    globalActionBusyHideTimer = null;
+  }
+
+  globalActionLockDepth = 0;
+  setGlobalActionBusyVisible(false);
+  return suspendedDepth;
+}
+
+function resumeGlobalActionBusyAfterDialog(suspendedDepth) {
+  if (!suspendedDepth || suspendedDepth <= 0) return;
+  globalActionLockDepth = Math.max(globalActionLockDepth, suspendedDepth);
+  requestGlobalActionBusy({ immediate: true });
+}
+
+function requestGlobalActionBusy({ immediate = true, delay = 0 } = {}) {
+  if (globalActionLockDepth <= 0) return;
+  if (globalActionBusyTimer) {
+    clearTimeout(globalActionBusyTimer);
+    globalActionBusyTimer = null;
+  }
+
+  const show = () => {
+    if (globalActionLockDepth > 0) setGlobalActionBusyVisible(true);
+  };
+
+  if (immediate || delay <= 0) show();
+  else globalActionBusyTimer = window.setTimeout(show, delay);
+}
+
+function beginGlobalActionLock() {
+  globalActionLockDepth += 1;
+  requestGlobalActionBusy({ immediate: true });
+}
+
+function endGlobalActionLock() {
+  globalActionLockDepth = Math.max(0, globalActionLockDepth - 1);
+  if (globalActionLockDepth === 0) {
+    if (globalActionBusyTimer) {
+      clearTimeout(globalActionBusyTimer);
+      globalActionBusyTimer = null;
+    }
+
+    const elapsed = globalActionBusyVisibleSince ? Date.now() - globalActionBusyVisibleSince : GLOBAL_ACTION_BUSY_MIN_VISIBLE_MS;
+    const remaining = Math.max(0, GLOBAL_ACTION_BUSY_MIN_VISIBLE_MS - elapsed);
+
+    if (remaining > 0 && getAppBusyOverlay() && !getAppBusyOverlay().classList.contains("hidden")) {
+      globalActionBusyHideTimer = window.setTimeout(() => {
+        globalActionBusyHideTimer = null;
+        if (globalActionLockDepth === 0) setGlobalActionBusyVisible(false);
+      }, remaining);
+    } else {
+      setGlobalActionBusyVisible(false);
+    }
+  }
+}
+
+function blockInteractionWhileBusy(event) {
+  if (globalActionLockDepth <= 0) return;
+  const overlay = getAppBusyOverlay();
+
+  // Zodra een actie-lock actief is, blokkeren we alle interactie buiten de busy-overlay.
+  // Niet wachten tot de browser de overlay visueel heeft getekend, want net die korte tussenfase
+  // liet op iPhone nog swipes/klikken door bij snelle submits.
+  if (overlay && overlay.contains(event.target)) return;
+  if (event.target?.closest?.('[data-allow-busy-download="true"]')) return;
+
+  event.preventDefault();
+  event.stopImmediatePropagation?.();
+  event.stopPropagation();
+}
+
+["click", "dblclick", "pointerdown", "touchstart", "touchmove", "wheel", "keydown"].forEach(type => {
+  document.addEventListener(type, blockInteractionWhileBusy, { capture: true, passive: false });
+});
+
 function getActionLockButton(event) {
   if (!event?.target) return null;
   if (event.target.matches?.('button')) return event.target;
@@ -8163,22 +12970,114 @@ function setActionLocked(button, locked) {
   }
 }
 
+function waitForBusyOverlayPaint() {
+  return new Promise(resolve => {
+    if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(() => window.requestAnimationFrame(resolve));
+    } else {
+      setTimeout(resolve, 0);
+    }
+  });
+}
+
+function waitMilliseconds(ms) {
+  return new Promise(resolve => window.setTimeout(resolve, Math.max(0, Number(ms) || 0)));
+}
+
+async function keepBusyOverlayVisibleSince(startedAt, minVisibleMs = 750) {
+  const elapsed = Date.now() - Number(startedAt || Date.now());
+  const remaining = Math.max(0, Number(minVisibleMs || 0) - elapsed);
+  if (remaining > 0) await waitMilliseconds(remaining);
+}
+
 function withActionLock(handler) {
   return async function actionLockWrapper(event) {
     const button = getActionLockButton(event) || this?.querySelector?.('button[type="submit"], .btn-primary, .btn-danger, button');
-    if (button?.dataset?.actionLocked === "true") {
+    if (button?.dataset?.actionLocked === "true" || globalActionLockDepth > 0) {
       event?.preventDefault?.();
+      event?.stopImmediatePropagation?.();
       event?.stopPropagation?.();
       return;
     }
 
+    beginGlobalActionLock();
     setActionLocked(button, true);
     try {
+      // Geef de browser eerst tijd om de overlay écht te tekenen.
+      // Zonder deze paint-pauze zijn korte/medium acties soms klaar vóór de gebruiker iets ziet,
+      // terwijl interactie in die fractie toch nog mogelijk voelt.
+      await waitForBusyOverlayPaint();
       return await handler.call(this, event);
     } finally {
       setActionLocked(button, false);
+      endGlobalActionLock();
     }
   };
+}
+
+async function runWithGlobalActionBusy(work) {
+  beginGlobalActionLock();
+  try {
+    // Forceer de busy-overlay onmiddellijk zichtbaar.
+    // Dit is nodig bij flows met eerst een bevestigingsdialoog (bv. privé-afspraak verwijderen),
+    // omdat de overlay anders soms pas na de effectieve delete wordt getekend.
+    setGlobalActionBusyVisible(true);
+    await waitForBusyOverlayPaint();
+    return await work();
+  } finally {
+    endGlobalActionLock();
+  }
+}
+
+function wrapSupabaseWriteThenableWithBusy(query) {
+  if (!query || query.__nailbookerBusyWrapped) return query;
+  const originalThen = typeof query.then === "function" ? query.then.bind(query) : null;
+  if (!originalThen) return query;
+
+  Object.defineProperty(query, "__nailbookerBusyWrapped", { value: true, configurable: true });
+  query.then = function nailbookerBusyThen(onFulfilled, onRejected) {
+    beginGlobalActionLock();
+    return originalThen(
+      value => {
+        endGlobalActionLock();
+        return typeof onFulfilled === "function" ? onFulfilled(value) : value;
+      },
+      error => {
+        endGlobalActionLock();
+        if (typeof onRejected === "function") return onRejected(error);
+        throw error;
+      }
+    );
+  };
+  return query;
+}
+
+function installSupabaseWriteBusyPatch() {
+  if (typeof supabaseClient === "undefined" || !supabaseClient || supabaseClient.__nailbookerBusyPatchInstalled) return;
+
+  const originalFrom = typeof supabaseClient.from === "function" ? supabaseClient.from.bind(supabaseClient) : null;
+  if (originalFrom) {
+    supabaseClient.from = function nailbookerBusyFrom(...args) {
+      const builder = originalFrom(...args);
+      ["insert", "update", "upsert", "delete"].forEach(methodName => {
+        if (!builder || typeof builder[methodName] !== "function" || builder[methodName].__nailbookerBusyPatched) return;
+        const originalMethod = builder[methodName].bind(builder);
+        const patchedMethod = function nailbookerBusyWriteMethod(...methodArgs) {
+          return wrapSupabaseWriteThenableWithBusy(originalMethod(...methodArgs));
+        };
+        Object.defineProperty(patchedMethod, "__nailbookerBusyPatched", { value: true });
+        builder[methodName] = patchedMethod;
+      });
+      return builder;
+    };
+  }
+
+  if (supabaseClient.auth && typeof supabaseClient.auth.updateUser === "function") {
+    const originalUpdateUser = supabaseClient.auth.updateUser.bind(supabaseClient.auth);
+    supabaseClient.auth.updateUser = (...args) => runWithGlobalActionBusy(() => originalUpdateUser(...args));
+  }
+
+  Object.defineProperty(supabaseClient, "__nailbookerBusyPatchInstalled", { value: true, configurable: true });
 }
 
 async function initAppData() {
@@ -8191,22 +13090,1360 @@ async function initAppData() {
 }
 
 async function startApp() {
-	await registerServiceWorker();
-	await initAppData();
-	registerEvents();
-	await syncAuthUI();
-	rerenderAll();
-	await syncNotificationState();
+  beginGlobalActionLock();
+  try {
+    await registerServiceWorker();
+    installSupabaseWriteBusyPatch();
+    await initAppData();
+    registerEvents();
+    await syncAuthUI();
+    rerenderAll();
+    await syncNotificationState();
 
-  const user = await getCurrentUser();
+    const user = await getCurrentUser();
 
-  setupAppBrowserBackNavigation();
+    setupAppBrowserBackNavigation();
 
-  if (user) {
-    switchScreen("agendaScreen", t("agenda"), { replaceHistory: true });
-  } else {
-    switchScreen("accountScreen", t("account"), { replaceHistory: true });
+    if (user) {
+      switchScreen("agendaScreen", t("agenda"), { replaceHistory: true });
+    } else {
+      switchScreen("accountScreen", t("account"), { replaceHistory: true });
+    }
+  } finally {
+    endGlobalActionLock();
   }
 }
 
+
+
+/* =========================================================
+   AGENDA: MAANDKALENDER <-> DAGKALENDER
+   Dagweergave met uurindeling zoals een compacte Google Calendar.
+========================================================= */
+(function installAgendaDayCalendarMode() {
+  const HOUR_HEIGHT = 56;
+  const AGENDA_DAY_LINE_OFFSET = 10;
+  const START_SCROLL_HOUR = 8;
+
+  if (!state) return;
+  if (!state.agendaCalendarMode) state.agendaCalendarMode = "month";
+  function agendaDayVisualTop(minutes) {
+    const safeMinutes = Math.max(0, Math.min(24 * 60, Number(minutes) || 0));
+    if (safeMinutes >= 24 * 60) return 24 * HOUR_HEIGHT;
+    return (safeMinutes / 60) * HOUR_HEIGHT + AGENDA_DAY_LINE_OFFSET;
+  }
+
+  function agendaDayVisualHeight(startMinutes, endMinutes) {
+    const safeStart = Math.max(0, Math.min(24 * 60, Number(startMinutes) || 0));
+    const safeEnd = Math.max(safeStart, Math.min(24 * 60, Number(endMinutes) || safeStart));
+    return Math.max(1, agendaDayVisualTop(safeEnd) - agendaDayVisualTop(safeStart));
+  }
+
+
+  const originalRenderCalendar = renderCalendar;
+  const originalRenderAgendaList = renderAgendaList;
+  const originalRegisterEvents = registerEvents;
+  const originalJumpToToday = jumpToToday;
+
+  function getSelectedDateObject() {
+    const d = new Date(String(state.selectedDate || todayStr) + "T00:00:00");
+    return Number.isNaN(d.getTime()) ? new Date(todayStr + "T00:00:00") : d;
+  }
+
+  function clampAgendaDayScrollTop(scroll, value) {
+    if (!scroll) return 0;
+    const maxScrollTop = Math.max(0, scroll.scrollHeight - scroll.clientHeight);
+    return Math.max(0, Math.min(Number(value) || 0, maxScrollTop));
+  }
+
+  function preferredAgendaDayScrollTop(scroll, dateStr = state.selectedDate) {
+    if (!scroll) return 0;
+    if (dateStr === todayStr) {
+      const now = new Date();
+      const minutes = (now.getHours() * 60) + now.getMinutes();
+      return clampAgendaDayScrollTop(scroll, agendaDayVisualTop(minutes) - (scroll.clientHeight / 2));
+    }
+    return clampAgendaDayScrollTop(scroll, START_SCROLL_HOUR * HOUR_HEIGHT);
+  }
+
+  function applyAgendaDayScrollPosition(scroll, wrap, dateStr = state.selectedDate) {
+    if (!scroll) return;
+
+    const forceDefault = Boolean(state.agendaDayForceDefaultScroll);
+    const restoreScrollTop = Number(state.agendaDayRestoreScrollTop);
+
+    if (!forceDefault && Number.isFinite(restoreScrollTop) && restoreScrollTop >= 0) {
+      scroll.scrollTop = clampAgendaDayScrollTop(scroll, restoreScrollTop);
+      if (wrap) wrap.dataset.userScrolled = "1";
+      return;
+    }
+
+    if (forceDefault || !wrap?.dataset.userScrolled) {
+      scroll.scrollTop = preferredAgendaDayScrollTop(scroll, dateStr);
+      if (wrap && forceDefault) wrap.dataset.userScrolled = "1";
+    }
+  }
+
+  function setAgendaCalendarMode(mode) {
+    const nextMode = mode === "day" ? "day" : "month";
+    if (nextMode === "day") {
+      state.agendaDayForceDefaultScroll = true;
+      delete state.agendaDayRestoreScrollTop;
+      const existingWrap = document.getElementById("agendaDayCalendar");
+      if (existingWrap) delete existingWrap.dataset.userScrolled;
+    }
+    state.agendaCalendarMode = nextMode;
+    document.body.classList.toggle("agenda-day-mode", nextMode === "day");
+    closeAgendaFabMenu?.();
+    renderCalendar();
+    renderAgendaList();
+
+    window.setTimeout(() => {
+      state.agendaCalendarMode = nextMode;
+      document.body.classList.toggle("agenda-day-mode", nextMode === "day");
+      updateAgendaCalendarModeUi();
+    }, 0);
+  }
+
+  function ensureAgendaCalendarToggle() {
+    const panel = document.querySelector("#agendaScreen .calendar-panel");
+    if (!panel) return null;
+
+    let toggle = document.getElementById("agendaCalendarModeToggle");
+    if (!toggle) {
+      toggle = document.createElement("button");
+      toggle.id = "agendaCalendarModeToggle";
+      toggle.type = "button";
+      toggle.className = "agenda-calendar-mode-toggle";
+      toggle.setAttribute("aria-label", "Wissel tussen maandkalender en dagkalender");
+      toggle.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        const now = Date.now();
+        const lastSwipe = Number(state.agendaDayLastSwipeAt || 0);
+        if (now - lastSwipe < 180) return;
+
+        closeAgendaFabMenu?.();
+        const isDayMode = state.agendaCalendarMode === "day" || document.body.classList.contains("agenda-day-mode");
+        setAgendaCalendarMode(isDayMode ? "month" : "day");
+      }, true);
+      panel.appendChild(toggle);
+    }
+
+    toggle.innerHTML = state.agendaCalendarMode === "day"
+      ? '<span class="agenda-calendar-toggle-chevrons is-down"><span>›</span><span>›</span></span>'
+      : '<span class="agenda-calendar-toggle-chevrons is-up"><span>›</span><span>›</span></span>';
+
+    return toggle;
+  }
+
+  function ensureAgendaDayCalendar() {
+    const panel = document.querySelector("#agendaScreen .calendar-panel");
+    if (!panel) return null;
+
+    let wrap = document.getElementById("agendaDayCalendar");
+    if (!wrap) {
+      wrap = document.createElement("div");
+      wrap.id = "agendaDayCalendar";
+      wrap.className = "agenda-day-calendar";
+      wrap.addEventListener("click", () => closeAgendaFabMenu?.());
+      panel.insertBefore(wrap, document.getElementById("agendaCalendarModeToggle") || null);
+    }
+
+    return wrap;
+  }
+
+  function getShortWeekdayLabel(date) {
+    const keys = ["sundayShort", "mondayShort", "tuesdayShort", "wednesdayShort", "thursdayShort", "fridayShort", "saturdayShort"];
+    const key = keys[date.getDay()] || "";
+    return key ? t(key) : "";
+  }
+
+  function setMonthHeaderForDayMode() {
+    const title = document.getElementById("monthPickerBtn");
+    if (!title) return;
+    const d = getSelectedDateObject();
+    const shortDay = getShortWeekdayLabel(d);
+    const formattedDate = new Intl.DateTimeFormat(getCurrentLanguage(), {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }).format(d);
+    title.textContent = `${shortDay ? `${shortDay} ` : ""}${formattedDate}`;
+  }
+
+  function minutesForDayView(appointment) {
+    const dateStr = state.selectedDate;
+    if (isPrivateAppointment(appointment)) {
+      const bounds = getPrivateRangeBounds(appointment);
+      const start = minutesFromTimeString(appointment.time || "00:00");
+      const end = minutesFromTimeString(appointment.privateEndTime || appointment.private_end_time || appointment.time || "00:00");
+      if (bounds.end > bounds.start) {
+        if (dateStr === bounds.start) return { start: start, end: 24 * 60 };
+        if (dateStr === bounds.end) return { start: 0, end: Math.max(end, 30) };
+        return { start: 0, end: 24 * 60 };
+      }
+      return { start, end: Math.max(end, start + 30) };
+    }
+
+    // Dagkalender: het visuele blok moet exact lopen van beginuur tot het
+    // einduur dat ook in het blok wordt getoond. Daarom gebruiken we dezelfde
+    // berekening als getAppointmentDisplayEndTime(), inclusief standaardpauze.
+    const range = appointmentTimeRange(appointment, Number(getSettings().defaultBreakMinutes || 0));
+    const start = Math.max(0, Math.min(24 * 60, range.startMinutes));
+    const end = Math.max(start + 15, Math.min(24 * 60, range.endMinutes));
+    return { start, end };
+  }
+
+
+  function isPinnedFullDayPrivateForDayView(appointment) {
+    if (!isPrivateAppointment(appointment)) return false;
+    const bounds = getPrivateRangeBounds(appointment);
+    if (bounds.end <= bounds.start) return false;
+    const currentDate = state.selectedDate;
+    return currentDate > bounds.start && currentDate < bounds.end;
+  }
+
+  function assignOverlapColumns(items) {
+    const sorted = items
+      .slice()
+      .sort((a, b) => a.range.start - b.range.start || a.range.end - b.range.end);
+
+    const groups = [];
+    let current = [];
+    let groupEnd = -1;
+
+    sorted.forEach(item => {
+      if (!current.length || item.range.start < groupEnd) {
+        current.push(item);
+        groupEnd = Math.max(groupEnd, item.range.end);
+      } else {
+        groups.push(current);
+        current = [item];
+        groupEnd = item.range.end;
+      }
+    });
+    if (current.length) groups.push(current);
+
+    groups.forEach(group => {
+      const activeColumns = [];
+      group.forEach(item => {
+        let columnIndex = activeColumns.findIndex(end => end <= item.range.start);
+        if (columnIndex === -1) {
+          columnIndex = activeColumns.length;
+        }
+        activeColumns[columnIndex] = item.range.end;
+        item.columnIndex = columnIndex;
+      });
+
+      const columnCount = Math.max(1, ...group.map(item => item.columnIndex + 1));
+      group.forEach(item => {
+        item.columnCount = columnCount;
+      });
+    });
+
+    return sorted;
+  }
+
+
+  function buildAgendaDayCalendarMarkupForDate(dateStr) {
+    const previousSelectedDate = state.selectedDate;
+    state.selectedDate = dateStr;
+
+    try {
+      const data = getData();
+      const appts = getAppointmentsForDate(dateStr, data);
+      const totalHeight = 24 * HOUR_HEIGHT;
+
+      const hourRows = Array.from({ length: 24 }, (_, hour) => `
+        <div class="agenda-day-hour-row" style="height:${HOUR_HEIGHT}px">
+          <div class="agenda-day-hour-label">${String(hour).padStart(2, "0")}:00</div>
+          <div class="agenda-day-hour-line"></div>
+        </div>
+      `).join("");
+
+      const pinnedPrivateAppointments = appts.filter(isPinnedFullDayPrivateForDayView);
+      const timedAppointments = assignOverlapColumns(appts
+        .filter(app => !isPinnedFullDayPrivateForDayView(app))
+        .map(app => ({ app, range: minutesForDayView(app) })));
+
+      const pinnedBlocks = pinnedPrivateAppointments.map(app => {
+        const displayTime = getPrivateAgendaDisplayTime(app, dateStr);
+        const title = app.privateTitle || "Privé";
+        const sub = app.privateDetails || "Privé-afspraak";
+        return `
+          <button class="agenda-day-pinned-private appointment-card" type="button" data-appointment-id="${htmlEscape(String(app.sourceAppointmentId || app.id))}">
+            <div class="agenda-day-appointment-row appointment-row">
+              <div class="time-block">
+                <span class="time">${htmlEscape(displayTime.main)}</span>
+                <span class="time-end">${htmlEscape(displayTime.sub)}</span>
+              </div>
+              <div class="agenda-day-appointment-main">
+                <div class="main-name">${htmlEscape(title)}</div>
+                <div class="meta">${htmlEscape(sub)}</div>
+              </div>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      const appointmentBlocks = timedAppointments.map(item => {
+        const app = item.app;
+        const privateApp = isPrivateAppointment(app);
+        const customer = customerById(data, app.customerId);
+        const service = serviceById(data, app.serviceId);
+        const range = item.range;
+        const top = agendaDayVisualTop(range.start);
+        const height = agendaDayVisualHeight(range.start, range.end);
+        const columnWidth = 100 / Math.max(1, item.columnCount || 1);
+        const left = (item.columnIndex || 0) * columnWidth;
+        const width = columnWidth;
+        const displayTime = privateApp ? getPrivateAgendaDisplayTime(app, dateStr) : {
+          main: String(app.time || "00:00").slice(0, 5),
+          sub: `tot ${getAppointmentDisplayEndTime(app, Number(getSettings().defaultBreakMinutes || 0))}`
+        };
+        const title = privateApp
+          ? (app.privateTitle || "Privé")
+          : (customer ? fullName(customer) : "Onbekend");
+        const sub = privateApp
+          ? (app.privateDetails || "Privé-afspraak")
+          : [service?.name || "", app.paid ? paymentMethodNameForAppointment(app, data) : ""].filter(Boolean).join(" · ");
+        const amount = privateApp ? "" : euro(app.price || 0, app.currency || getCurrentCurrency());
+        const paidClass = !privateApp && app.paid ? " paid" : "";
+        const noShowClass = !privateApp && String(app.status || "").toLowerCase() === "no-show" ? " no-show" : "";
+        const realId = htmlEscape(String(app.sourceAppointmentId || app.id));
+        return `
+          <button class="agenda-day-appointment appointment-card${privateApp ? " private" : " normal"}" type="button" data-appointment-id="${realId}" data-private="${privateApp ? "1" : "0"}" style="top:${top}px;height:${height}px;left:${left}%;width:calc(${width}% - 4px)">
+            <div class="agenda-day-appointment-row appointment-row">
+              <div class="time-block">
+                <span class="time">${htmlEscape(displayTime.main)}</span>
+                <span class="time-end">${htmlEscape(displayTime.sub)}</span>
+              </div>
+              <div class="agenda-day-appointment-main">
+                <div class="main-name">${htmlEscape(title)}</div>
+                <div class="meta">${htmlEscape(sub)}</div>
+              </div>
+              ${privateApp ? "" : `<span class="price-chip${paidClass}${noShowClass}" data-day-payment-chip="1" data-id="${realId}" data-appointment-id="${realId}">${htmlEscape(amount)}</span>`}
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      return `
+        ${pinnedBlocks ? `<div class="agenda-day-pinned-private-wrap">${pinnedBlocks}</div>` : ""}
+        <div class="agenda-day-scroll">
+          <div class="agenda-day-grid" style="height:${totalHeight}px">
+            ${hourRows}
+            ${dateStr === todayStr ? `<div class="agenda-day-now-line" style="top:${agendaDayVisualTop(new Date().getHours() * 60 + new Date().getMinutes())}px"><span></span></div>` : ""}
+            <div class="agenda-day-appointments-layer">${appointmentBlocks}</div>
+          </div>
+        </div>
+      `;
+    } finally {
+      state.selectedDate = previousSelectedDate;
+    }
+  }
+
+  function renderAgendaDayCalendar() {
+    const wrap = ensureAgendaDayCalendar();
+    if (!wrap) return;
+
+    // Bewaar de huidige scrollpositie vóór de dagkalender opnieuw wordt opgebouwd.
+    // renderCalendar() en renderAgendaList() kunnen kort na elkaar renderAgendaDayCalendar()
+    // aanroepen. Zonder deze buffer kan de tweede render de herstelde positie opnieuw
+    // verliezen, waardoor de dagkalender na een swipe terug naar 00:00 springt.
+    const existingDayScroll = wrap.querySelector(".agenda-day-scroll");
+    const existingScrollTop = existingDayScroll ? existingDayScroll.scrollTop : null;
+    if (
+      !state.agendaDayForceDefaultScroll &&
+      existingDayScroll &&
+      wrap.dataset.userScrolled === "1" &&
+      !Number.isFinite(Number(state.agendaDayRestoreScrollTop)) &&
+      Number.isFinite(existingScrollTop)
+    ) {
+      state.agendaDayRestoreScrollTop = existingScrollTop;
+    }
+
+    const data = getData();
+    const appts = getAppointmentsForDate(state.selectedDate, data);
+    const totalHeight = 24 * HOUR_HEIGHT;
+
+    const hourRows = Array.from({ length: 24 }, (_, hour) => `
+      <div class="agenda-day-hour-row" style="height:${HOUR_HEIGHT}px">
+        <div class="agenda-day-hour-label">${String(hour).padStart(2, "0")}:00</div>
+        <div class="agenda-day-hour-line"></div>
+      </div>
+    `).join("");
+
+    const pinnedPrivateAppointments = appts.filter(isPinnedFullDayPrivateForDayView);
+    const timedAppointments = assignOverlapColumns(appts
+      .filter(app => !isPinnedFullDayPrivateForDayView(app))
+      .map(app => ({ app, range: minutesForDayView(app) })));
+
+    const pinnedBlocks = pinnedPrivateAppointments.map(app => {
+      const displayTime = getPrivateAgendaDisplayTime(app, state.selectedDate);
+      const title = app.privateTitle || "Privé";
+      const sub = app.privateDetails || "Privé-afspraak";
+      return `
+        <button class="agenda-day-pinned-private appointment-card" type="button" data-appointment-id="${htmlEscape(String(app.sourceAppointmentId || app.id))}">
+          <div class="agenda-day-appointment-row appointment-row">
+            <div class="time-block">
+              <span class="time">${htmlEscape(displayTime.main)}</span>
+              <span class="time-end">${htmlEscape(displayTime.sub)}</span>
+            </div>
+            <div class="agenda-day-appointment-main">
+              <div class="main-name">${htmlEscape(title)}</div>
+              <div class="meta">${htmlEscape(sub)}</div>
+            </div>
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    const appointmentBlocks = timedAppointments.map(item => {
+      const app = item.app;
+      const privateApp = isPrivateAppointment(app);
+      const customer = customerById(data, app.customerId);
+      const service = serviceById(data, app.serviceId);
+      const range = item.range;
+      const top = agendaDayVisualTop(range.start);
+      const height = agendaDayVisualHeight(range.start, range.end);
+      const columnWidth = 100 / Math.max(1, item.columnCount || 1);
+      const left = (item.columnIndex || 0) * columnWidth;
+      const width = columnWidth;
+      const displayTime = privateApp ? getPrivateAgendaDisplayTime(app, state.selectedDate) : {
+        main: String(app.time || "00:00").slice(0, 5),
+        sub: `tot ${getAppointmentDisplayEndTime(app, Number(getSettings().defaultBreakMinutes || 0))}`
+      };
+      const title = privateApp
+        ? (app.privateTitle || "Privé")
+        : (customer ? fullName(customer) : "Onbekend");
+      const sub = privateApp
+        ? (app.privateDetails || "Privé-afspraak")
+        : [service?.name || "", app.paid ? paymentMethodNameForAppointment(app, data) : ""].filter(Boolean).join(" · ");
+      const amount = privateApp ? "" : euro(app.price || 0, app.currency || getCurrentCurrency());
+      const paidClass = !privateApp && app.paid ? " paid" : "";
+      const noShowClass = !privateApp && String(app.status || "").toLowerCase() === "no-show" ? " no-show" : "";
+      const realId = htmlEscape(String(app.sourceAppointmentId || app.id));
+      return `
+        <button class="agenda-day-appointment appointment-card${privateApp ? " private" : " normal"}" type="button" data-appointment-id="${realId}" data-private="${privateApp ? "1" : "0"}" style="top:${top}px;height:${height}px;left:${left}%;width:calc(${width}% - 4px)">
+          <div class="agenda-day-appointment-row appointment-row">
+            <div class="time-block">
+              <span class="time">${htmlEscape(displayTime.main)}</span>
+              <span class="time-end">${htmlEscape(displayTime.sub)}</span>
+            </div>
+            <div class="agenda-day-appointment-main">
+              <div class="main-name">${htmlEscape(title)}</div>
+              <div class="meta">${htmlEscape(sub)}</div>
+            </div>
+            ${privateApp ? "" : `<span class="price-chip${paidClass}${noShowClass}" data-day-payment-chip="1" data-id="${realId}" data-appointment-id="${realId}">${htmlEscape(amount)}</span>`}
+          </div>
+        </button>
+      `;
+    }).join("");
+
+    wrap.classList.toggle("has-pinned-private-day", pinnedPrivateAppointments.length > 0);
+    wrap.innerHTML = `
+      ${pinnedBlocks ? `<div class="agenda-day-pinned-private-wrap">${pinnedBlocks}</div>` : ""}
+      <button class="agenda-day-hidden-nav agenda-day-hidden-nav-top hidden" type="button" aria-label="Toon eerdere verborgen afspraken">...</button>
+      <div class="agenda-day-scroll">
+        <div class="agenda-day-grid" style="height:${totalHeight}px">
+          ${hourRows}
+          ${state.selectedDate === todayStr ? `<div class="agenda-day-now-line" style="top:${agendaDayVisualTop(new Date().getHours() * 60 + new Date().getMinutes())}px"><span></span></div>` : ""}
+          <div class="agenda-day-appointments-layer">${appointmentBlocks}</div>
+        </div>
+      </div>
+      <button class="agenda-day-hidden-nav agenda-day-hidden-nav-bottom hidden" type="button" aria-label="Toon latere verborgen afspraken">...</button>
+    `;
+
+    const dayScroll = wrap.querySelector(".agenda-day-scroll");
+    const hiddenTopBtn = wrap.querySelector(".agenda-day-hidden-nav-top");
+    const hiddenBottomBtn = wrap.querySelector(".agenda-day-hidden-nav-bottom");
+
+    // Meteen scrollen, niet pas in een setTimeout. Zo verschijnt de dagkalender
+    // bij openen en tijdens swipen direct op het juiste uur, zonder 00:00-flits.
+    applyAgendaDayScrollPosition(dayScroll, wrap, state.selectedDate);
+
+    const getVisibleDayAppointmentButtons = () => Array.from(wrap.querySelectorAll(".agenda-day-scroll .agenda-day-appointment"));
+
+    const updateAgendaDayHiddenNavButtons = () => {
+      if (!dayScroll || !hiddenTopBtn || !hiddenBottomBtn) return;
+
+      const appointments = getVisibleDayAppointmentButtons();
+      const scrollTop = dayScroll.scrollTop;
+      const viewportBottom = scrollTop + dayScroll.clientHeight;
+      const tolerance = 6;
+
+      const hasHiddenAbove = appointments.some(button => (button.offsetTop + button.offsetHeight) < (scrollTop + tolerance));
+      const hasHiddenBelow = appointments.some(button => button.offsetTop > (viewportBottom - tolerance));
+
+      hiddenTopBtn.classList.toggle("hidden", !hasHiddenAbove);
+      hiddenBottomBtn.classList.toggle("hidden", !hasHiddenBelow);
+    };
+
+    const scrollToNearestHiddenAppointment = direction => {
+      if (!dayScroll) return;
+
+      const appointments = getVisibleDayAppointmentButtons()
+        .map(button => ({ button, top: button.offsetTop, bottom: button.offsetTop + button.offsetHeight }))
+        .sort((a, b) => a.top - b.top);
+
+      const scrollTop = dayScroll.scrollTop;
+      const viewportBottom = scrollTop + dayScroll.clientHeight;
+      const target = direction < 0
+        ? appointments.filter(item => item.bottom < scrollTop + 6).pop()
+        : appointments.find(item => item.top > viewportBottom - 6);
+
+      if (!target) return;
+
+      dayScroll.scrollTo({
+        top: Math.max(0, target.top - 10),
+        behavior: "smooth"
+      });
+    };
+
+    [hiddenTopBtn, hiddenBottomBtn].forEach((button, index) => {
+      if (!button) return;
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation?.();
+        closeAgendaFabMenu?.();
+        scrollToNearestHiddenAppointment(index === 0 ? -1 : 1);
+      });
+    });
+
+    if (dayScroll) {
+      dayScroll.addEventListener("scroll", () => {
+        wrap.dataset.userScrolled = "1";
+        updateAgendaDayHiddenNavButtons();
+      }, { passive: true });
+      window.setTimeout(updateAgendaDayHiddenNavButtons, 0);
+    }
+
+    wrap.querySelectorAll(".agenda-day-appointment, .agenda-day-pinned-private").forEach(button => {
+      button.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+        closeAgendaFabMenu?.();
+        const id = button.dataset.appointmentId;
+        const app = getAppointmentsForDate(state.selectedDate, getData()).find(item => String(item.id) === String(id) || String(item.sourceAppointmentId || "") === String(id));
+        if (!app) return;
+
+        const paymentChip = event.target?.closest?.("[data-day-payment-chip]");
+        if (paymentChip && !isPrivateAppointment(app)) {
+          if (typeof openPaymentDialog === "function") {
+            openPaymentDialog(app.sourceAppointmentId || app.id, paymentChip);
+            return;
+          }
+        }
+
+        if (typeof openAppointmentActionPopover === "function") {
+          openAppointmentActionPopover(app.sourceAppointmentId || app.id, button);
+        } else {
+          openEditAppointmentDialog(app.sourceAppointmentId || app.id);
+        }
+      });
+    });
+
+    if (!wrap.dataset.daySwipeBound) {
+      wrap.dataset.daySwipeBound = "1";
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let lastX = 0;
+      let tracking = false;
+      let horizontal = false;
+      let daySwipePreview = null;
+      let daySwipeStep = 0;
+      let swipeLock = false;
+      let suppressDayClick = false;
+      let suppressDayClickTimer = null;
+      const intentThreshold = 10;
+      const commitThreshold = 54;
+
+      const getDayWrap = () => document.getElementById("agendaDayCalendar");
+
+      const clearDaySwipe = () => {
+        const dayWrap = getDayWrap();
+        if (daySwipePreview) {
+          daySwipePreview.remove();
+          daySwipePreview = null;
+        }
+        daySwipeStep = 0;
+        if (dayWrap) {
+          dayWrap.classList.remove("is-day-swiping", "is-day-swipe-animating");
+          dayWrap.style.removeProperty("--agenda-day-current-x");
+          dayWrap.style.removeProperty("--agenda-day-preview-x");
+          dayWrap.style.removeProperty("--agenda-day-preview-opacity");
+        }
+      };
+
+      const resetDaySwipeTracking = () => {
+        tracking = false;
+        horizontal = false;
+        touchStartX = 0;
+        touchStartY = 0;
+        lastX = 0;
+      };
+
+      const ensureDaySwipePreview = dx => {
+        const dayWrap = getDayWrap();
+        if (!dayWrap) return false;
+        const step = dx < 0 ? 1 : -1;
+        if (daySwipePreview && daySwipeStep === step) return true;
+
+        if (daySwipePreview) daySwipePreview.remove();
+        daySwipeStep = step;
+
+        const d = getSelectedDateObject();
+        d.setDate(d.getDate() + step);
+        const targetDate = formatDateInput(d);
+
+        daySwipePreview = document.createElement("div");
+        daySwipePreview.className = "agenda-day-swipe-preview";
+        daySwipePreview.innerHTML = buildAgendaDayCalendarMarkupForDate(targetDate);
+        daySwipePreview.querySelectorAll("[id]").forEach(el => el.removeAttribute("id"));
+        daySwipePreview.querySelectorAll("button").forEach(button => {
+          button.setAttribute("tabindex", "-1");
+          button.setAttribute("aria-hidden", "true");
+        });
+
+        const currentScroll = dayWrap.querySelector(".agenda-day-scroll")?.scrollTop || 0;
+        const previewScroll = daySwipePreview.querySelector(".agenda-day-scroll");
+
+        dayWrap.appendChild(daySwipePreview);
+        if (previewScroll) previewScroll.scrollTop = clampAgendaDayScrollTop(previewScroll, currentScroll);
+        dayWrap.classList.remove("is-day-swipe-animating");
+        dayWrap.classList.add("is-day-swiping");
+        return true;
+      };
+
+      const updateDaySwipePosition = dx => {
+        const dayWrap = getDayWrap();
+        if (!dayWrap || !ensureDaySwipePreview(dx)) return false;
+        const width = dayWrap.clientWidth || window.innerWidth || 360;
+        const limitedDx = Math.max(-width, Math.min(width, dx));
+        const previewStart = daySwipeStep > 0 ? width : -width;
+        const progress = Math.min(1, Math.abs(limitedDx) / Math.max(width, 1));
+        dayWrap.style.setProperty("--agenda-day-current-x", `${limitedDx}px`);
+        dayWrap.style.setProperty("--agenda-day-preview-x", `${previewStart + limitedDx}px`);
+        dayWrap.style.setProperty("--agenda-day-preview-opacity", String(0.45 + (progress * 0.55)));
+        return true;
+      };
+
+      const finishDaySwipe = commit => {
+        const dayWrap = getDayWrap();
+        const step = daySwipeStep;
+        if (!dayWrap || !daySwipePreview || !step) {
+          clearDaySwipe();
+          swipeLock = false;
+          return;
+        }
+
+        const width = dayWrap.clientWidth || window.innerWidth || 360;
+        let settled = false;
+        dayWrap.classList.remove("is-day-swiping");
+        dayWrap.classList.add("is-day-swipe-animating");
+
+        if (commit) {
+          dayWrap.style.setProperty("--agenda-day-current-x", `${step > 0 ? -width : width}px`);
+          dayWrap.style.setProperty("--agenda-day-preview-x", "0px");
+          dayWrap.style.setProperty("--agenda-day-preview-opacity", "1");
+        } else {
+          dayWrap.style.setProperty("--agenda-day-current-x", "0px");
+          dayWrap.style.setProperty("--agenda-day-preview-x", `${step > 0 ? width : -width}px`);
+          dayWrap.style.setProperty("--agenda-day-preview-opacity", "0.45");
+        }
+
+        const done = () => {
+          if (settled) return;
+          settled = true;
+          dayWrap.removeEventListener("transitionend", onTransitionEnd);
+
+          if (commit) {
+            state.agendaDayLastSwipeAt = Date.now();
+            state.agendaCalendarMode = "day";
+            document.body.classList.add("agenda-day-mode");
+            closeAgendaFabMenu?.();
+            const preservedDayScrollTop = dayWrap.querySelector(".agenda-day-scroll")?.scrollTop;
+            if (Number.isFinite(preservedDayScrollTop)) {
+              state.agendaDayRestoreScrollTop = preservedDayScrollTop;
+            }
+            clearDaySwipe();
+            shiftSelectedDay(step);
+            window.setTimeout(() => {
+              state.agendaCalendarMode = "day";
+              document.body.classList.add("agenda-day-mode");
+              updateAgendaCalendarModeUi();
+              swipeLock = false;
+            }, 0);
+          } else {
+            clearDaySwipe();
+            swipeLock = false;
+          }
+        };
+
+        const onTransitionEnd = event => {
+          if (event.propertyName !== "transform") return;
+          const target = event.target;
+          if (target !== dayWrap && !target.closest?.("#agendaDayCalendar")) return;
+          done();
+        };
+
+        dayWrap.addEventListener("transitionend", onTransitionEnd);
+        window.setTimeout(done, 260);
+      };
+
+      wrap.addEventListener("touchstart", event => {
+        const touch = event.touches?.[0];
+        if (!touch || swipeLock) return;
+
+        // Laat swipen ook toe wanneer de vinger start op een afspraakblok.
+        // Op dagen met een grote afspraak bedekt dat blok bijna de volledige dagkalender;
+        // een algemene button-blokkering zorgde er dan voor dat de swipe nooit startte.
+        if (event.target.closest("input, select, textarea, dialog, #agendaCalendarModeToggle")) return;
+        if (state.agendaCalendarMode !== "day") return;
+
+        tracking = true;
+        horizontal = false;
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        lastX = touchStartX;
+      }, { passive: true });
+
+      wrap.addEventListener("touchmove", event => {
+        if (!tracking || event.touches.length !== 1) return;
+        const touch = event.touches[0];
+        const dx = touch.clientX - touchStartX;
+        const dy = touch.clientY - touchStartY;
+        const absX = Math.abs(dx);
+        const absY = Math.abs(dy);
+
+        if (!horizontal) {
+          if (absX < intentThreshold && absY < intentThreshold) return;
+          if (absY > absX) {
+            resetDaySwipeTracking();
+            clearDaySwipe();
+            return;
+          }
+          horizontal = true;
+          closeAgendaFabMenu?.();
+        }
+
+        if (updateDaySwipePosition(dx)) {
+          event.preventDefault();
+          event.stopPropagation();
+          lastX = touch.clientX;
+        }
+      }, { passive: false });
+
+      wrap.addEventListener("touchend", event => {
+        if (!tracking || !horizontal) {
+          resetDaySwipeTracking();
+          clearDaySwipe();
+          return;
+        }
+
+        const endX = event.changedTouches?.[0]?.clientX ?? lastX;
+        const dx = endX - touchStartX;
+        const dayWrap = getDayWrap();
+        const width = dayWrap?.clientWidth || window.innerWidth || 360;
+        const dynamicThreshold = Math.min(commitThreshold, Math.max(38, width * 0.14));
+        const commit = Math.abs(dx) >= dynamicThreshold;
+
+        if (commit && daySwipeStep !== (dx < 0 ? 1 : -1)) {
+          ensureDaySwipePreview(dx);
+        }
+
+        resetDaySwipeTracking();
+        event.preventDefault();
+        event.stopPropagation();
+        swipeLock = true;
+
+        if (commit) {
+          suppressDayClick = true;
+          window.clearTimeout(suppressDayClickTimer);
+          suppressDayClickTimer = window.setTimeout(() => {
+            suppressDayClick = false;
+          }, 380);
+        }
+
+        finishDaySwipe(commit);
+      }, { passive: false });
+
+      wrap.addEventListener("click", event => {
+        if (!suppressDayClick) return;
+        suppressDayClick = false;
+        window.clearTimeout(suppressDayClickTimer);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation?.();
+      }, true);
+
+      wrap.addEventListener("touchcancel", () => {
+        resetDaySwipeTracking();
+        swipeLock = true;
+        finishDaySwipe(false);
+      }, { passive: true });
+    }
+
+    window.setTimeout(() => {
+      const scroll = wrap.querySelector(".agenda-day-scroll");
+      if (!scroll) return;
+
+      applyAgendaDayScrollPosition(scroll, wrap, state.selectedDate);
+
+      if (Number.isFinite(Number(state.agendaDayRestoreScrollTop))) {
+        window.clearTimeout(state.agendaDayRestoreScrollTopClearTimer);
+        state.agendaDayRestoreScrollTopClearTimer = window.setTimeout(() => {
+          delete state.agendaDayRestoreScrollTop;
+          delete state.agendaDayRestoreScrollTopClearTimer;
+        }, 500);
+      }
+
+      if (state.agendaDayForceDefaultScroll) {
+        delete state.agendaDayForceDefaultScroll;
+      }
+    }, 0);
+  }
+
+  function shiftSelectedDay(step) {
+    const currentDayScrollTop = document.querySelector("#agendaDayCalendar .agenda-day-scroll")?.scrollTop;
+    if (!Number.isFinite(Number(state.agendaDayRestoreScrollTop)) && Number.isFinite(currentDayScrollTop)) {
+      state.agendaDayRestoreScrollTop = currentDayScrollTop;
+    }
+
+    const d = getSelectedDateObject();
+    d.setDate(d.getDate() + step);
+    state.selectedDate = formatDateInput(d);
+    state.currentYear = d.getFullYear();
+    state.currentMonth = d.getMonth();
+    state.revenueSyncSelectedDateOnOpen = true;
+    renderCalendar();
+    renderAgendaList();
+    renderRevenue();
+  }
+
+  function updateAgendaCalendarModeUi() {
+    document.body.classList.toggle("agenda-day-mode", state.agendaCalendarMode === "day");
+    ensureAgendaCalendarToggle();
+
+    const dayCalendar = ensureAgendaDayCalendar();
+    const weekdayRow = document.querySelector("#agendaScreen .weekday-row");
+    const monthGrid = document.getElementById("calendarGrid");
+
+    if (state.agendaCalendarMode === "day") {
+      if (weekdayRow) weekdayRow.classList.add("hidden");
+      if (monthGrid) monthGrid.classList.add("hidden");
+      if (dayCalendar) dayCalendar.classList.remove("hidden");
+      setMonthHeaderForDayMode();
+      renderAgendaDayCalendar();
+    } else {
+      if (weekdayRow) weekdayRow.classList.remove("hidden");
+      if (monthGrid) monthGrid.classList.remove("hidden");
+      if (dayCalendar) dayCalendar.classList.add("hidden");
+      const title = document.getElementById("monthPickerBtn");
+      if (title) title.textContent = `${getMonthNameUpper(state.currentMonth)} ${state.currentYear}`;
+    }
+  }
+
+  renderCalendar = function patchedRenderCalendar() {
+    originalRenderCalendar();
+    updateAgendaCalendarModeUi();
+  };
+
+  renderAgendaList = function patchedRenderAgendaList() {
+    originalRenderAgendaList();
+    if (state.agendaCalendarMode === "day") {
+      renderAgendaDayCalendar();
+    }
+  };
+
+  jumpToToday = function patchedJumpToToday() {
+    originalJumpToToday();
+    if (state.agendaCalendarMode === "day") {
+      const d = getSelectedDateObject();
+      state.currentYear = d.getFullYear();
+      state.currentMonth = d.getMonth();
+      renderCalendar();
+      renderAgendaList();
+    }
+  };
+
+  registerEvents = function patchedRegisterEvents() {
+    originalRegisterEvents();
+
+    document.getElementById("prevMonthBtn")?.addEventListener("click", event => {
+      if (state.agendaCalendarMode !== "day") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeAgendaFabMenu?.();
+      shiftSelectedDay(-1);
+    }, true);
+
+    document.getElementById("nextMonthBtn")?.addEventListener("click", event => {
+      if (state.agendaCalendarMode !== "day") return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeAgendaFabMenu?.();
+      shiftSelectedDay(1);
+    }, true);
+
+    document.getElementById("monthPickerBtn")?.addEventListener("click", event => {
+      if (state.agendaCalendarMode !== "day") return;
+      closeAgendaFabMenu?.();
+    }, true);
+
+    document.querySelector("#agendaScreen .calendar-panel")?.addEventListener("click", () => {
+      closeAgendaFabMenu?.();
+    }, true);
+  };
+})();
+
+
 startApp();
+/* =========================
+   ADMIN - geïntegreerd in app
+========================= */
+const adminState = {
+  users: [],
+  filtered: [],
+  isLoaded: false,
+  isLoading: false
+};
+
+function adminToast(message) {
+  const toast = document.getElementById("adminToast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.remove("hidden");
+  window.clearTimeout(adminToast._timer);
+  adminToast._timer = window.setTimeout(() => toast.classList.add("hidden"), 3600);
+}
+
+function humanAdminError(error) {
+  const msg = String(error?.message || error || "");
+  if (msg === "Failed to fetch" || msg.includes("Failed to fetch")) {
+    return "Kan de admin-functie niet bereiken. Controleer of de Supabase Edge Function 'admin-users' is gedeployed en CORS actief is.";
+  }
+  if (msg.includes("FunctionsHttpError")) return "De admin-functie gaf een fout terug. Controleer de Edge Function logs in Supabase.";
+  if (msg.includes("Niet ingelogd")) return "Je bent niet ingelogd.";
+  return msg || "Er ging iets mis.";
+}
+
+function escapeAdminHtml(value) {
+  return String(value ?? "").replace(/[&<>'"]/g, char => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+  }[char]));
+}
+
+function formatAdminDateTime(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return new Intl.DateTimeFormat("nl-BE", { dateStyle: "short", timeStyle: "short" }).format(date);
+}
+
+function setAdminButtonBusy(button, busy) {
+  if (!button) return;
+  button.disabled = Boolean(busy);
+  button.setAttribute("aria-busy", busy ? "true" : "false");
+}
+
+function setAdminEmptyState(message) {
+  const list = document.getElementById("adminUsersList");
+  if (list) list.innerHTML = `<div class="admin-empty-state">${escapeAdminHtml(message)}</div>`;
+}
+
+async function callAdminFunction(action, payload = {}) {
+  if (!window.SUPABASE_URL || String(window.SUPABASE_URL).includes("VUL_HIER")) throw new Error("Supabase URL ontbreekt. Controleer supabase-client.js.");
+  if (!supabaseClient) throw new Error("Supabase is niet geïnitialiseerd.");
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const token = sessionData?.session?.access_token;
+  if (!token) throw new Error("Niet ingelogd.");
+
+  const url = `${window.SUPABASE_URL.replace(/\/$/, "")}/functions/v1/admin-users`;
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ action, ...payload })
+    });
+  } catch (error) {
+    throw new Error(humanAdminError(error));
+  }
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(result.error || `Adminactie mislukt (${response.status}).`);
+  return result;
+}
+
+async function ensureAdminAccess() {
+  const profile = await getCurrentProfile();
+  updateAdminNavVisibility(profile);
+  if (!profile?.is_admin) {
+    throw new Error("Geen adminrechten voor dit account.");
+  }
+  return profile;
+}
+
+async function loadAdminUsers(force = false) {
+  if (adminState.isLoading) return;
+  if (adminState.isLoaded && !force) {
+    applyAdminFilters();
+    return;
+  }
+
+  const refreshBtn = document.getElementById("adminRefreshBtn");
+  await runWithGlobalActionBusy(async () => {
+    try {
+      adminState.isLoading = true;
+      setAdminButtonBusy(refreshBtn, true);
+      setAdminEmptyState("Gebruikers laden...");
+      await ensureAdminAccess();
+      const result = await callAdminFunction("list");
+      adminState.users = Array.isArray(result.users) ? result.users : [];
+      await enrichAdminUsersWithSubscriptionFlags();
+      await enrichAdminUsersWithVisibleAppointmentCounts();
+      adminState.isLoaded = true;
+      applyAdminFilters();
+    } catch (error) {
+      setAdminEmptyState(humanAdminError(error));
+      adminToast(humanAdminError(error));
+    } finally {
+      adminState.isLoading = false;
+      setAdminButtonBusy(refreshBtn, false);
+    }
+  });
+}
+
+function applyAdminFilters() {
+  const query = String(document.getElementById("adminSearch")?.value || "").trim().toLowerCase();
+  const status = document.getElementById("adminStatusFilter")?.value || "all";
+
+  adminState.filtered = adminState.users.filter(user => {
+    if (status === "active" && user.is_blocked) return false;
+    if (status === "blocked" && !user.is_blocked) return false;
+    const haystack = [user.first_name, user.last_name, user.email, user.salon_name, user.country, user.region, user.city, user.timezone, user.subscription_plan, user.subscription_status].join(" ").toLowerCase();
+    return !query || haystack.includes(query);
+  });
+  renderAdminStats();
+  renderAdminUsers();
+}
+
+function renderAdminStats() {
+  const users = adminState.users;
+  const total = users.length;
+  const blocked = users.filter(user => user.is_blocked).length;
+  const active = total - blocked;
+  const subscriptions = users.filter(user => {
+    if (user.is_blocked) return false;
+    const state = getAdminSubscriptionDisplayState(user);
+    return state.subscriptionText === "Lifetime PRO" || state.subscriptionText === "PRO actief" || state.subscriptionText === "Free proefperiode";
+  }).length;
+  [["adminTotalUsers", total], ["adminActiveUsers", active], ["adminBlockedUsers", blocked], ["adminActiveSubscriptions", subscriptions]].forEach(([id, value]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = String(value);
+  });
+}
+
+
+function isAdminLifetimeProUser(user = {}) {
+  const plan = String(user.subscription_plan || "free").toLowerCase();
+  const status = String(user.subscription_status || "none").toLowerCase();
+  const price = Number(user.subscription_price_monthly);
+  const periodEnd = user.subscription_current_period_end;
+  return plan === "pro" && (
+    Boolean(user.is_lifetime) ||
+    status === "lifetime" ||
+    (status === "active" && Number.isFinite(price) && price === 0 && !periodEnd)
+  );
+}
+
+function applyAdminSubscriptionPatchToState(userId, patch = {}) {
+  adminState.users = adminState.users.map(user =>
+    String(user.id) === String(userId) ? { ...user, ...patch } : user
+  );
+  adminState.filtered = adminState.filtered.map(user =>
+    String(user.id) === String(userId) ? { ...user, ...patch } : user
+  );
+  applyAdminFilters();
+}
+
+async function enrichAdminUsersWithSubscriptionFlags() {
+  if (!adminState.users.length || !supabaseClient?.rpc) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc("admin_get_subscription_flags");
+    if (error || !Array.isArray(data) || !data.length) return;
+
+    const flagsById = new Map(data.map(item => [String(item.id), item]));
+    adminState.users = adminState.users.map(user => {
+      const flags = flagsById.get(String(user.id));
+      return flags ? { ...user, ...flags } : user;
+    });
+  } catch (error) {
+    // De adminlijst blijft bruikbaar zonder deze optionele verrijking.
+  }
+}
+
+async function enrichAdminUsersWithVisibleAppointmentCounts() {
+  if (!adminState.users.length || !supabaseClient?.rpc) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc("admin_get_visible_appointment_counts");
+    if (error || !Array.isArray(data)) return;
+
+    const countsById = new Map(data.map(row => [String(row.user_id), Number(row.appointments_count || 0)]));
+    adminState.users = adminState.users.map(user => ({
+      ...user,
+      visible_appointments_count: countsById.has(String(user.id))
+        ? countsById.get(String(user.id))
+        : 0
+    }));
+  } catch (error) {
+    // Zonder de optionele admin-RPC behouden we de telling uit de admin-users functie.
+  }
+}
+
+async function runAdminSubscriptionUpdate(userId, mode, payload) {
+  let lastError = null;
+
+  try {
+    await callAdminFunction("setSubscription", { userId, mode });
+    return;
+  } catch (error) {
+    lastError = error;
+  }
+
+  try {
+    const { error } = await supabaseClient.rpc("admin_set_user_subscription", {
+      target_user_id: userId,
+      subscription_mode: mode
+    });
+    if (error) throw error;
+    return;
+  } catch (error) {
+    lastError = error;
+  }
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .update(payload)
+    .eq("id", userId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data?.id) {
+    throw new Error(lastError?.message || "Abonnement kon niet aangepast worden. Voer de admin subscription SQL uit.");
+  }
+}
+
+function getAdminSubscriptionDisplayState(user = {}) {
+  if (user.is_blocked) {
+    return { accountText: "Geblokkeerd", statusClass: "blocked", subscriptionText: "Geblokkeerd" };
+  }
+
+  const plan = String(user.subscription_plan || "free").toLowerCase();
+  const status = String(user.subscription_status || "trial").toLowerCase();
+  const isLifetime = Boolean(user.is_lifetime) || status === "lifetime";
+  if (isLifetime) {
+    return { accountText: "Actief", statusClass: "", subscriptionText: "Lifetime PRO" };
+  }
+
+  let accessEndsAt = parseSubscriptionDate(user.access_expires_at);
+  if (!accessEndsAt && plan === "pro") accessEndsAt = parseSubscriptionDate(user.subscription_current_period_end);
+  if (!accessEndsAt) accessEndsAt = parseSubscriptionDate(user.trial_ends_at);
+  if (!accessEndsAt) {
+    const start = parseSubscriptionDate(user.trial_started_at) || parseSubscriptionDate(user.created_at);
+    if (start) {
+      accessEndsAt = new Date(start);
+      accessEndsAt.setDate(accessEndsAt.getDate() + 30);
+    }
+  }
+
+  if (plan === "pro" && status === "active" && !accessEndsAt) {
+    return { accountText: "Actief", statusClass: "", subscriptionText: "PRO actief" };
+  }
+
+  if (!accessEndsAt || accessEndsAt.getTime() > Date.now()) {
+    const label = plan === "pro" ? "PRO actief" : "Free proefperiode";
+    return { accountText: "Actief", statusClass: "", subscriptionText: label };
+  }
+
+  const deleteAt = parseSubscriptionDate(user.data_delete_at) || addMonthsSafe(accessEndsAt, 6);
+  if (deleteAt && deleteAt.getTime() <= Date.now()) {
+    return { accountText: "Deactiveren", statusClass: "blocked", subscriptionText: "Bewaartermijn verstreken" };
+  }
+
+  const deleteLabel = deleteAt ? ` · data tot ${formatSubscriptionDate(deleteAt)}` : "";
+  return {
+    accountText: "Alleen-lezen",
+    statusClass: "",
+    subscriptionText: `${plan === "pro" ? "PRO verlopen" : "Proefperiode verlopen"}${deleteLabel}`
+  };
+}
+
+function renderAdminUsers() {
+  const list = document.getElementById("adminUsersList");
+  if (!list) return;
+  if (!adminState.filtered.length) {
+    list.innerHTML = `<div class="admin-empty-state">Geen accounts gevonden voor deze selectie.</div>`;
+    return;
+  }
+  list.innerHTML = adminState.filtered.map(user => {
+    const name = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Naam ontbreekt";
+    const location = [user.region, user.country].filter(Boolean).join(" · ") || "-";
+    const plan = user.subscription_plan || "free";
+    const subStatus = user.subscription_status || "none";
+    const adminSubscriptionState = getAdminSubscriptionDisplayState(user);
+    const statusClass = adminSubscriptionState.statusClass;
+    const statusText = adminSubscriptionState.accountText;
+    const blockAction = user.is_blocked
+      ? `<button class="btn btn-secondary" type="button" data-admin-action="unblock" data-user-id="${escapeAdminHtml(user.id)}">Deblokkeren</button>`
+      : `<button class="btn btn-secondary" type="button" data-admin-action="block" data-user-id="${escapeAdminHtml(user.id)}">Blokkeren</button>`;
+    const isLifetimePro = isAdminLifetimeProUser(user);
+    const lifetimeAction = isLifetimePro
+      ? `<button class="btn btn-secondary" type="button" disabled aria-disabled="true">Lifetime PRO actief</button>`
+      : `<button class="btn btn-primary" type="button" data-admin-action="setLifetimePro" data-user-id="${escapeAdminHtml(user.id)}">Lifetime PRO</button>`;
+    return `
+      <article class="admin-user-card">
+        <div class="admin-user-card-main">
+          <div class="admin-user-topline">
+            <div>
+              <div class="admin-user-name">${escapeAdminHtml(name)}</div>
+              <div class="admin-user-email">${escapeAdminHtml(user.email || "-")}</div>
+              <div class="admin-user-small">Aangemaakt: ${escapeAdminHtml(formatAdminDateTime(user.created_at))}</div>
+            </div>
+            <span class="admin-status-pill ${statusClass}">${statusText}</span>
+          </div>
+          <div class="admin-user-grid">
+            <div class="admin-user-field"><span>Salon</span><strong>${escapeAdminHtml(user.salon_name || "-")}</strong></div>
+            <div class="admin-user-field"><span>Locatie</span><strong>${escapeAdminHtml(location)}</strong></div>
+            <div class="admin-user-field"><span>Tijdzone</span><strong>${escapeAdminHtml(user.timezone || "-")}</strong></div>
+            <div class="admin-user-field"><span>Abonnement</span><strong>${escapeAdminHtml(adminSubscriptionState.subscriptionText)}</strong></div>
+            <div class="admin-user-field"><span>Gebruik</span><strong>${Number(user.visible_appointments_count ?? user.appointments_count ?? 0)} afspraken</strong></div>
+            <div class="admin-user-field"><span>Data</span><strong>${Number(user.customers_count || 0)} klanten · ${Number(user.errors_count || 0)} errors</strong></div>
+          </div>
+        </div>
+        <div class="admin-actions">
+          ${lifetimeAction}
+          ${blockAction}
+          <button class="btn btn-danger" type="button" data-admin-action="delete" data-user-id="${escapeAdminHtml(user.id)}">Verwijderen</button>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+async function blockAdminUser(userId) {
+  const reason = window.prompt("Reden voor blokkering/pauzering?", "Misbruik of administratieve reden") || "";
+  await callAdminFunction("block", { userId, reason });
+  adminToast("Account geblokkeerd. Gegevens blijven bewaard.");
+  adminState.isLoaded = false;
+  await loadAdminUsers(true);
+}
+
+async function unblockAdminUser(userId) {
+  await callAdminFunction("unblock", { userId });
+  adminToast("Account opnieuw actief.");
+  adminState.isLoaded = false;
+  await loadAdminUsers(true);
+}
+
+async function deleteAdminUser(userId) {
+  const user = adminState.users.find(item => String(item.id) === String(userId));
+  const label = user?.email || userId;
+  const confirmation = window.prompt(`Dit verwijdert ${label} volledig, inclusief geschiedenis. Typ VERWIJDEREN om te bevestigen.`);
+  if (confirmation !== "VERWIJDEREN") return;
+  await callAdminFunction("delete", { userId, reason: "Definitief verwijderd door admin" });
+  adminToast("Account en bekende geschiedenis volledig verwijderd.");
+  adminState.isLoaded = false;
+  await loadAdminUsers(true);
+}
+
+async function setAdminUserSubscription(userId, mode) {
+  await ensureAdminAccess();
+  const nowIso = new Date().toISOString();
+  const payload = mode === "lifetime"
+    ? {
+        subscription_plan: "pro",
+        subscription_status: "active",
+        is_lifetime: true,
+        subscription_current_period_end: null,
+        subscription_price_monthly: 0,
+        subscription_currency: "EUR",
+        subscription_updated_at: nowIso,
+        payment_provider: "admin",
+        payment_customer_id: null,
+        payment_subscription_id: null,
+        updated_at: nowIso
+      }
+    : {
+        subscription_plan: "pro",
+        subscription_status: "active",
+        is_lifetime: false,
+        subscription_current_period_end: new Date(Date.now() + 31 * 24 * 60 * 60 * 1000).toISOString(),
+        subscription_price_monthly: 8.95,
+        subscription_currency: "EUR",
+        subscription_updated_at: nowIso,
+        payment_provider: "manual",
+        payment_customer_id: null,
+        payment_subscription_id: null,
+        updated_at: nowIso
+      };
+
+  await runAdminSubscriptionUpdate(userId, mode, payload);
+
+  applyAdminSubscriptionPatchToState(userId, payload);
+  adminToast(mode === "lifetime" ? "Lifetime PRO ingesteld." : "Maandelijks PRO ingesteld.");
+
+  adminState.isLoaded = false;
+  await loadAdminUsers(true);
+
+  const currentUser = await getCurrentUser();
+  if (currentUser && String(currentUser.id) === String(userId)) {
+    await syncAuthUI();
+  }
+}
+
+function setupIntegratedAdminEvents() {
+  document.getElementById("adminRefreshBtn")?.addEventListener("click", () => loadAdminUsers(true));
+  document.getElementById("adminSearch")?.addEventListener("input", applyAdminFilters);
+  document.getElementById("adminStatusFilter")?.addEventListener("change", applyAdminFilters);
+  document.getElementById("adminUsersList")?.addEventListener("click", event => {
+    const button = event.target.closest("button[data-admin-action]");
+    if (!button) return;
+    const action = button.dataset.adminAction;
+    const userId = button.dataset.userId;
+    const run = action === "block"
+      ? blockAdminUser
+      : action === "unblock"
+        ? unblockAdminUser
+        : action === "setLifetimePro"
+          ? (id) => setAdminUserSubscription(id, "lifetime")
+          : action === "setMonthlyPro"
+            ? (id) => setAdminUserSubscription(id, "monthly")
+            : deleteAdminUser;
+    setAdminButtonBusy(button, true);
+    run(userId).catch(error => adminToast(humanAdminError(error))).finally(() => setAdminButtonBusy(button, false));
+  });
+}
+
+(function patchAdminScreenLoader() {
+  setupIntegratedAdminEvents();
+  const originalSwitchScreenForAdmin = switchScreen;
+  switchScreen = function patchedAdminSwitchScreen(screenId, title, options = {}) {
+    originalSwitchScreenForAdmin(screenId, title, options);
+    if (state.currentScreen === "adminScreen") {
+      loadAdminUsers(false);
+    }
+  };
+})();

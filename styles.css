@@ -252,6 +252,14 @@ button {
   color: var(--primary-dark);
 }
 
+
+.header-key-icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+  color: currentColor;
+}
+
 .header-account-icon .icon {
   width: 28px;
   height: 28px;
@@ -301,7 +309,7 @@ button {
 
 .section-head h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -329,9 +337,17 @@ button {
 .service-card,
 .account-card {
   background: var(--card);
-  border: 1px solid var(--line);
+  border-bottom: 2px solid var(--line);
   /* border-radius: var(--radius-lg); */
-  box-shadow: var(--shadow-card);
+  /* box-shadow: var(--shadow-card); */
+  margin-bottom: 0px;
+}
+
+.appointment-card,
+.detail-card,
+.account-card {
+  background: var(--card);
+  border: 0px solid var(--line);
   margin-bottom: 6px;
 }
 
@@ -354,7 +370,7 @@ button {
 }
 
 .detail-value {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.45;
 }
 
@@ -456,7 +472,7 @@ button {
 .day-cell,
 .empty-cell {
   aspect-ratio: 1 / 0.76;
-  border-radius: 14px;
+  border-radius: 4px;
 }
 
 .empty-cell {
@@ -570,7 +586,7 @@ button {
 
 .main-name,
 .client-name {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   margin-bottom: 4px;
 }
@@ -616,7 +632,7 @@ button {
   color: var(--muted);
   min-width: 34px;
   height: 34px;
-  border-radius: 10px;
+  border-radius: 2px;
   font-weight: 700;
   flex: 0 0 auto;
   box-shadow: 0 4px 10px rgba(165, 116, 140, 0.06);
@@ -638,7 +654,7 @@ button {
 .summary-block {
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 6px;
   padding: 14px 12px;
   box-shadow: var(--shadow-soft);
 }
@@ -720,7 +736,7 @@ button {
   min-height: 48px;
   min-width: 0;
   border: none;
-  border-radius: 8px;
+  border-radius: 2px;
   padding: 12px 18px;
   font-weight: 700;
   letter-spacing: 0.1px;
@@ -756,7 +772,7 @@ button {
   border: 1px solid var(--line-strong);
   background: #333;
   color: var(--text);
-  border-radius: 8px;
+  border-radius: 2px;
   padding: 10px 14px;
   font-weight: 700;
   /* box-shadow: 0 6px 14px rgba(165, 116, 140, 0.08); */
@@ -906,7 +922,7 @@ button {
   width: 100%;
   min-height: 48px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 2px;
   padding: 12px 14px;
   background: #ffffff;
 }
@@ -933,7 +949,7 @@ button {
 
 .file-field::file-selector-button {
   border: none;
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 10px 14px;
   margin-right: 12px;
   background: var(--primary-soft);
@@ -974,7 +990,7 @@ button {
   padding: 0 !important;
   margin: 0;
   color: var(--primary-dark);
-  border-radius: 10px;
+  border-radius: 2px;
   z-index: 2;
   appearance: none;
   -webkit-appearance: none;
@@ -1033,7 +1049,7 @@ button {
   width: min(92vw, 420px);
   max-width: calc(100vw - 16px);
   border: none;
-  border-radius: 24px;
+  border-radius: 2px;
   padding: 0;
   background: transparent;
   overflow: hidden;
@@ -1048,7 +1064,7 @@ button {
   max-width: 100%;
   min-width: 0;
   background: #ffffff;
-  border-radius: 24px;
+  border-radius: 2px;
   padding: 18px;
   box-shadow: 0 24px 44px rgba(84, 48, 65, 0.25);
   overflow-x: hidden;
@@ -1252,7 +1268,7 @@ button {
 .payment-popover-card {
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 2px;
   box-shadow: 0 16px 32px rgba(84, 48, 65, 0.2);
   overflow: hidden;
 }
@@ -1278,7 +1294,7 @@ button {
 
 .payment-popover-amount {
   margin-top: 4px;
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.1;
   color: var(--text);
@@ -1294,7 +1310,7 @@ button {
   gap: 7px;
   min-height: 34px;
   border: 1px solid #f0dce5;
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 6px 10px;
   background: #fff8fb;
   color: var(--primary-dark);
@@ -1337,7 +1353,7 @@ button {
   margin-top: 8px;
   padding: 10px;
   border: 1px solid #f1dfe7;
-  border-radius: 14px;
+  border-radius: 2px;
   background: #ffffff;
   box-shadow: 0 12px 24px rgba(84, 48, 65, 0.14);
 }
@@ -1346,7 +1362,7 @@ button {
   display: grid;
   place-items: center;
   padding: 6px;
-  border-radius: 12px;
+  border-radius: 2px;
   background: #ffffff;
   border: 1px solid #f4e8ee;
 }
@@ -1455,7 +1471,7 @@ button {
 
 .empty-state {
   border: 1px dashed var(--line-strong);
-  border-radius: 18px;
+  border-radius: 2px;
   background: #ffffff;
   padding: 22px 16px;
   text-align: center;
@@ -2068,7 +2084,7 @@ button {
 }
 
 .client-appointment-service {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
@@ -2119,7 +2135,6 @@ button {
 #revenueScreen {
   grid-template-rows: 1fr;
   min-height: 0;
-  background: #fbf7f9;
 }
 
 .revenue-screen-shell {
@@ -2140,7 +2155,7 @@ button {
   min-width: 0;
   min-height: 92px;
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: 2px;
   background: #ffffff;
   color: #555052;
   display: grid;
@@ -2259,7 +2274,7 @@ button {
 .revenue-method-title {
   margin: 4px 0 8px;
   color: var(--primary-dark);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -2480,7 +2495,7 @@ button {
   border-bottom: 1px solid #eadbe3;
   background: rgba(245, 235, 240, 0.45);
   pointer-events: none;
-  border-radius: 12px;
+  border-radius: 2px;
 }
 
 .revenue-wheel-columns {
@@ -2578,7 +2593,7 @@ button {
 
   .day-cell,
   .empty-cell {
-    border-radius: 12px;
+    border-radius: 2px;
   }
 
   .day-cell {
@@ -2613,7 +2628,7 @@ button {
 
   .revenue-period-tile {
     min-height: 78px;
-    border-radius: 20px;
+    border-radius: 2px;
     padding: 10px 4px 8px;
   }
 
@@ -2662,7 +2677,7 @@ button {
   background: #fff;
   color: var(--muted);
   min-height: 38px;
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 8px 14px;
   font-weight: 700;
 }
@@ -2708,7 +2723,7 @@ button {
   width: 24px;
   height: 24px;
   border: 2px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: 2px;
   display: grid;
   place-items: center;
   color: #fff;
@@ -2759,7 +2774,7 @@ button {
 
 .todo-status-pill {
   flex: 0 0 auto;
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 4px 8px;
   font-size: 11px;
   font-weight: 700;
@@ -2807,7 +2822,7 @@ button {
   .todo-filter-btn {
     width: 100%;
     text-align: left;
-    border-radius: 18px;
+    border-radius: 2px;
   }
 
   .todo-list-panel .scroll-list {
@@ -3053,7 +3068,7 @@ button {
 }
 
 .statistics-kpi strong {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.2;
   color: var(--text);
 }
@@ -3098,7 +3113,7 @@ button {
   color: var(--text);
   box-shadow: inset 0 0 0 1px var(--line);
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.1;
 }
 
@@ -3216,7 +3231,7 @@ button {
 
 .statistics-top-customer-amount {
   white-space: nowrap;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .statistics-more-wrap {
@@ -3439,7 +3454,7 @@ button {
 
   .revenue-period-tile {
     min-height: 76px;
-    border-radius: 18px;
+    border-radius: 2px;
   }
 }
 
@@ -3507,7 +3522,7 @@ button {
     place-items: center start;
     gap: 12px;
     padding: 12px 14px;
-    border-radius: 18px;
+    border-radius: 2px;
     text-align: left;
   }
 
@@ -3547,7 +3562,7 @@ button {
   .revenue-chart-card,
   .revenue-list-panel,
   .app-control-card {
-    border-radius: 18px;
+    border-radius: 2px;
   }
 
   .fab,
@@ -3716,7 +3731,7 @@ button {
   /* Algemene formulieren en detailpagina's */
   .field-row,
   .info-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   #clientDetailContent {
@@ -3984,7 +3999,7 @@ button {
   -webkit-overflow-scrolling: touch;
   background: #ffffff;
   border: 1px solid var(--line-strong);
-  border-radius: 16px;
+  border-radius: 2px;
   box-shadow: 0 16px 34px rgba(84, 48, 65, 0.18);
   padding: 6px;
 }
@@ -4231,7 +4246,7 @@ button {
 
   .topbar-title-wrap h1,
   #screenTitle {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.1;
   }
 
@@ -4265,7 +4280,7 @@ button {
 
   .nav-btn {
     min-width: calc((100% - 12px) / 4);
-    border-radius: 13px;
+    border-radius: 2px;
     padding: 6px 7px;
     gap: 2px;
     font-size: 12px;
@@ -4350,58 +4365,7 @@ button {
   }
 }
 
-/* =========================================================
-   GESLACHTSKEUZE ACCOUNT
-========================================================= */
-.gender-choice-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 4px;
-}
 
-.gender-choice {
-  position: relative;
-  display: block;
-}
-
-.gender-choice input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.gender-choice span {
-  min-height: 48px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: #ffffff;
-  color: var(--muted);
-  display: grid;
-  place-items: center;
-  font-weight: 700;
-  box-shadow: var(--shadow-soft);
-  transition:
-    transform 0.14s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease;
-}
-
-.gender-choice:hover span {
-  transform: translateY(-1px);
-}
-
-.gender-choice input:checked + span {
-  background: var(--primary-soft);
-  color: var(--primary-dark);
-  border-color: var(--primary);
-}
-
-.gender-choice input:focus-visible + span {
-  outline: 2px solid rgba(185, 109, 135, 0.35);
-  outline-offset: 2px;
-}
 
 /* =========================================================
    DIENSTEN SORTEREN
@@ -4685,7 +4649,7 @@ button {
   min-height: 68px;
   width: auto;
   border: none !important;
-  border-radius: 16px;
+  border-radius: 2px;
   background: transparent !important;
   color: var(--muted) !important;
   display: grid !important;
@@ -5023,7 +4987,7 @@ button {
   background: #ffffff;
   color: var(--text);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 2px;
   text-align: center;
   font-weight: 600;
   -webkit-tap-highlight-color: transparent;
@@ -5059,7 +5023,7 @@ button {
   }
 
   .appointment-wheel-card .revenue-wheel-option {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 
@@ -5074,7 +5038,7 @@ button {
 #revenueTitle {
   margin: 0;
   color: var(--primary-dark);
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.25;
   font-weight: 700;
 }
@@ -5239,7 +5203,7 @@ button {
   margin-top: 14px;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 2px;
   background: #f7f4f6;
   color: var(--text);
 }
@@ -5280,7 +5244,7 @@ button {
   min-height: 40px;
   padding: 8px 12px;
   font-size: 14px;
-  border-radius: 12px;
+  border-radius: 2px;
 }
 
 
@@ -5295,11 +5259,8 @@ body.auth-locked .fab {
   pointer-events: none !important;
 }
 
-.header-account-icon,
-.header-account-icon svg,
-.header-account-icon path {
+.header-account-icon {
   color: inherit;
-  fill: currentColor !important;
 }
 
 /* =========================================================
@@ -5327,6 +5288,19 @@ body.auth-locked .fab {
   height: 18px;
   accent-color: var(--primary-dark);
   flex: 0 0 auto;
+}
+
+.register-wizard-actions .btn:disabled,
+.register-wizard-actions .btn.is-disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.register-wizard-actions .btn:disabled:hover,
+.register-wizard-actions .btn.is-disabled:hover {
+  transform: none;
 }
 
 
@@ -5577,7 +5551,7 @@ button.is-action-locked .app-action-nav-label {
 
   .revenue-screen-shell .revenue-period-tile {
     min-height: 82px;
-    border-radius: 16px;
+    border-radius: 2px;
     column-gap: 4px;
     row-gap: 6px;
     padding: 12px 5px 9px;
@@ -5605,7 +5579,7 @@ button.is-action-locked .app-action-nav-label {
 
   .revenue-screen-shell .revenue-period-tile {
     min-height: 78px;
-    border-radius: 14px;
+    border-radius: 2px;
     column-gap: 3px;
     row-gap: 5px;
     padding: 10px 4px 8px;
@@ -5775,6 +5749,7 @@ button.is-action-locked .app-action-nav-label {
     gap: 5px !important;
   }
 
+  /* OMZET FILTERKNOPPEN BOVENAAN  */
   .revenue-screen-shell .revenue-period-tile {
     min-height: 82px !important;
     border-radius: 16px !important;
@@ -5962,8 +5937,8 @@ button.is-action-locked .app-action-nav-label {
 ========================================================= */
 .revenue-insights-card {
   background: #fff;
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow-card);
+  /* border: 1px solid var(--line);
+  box-shadow: var(--shadow-card); */
   margin-bottom: 10px;
   padding: 14px 12px 16px;
 }
@@ -5985,7 +5960,7 @@ button.is-action-locked .app-action-nav-label {
 }
 
 .revenue-summary-item {
-  border-radius: 20px;
+  border-radius: 2px;
 }
 
 .revenue-chart-area {
@@ -6028,7 +6003,7 @@ button.is-action-locked .app-action-nav-label {
   }
 
   .revenue-summary-item {
-    border-radius: 18px;
+    border-radius: 2px;
   }
 }
 
@@ -6207,6 +6182,68 @@ button.is-action-locked .app-action-nav-label {
   cursor: not-allowed;
 }
 
+/* Snelle verwijderactie in afspraak-popover */
+.appointment-action-details-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  align-items: stretch;
+  border-bottom: 1px solid #f6edf1;
+}
+
+.appointment-action-details-row .payment-method-popup-item {
+  border-top: none;
+  border-bottom: none;
+}
+
+.appointment-action-details-row + .payment-method-popup-item {
+  border-top: none;
+}
+
+.appointment-action-delete-btn {
+  width: 46px;
+  min-width: 46px;
+  border: none;
+  border-left: 1px solid #f6edf1;
+  background: #ffffff;
+  color: var(--primary-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.appointment-action-delete-btn:hover,
+.appointment-action-delete-btn:active {
+  background: var(--danger-soft);
+  color: var(--danger);
+  transform: none;
+}
+
+.appointment-action-delete-svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+  fill: currentColor;
+}
+
+.appointment-action-customer-btn {
+  gap: 14px;
+}
+
+.appointment-action-customer-svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  display: block;
+  fill: currentColor;
+  color: var(--primary-dark);
+}
+
+.appointment-action-customer-btn:disabled .appointment-action-customer-svg {
+  opacity: 0.45;
+}
+
 /* Correcties afspraak actie-popover + klantfiche-icoon */
 .appointment-action-popover .payment-popover-card {
   position: relative;
@@ -6263,21 +6300,15 @@ button.is-action-locked .app-action-nav-label {
 }
 
 .appointment-open-customer-icon {
-  width: 38px;
-  height: 32px;
+  width: 30px;
+  height: 26px;
   display: block;
   overflow: visible;
 }
 
-.appointment-open-customer-icon .file-icon-sheet,
-.appointment-open-customer-icon .file-icon-fold,
-.appointment-open-customer-icon .file-icon-line,
-.appointment-open-customer-icon .file-icon-arrow {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.appointment-open-customer-icon path {
+  fill: currentColor;
+  stroke: none;
 }
 
 /* =========================================================
@@ -6306,7 +6337,7 @@ button.is-action-locked .app-action-nav-label {
   width: 100%;
   min-height: 48px;
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 2px;
   padding: 12px 44px 12px 14px;
   background: linear-gradient(180deg, #ffffff 0%, #fffafb 100%);
   color: var(--text);
@@ -6383,7 +6414,7 @@ button.is-action-locked .app-action-nav-label {
   padding: 6px;
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 2px;
   box-shadow: 0 16px 32px rgba(84, 48, 65, 0.18);
   -webkit-overflow-scrolling: touch;
 }
@@ -6546,7 +6577,7 @@ button.is-action-locked .app-action-nav-label {
 #settingsForm .app-select-wrap:has(#settingsCurrency) .app-select-button,
 #settingsForm .app-select-wrap:has(#settingsReminderMinutes) .app-select-button {
   min-height: 48px;
-  border-radius: 14px;
+  border-radius: 2px;
 }
 
 #settingsForm .app-select-wrap:has(#settingsLanguage) .app-select-option,
@@ -6678,7 +6709,7 @@ button.is-action-locked .app-action-nav-label {
 
 .revenue-calendar-nav {
   min-height: 38px;
-  border-radius: 12px;
+  border-radius: 2px;
   background: var(--primary-soft);
   font-size: 25px;
 }
@@ -6703,7 +6734,7 @@ button.is-action-locked .app-action-nav-label {
 .revenue-calendar-empty,
 .revenue-calendar-day {
   aspect-ratio: 1 / 0.82;
-  border-radius: 13px;
+  border-radius: 2px;
 }
 
 .revenue-calendar-day {
@@ -6754,7 +6785,7 @@ button.is-action-locked .app-action-nav-label {
 .revenue-month-option {
   min-height: 54px;
   border: 1px solid var(--line);
-  border-radius: 15px;
+  border-radius: 4px;
   background: #ffffff;
   color: var(--text);
   padding: 10px 6px;
@@ -6776,7 +6807,7 @@ button.is-action-locked .app-action-nav-label {
 
 @media (max-width: 420px) {
   .revenue-calendar-picker-head strong {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .revenue-calendar-weekdays,
@@ -6786,7 +6817,7 @@ button.is-action-locked .app-action-nav-label {
 
   .revenue-calendar-empty,
   .revenue-calendar-day {
-    border-radius: 11px;
+    border-radius: 2px;
   }
 
   .revenue-month-grid {
@@ -6813,7 +6844,7 @@ button.is-action-locked .app-action-nav-label {
 #appointmentForm .appointment-customer-picker .app-select-button,
 #appointmentForm .appointment-service-picker .app-select-button {
   min-height: 42px;
-  border-radius: 14px;
+  border-radius: 2px;
   background: linear-gradient(180deg, #ffffff 0%, #fffafb 100%);
 }
 
@@ -6869,7 +6900,7 @@ button.is-action-locked .app-action-nav-label {
   background: #ffffff;
   color: var(--muted);
   min-height: 38px;
-  border-radius: 999px;
+  border-radius: 2px;
   padding: 8px 14px;
   font-weight: 700;
   box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
@@ -6968,7 +6999,7 @@ button.is-action-locked .app-action-nav-label {
 }
 
 .todo-title {
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1.25;
   color: var(--text);
 }
@@ -7107,7 +7138,7 @@ button.is-action-locked .app-action-nav-label {
 .payment-qr-card {
   background: #ffffff;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 4px;
   box-shadow: 0 16px 32px rgba(84, 48, 65, 0.18);
   padding: 12px;
 }
@@ -7252,7 +7283,7 @@ button.is-action-locked .app-action-nav-label {
   width: min(280px, 100%);
   margin: 0 auto;
   padding: 12px;
-  border: 1px solid #f0e3ea;
+  border: 5px solid #f0e3ea;
   border-radius: 22px;
   background: #fff8fb;
 }
@@ -7292,15 +7323,91 @@ button.is-action-locked .app-action-nav-label {
 }
 
 /* =========================================================
-   FIX: datumkiezers afspraak/omzet met afspraak-bolletjes + swipe
+   GOOGLE KALENDER - automatische ICS-feed
 ========================================================= */
-.revenue-calendar-picker {
-  touch-action: pan-y;
-  transition: transform 180ms ease;
+.calendar-feed-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
 }
 
-.revenue-calendar-picker.is-swiping {
-  transform: translate3d(var(--picker-swipe-x, 0px), 0, 0);
+.calendar-feed-url-field {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calendar-feed-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.calendar-feed-actions .btn {
+  width: auto;
+}
+
+.calendar-feed-reset-btn {
+  margin-top: 0;
+}
+
+@media (max-width: 420px) {
+  .calendar-feed-row {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-feed-row .btn,
+  .calendar-feed-actions .btn {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   FIX: datumkiezers afspraak/omzet met afspraak-bolletjes + vloeiende swipe
+========================================================= */
+.revenue-calendar-picker,
+.revenue-month-picker {
+  position: relative;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.revenue-calendar-picker.is-swiping > :not(.revenue-calendar-swipe-preview),
+.revenue-calendar-picker.is-swipe-animating > :not(.revenue-calendar-swipe-preview),
+.revenue-month-picker.is-swiping > :not(.revenue-calendar-swipe-preview),
+.revenue-month-picker.is-swipe-animating > :not(.revenue-calendar-swipe-preview) {
+  transform: translate3d(var(--picker-current-x, 0px), 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.revenue-calendar-swipe-preview {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 10px;
+  transform: translate3d(var(--picker-preview-x, 100%), 0, 0);
+  opacity: var(--picker-swipe-opacity, 0.35);
+  pointer-events: none;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.revenue-calendar-swipe-preview .icon-btn,
+.revenue-calendar-swipe-preview button {
+  pointer-events: none;
+}
+
+.revenue-calendar-picker.is-swipe-animating > :not(.revenue-calendar-swipe-preview),
+.revenue-calendar-picker.is-swipe-animating .revenue-calendar-swipe-preview,
+.revenue-month-picker.is-swipe-animating > :not(.revenue-calendar-swipe-preview),
+.revenue-month-picker.is-swipe-animating .revenue-calendar-swipe-preview {
+  transition:
+    transform 230ms cubic-bezier(0.22, 0.72, 0.18, 1),
+    opacity 190ms ease;
 }
 
 .revenue-calendar-day {
@@ -7359,5 +7466,5066 @@ button.is-action-locked .app-action-nav-label {
     width: 3.5px;
     height: 3.5px;
     flex-basis: 3.5px;
+  }
+}
+
+/* =========================================================
+   FIX: afspraak zoeklijsten zonder zichtbare select-dropdown
+========================================================= */
+#appointmentForm .appointment-customer-select-fallback,
+#appointmentForm .appointment-service-select-fallback {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+#appointmentForm .appointment-customer-results:not(.hidden),
+#appointmentForm .appointment-service-results:not(.hidden) {
+  display: block !important;
+}
+
+/* =========================================================
+   PRIVÉ-AFSPRAKEN
+========================================================= */
+.appointment-private-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: #fff8fb;
+  color: var(--primary-dark);
+  font-weight: 700;
+  user-select: none;
+}
+
+.appointment-private-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+
+.appointment-private-field {
+  display: none;
+}
+
+#appointmentForm.appointment-private-mode .appointment-normal-field {
+  display: none !important;
+}
+
+#appointmentForm.appointment-private-mode .appointment-private-field {
+  display: block;
+}
+
+#appointmentForm.appointment-private-mode .appointment-date-field {
+  grid-column: 1 / -1;
+}
+
+#appointmentForm.appointment-private-mode .appointment-time-start-field {
+  grid-column: 1;
+}
+
+#appointmentForm.appointment-private-mode .appointment-private-end-field {
+  grid-column: 2;
+}
+
+.private-appointment-row {
+  background: #fff7e8;
+  border-left: 4px solid #d8a33a;
+}
+
+.private-appointment-row .main-name {
+  color: #8a5d00;
+}
+
+.private-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #f2d88f;
+  color: #6f4a00;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.day-cell .day-dots i.private-dot,
+.revenue-calendar-dots i.private-dot {
+  background: #d8a33a !important;
+}
+
+/* =========================================================
+   QR POPOVER - DEFINITIEF RECHTSONDER
+   Deze override fixeert enkel de QR-popover.
+========================================================= */
+#paymentQrPopover.payment-qr-popover {
+  position: fixed !important;
+  z-index: 1195 !important;
+  right: 12px !important;
+  left: auto !important;
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 12px) !important;
+  top: auto !important;
+
+  width: 100px !important;
+  height: 100px !important;
+  max-width: calc(100vw - 24px) !important;
+  transform: none !important;
+}
+
+#paymentQrPopover .payment-qr-card {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 10px !important;
+  border-radius: 0 !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#paymentQrPopover .payment-qr-card::before,
+#paymentQrPopover.payment-qr-popover[data-placement="bottom"] .payment-qr-card::before,
+#paymentQrPopover.payment-qr-popover[data-placement="top"] .payment-qr-card::before {
+  display: none !important;
+  content: none !important;
+}
+
+#paymentQrPopover .payment-qr-open-trigger {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--primary-dark) !important;
+  box-shadow: none !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 9px !important;
+  text-align: center !important;
+}
+
+#paymentQrPopover .payment-qr-mini {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+#paymentQrPopover .payment-qr-open-trigger > span:last-child {
+  font-size: 14px !important;
+  line-height: 1 !important;
+}
+
+#paymentQrButtonHint {
+  display: none !important;
+}
+
+
+
+/* =========================================================
+   INSTELLINGEN - OVERZICHTELIJKE APP-LAYOUT
+========================================================= */
+#settingsScreen {
+  grid-template-rows: 1fr;
+  min-height: 0;
+  background: #fbf7f9;
+}
+
+.settings-page {
+  min-height: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(248, 232, 238, 0.88), transparent 34%),
+    linear-gradient(180deg, #fffdfd 0%, #fbf7f9 100%);
+}
+
+.settings-scroll {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  padding: 14px 12px 168px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-card-modern {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.settings-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+}
+
+.settings-hero-logo {
+  display: block;
+  width: min(250px, 62vw);
+  max-height: 160px;
+  object-fit: contain;
+  object-position: left center;
+  margin: 0 0 15px;
+}
+
+.settings-kicker {
+  margin: 0 0 5px;
+  color: var(--primary-dark);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.settings-hero h2 {
+  margin: 0;
+  color: var(--primary-dark);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.settings-hero p {
+  margin: 8px 0 0;
+  max-width: 34rem;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.settings-dirty-badge {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 7px 10px;
+  border: 1px solid #eac9d5;
+  border-radius: 999px;
+  background: #fff5f8;
+  color: var(--primary-dark);
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.settings-section-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.settings-section-card {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+}
+
+.settings-section-card .field {
+  background: #fffdfd;
+}
+
+.settings-section-head {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.settings-section-head .detail-label {
+  margin: 0 0 4px;
+  color: var(--primary-dark);
+}
+
+.settings-section-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.settings-section-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #f0dce5;
+  border-radius: 15px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  line-height: 1;
+}
+
+.settings-svg-icon {
+  width: 23px;
+  height: 23px;
+  display: block;
+  fill: currentColor;
+}
+
+.settings-section-icon-qr .settings-svg-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.settings-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid #f1e2e9;
+  border-radius: 2px;
+  background: #fffafb;
+}
+
+.settings-switch-row span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.settings-switch-row strong {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.settings-switch-row small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.settings-switch-row input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 26px;
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+.settings-info-text {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.calendar-feed-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.calendar-feed-url-field {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.calendar-feed-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.calendar-feed-reset-btn {
+  margin-top: 0;
+}
+
+.settings-actions {
+  display: grid;
+  gap: 10px;
+  align-items: center;
+}
+
+.settings-actions-sticky {
+  display: none;
+  position: fixed;
+  left: max(6px, env(safe-area-inset-left));
+  right: max(6px, env(safe-area-inset-right));
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 6px);
+  z-index: 90;
+  margin: 0 auto;
+  width: min(calc(100% - 12px), 760px);
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -6px 18px rgba(170, 120, 145, 0.10);
+  backdrop-filter: blur(10px);
+}
+
+.settings-save-hint {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.settings-card-modern.is-dirty .settings-actions-sticky {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-color: #e7bfd0;
+  background: #fff8fb;
+}
+
+.settings-actions-sticky .action-btn {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.settings-card-modern.is-dirty .settings-save-hint {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+@media (min-width: 700px) {
+  .settings-section-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .settings-section-card-wide {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 420px) {
+  .settings-scroll {
+    padding: 12px 8px 104px;
+  }
+
+  .settings-hero,
+  .settings-section-card {
+    border-radius: 2px;
+  }
+
+  .settings-hero {
+    flex-direction: column;
+    padding: 16px 14px;
+  }
+
+  .settings-dirty-badge {
+    align-self: flex-start;
+  }
+
+  .settings-section-card {
+    padding: 14px 12px;
+  }
+
+  .settings-section-head {
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .settings-section-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 14px;
+  }
+
+  .settings-svg-icon {
+    width: 21px;
+    height: 21px;
+  }
+
+  .calendar-feed-row {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-feed-row .btn {
+    width: 100%;
+  }
+
+  .calendar-feed-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+/* =========================================================
+   MOBIELE POP-UPS / IPHONE VIEWPORT FIX
+   Zorgt dat dialogs, wheel-pickers en popovers nooit buiten het scherm vallen.
+========================================================= */
+.modal {
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px);
+  overflow: hidden;
+}
+
+.modal-card,
+.revenue-wheel-card,
+.appointment-wheel-card,
+.payment-qr-dialog-card,
+.app-message-card {
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal .field,
+.modal input,
+.modal select,
+.modal textarea {
+  font-size: 16px;
+}
+
+.payment-popover,
+.appointment-action-popover {
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - var(--bottom-nav-height) - 16px);
+  overflow: visible;
+}
+
+.payment-popover-card {
+  max-height: inherit;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.payment-method-popup-list,
+.appointment-action-list {
+  max-height: min(280px, calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - var(--bottom-nav-height) - 150px));
+}
+
+.appointment-customer-results,
+.appointment-service-results {
+  max-height: min(260px, calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 220px));
+}
+
+@media (max-width: 420px) {
+  .modal {
+    width: calc(100vw - 12px);
+    max-width: calc(100vw - 12px);
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px);
+  }
+
+  .modal-card,
+  .revenue-wheel-card,
+  .appointment-wheel-card,
+  .payment-qr-dialog-card,
+  .app-message-card {
+    max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 12px);
+  }
+
+  .payment-qr-dialog-image {
+    width: min(230px, 62vw);
+    height: min(230px, 62vw);
+  }
+
+  .payment-qr-dialog-code-wrap {
+    width: min(260px, 100%);
+    padding: 10px;
+  }
+
+  #paymentQrPopover.payment-qr-popover {
+    right: max(8px, env(safe-area-inset-right)) !important;
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 8px) !important;
+  }
+}
+
+@media (max-height: 700px) {
+  .revenue-wheel-column {
+    height: min(220px, 34dvh);
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+
+  .revenue-wheel-shell {
+    padding: 10px 0;
+  }
+
+  .modal-head {
+    margin-bottom: 6px;
+  }
+
+  .modal-actions {
+    margin-top: 12px;
+  }
+}
+
+/* Keuzevenster voor herhalende afspraken */
+#appMessageDialogActions.recurrence-choice-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  justify-content: stretch;
+}
+
+#appMessageDialogActions.recurrence-choice-actions .btn {
+  width: 100%;
+  min-width: 0;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+@media (min-width: 421px) {
+  #appMessageDialogActions.recurrence-choice-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #appMessageDialogActions.recurrence-choice-actions #appMessageCancelBtn {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* =========================================================
+   GLOBALE ACTIE-OVERLAY
+   Blokkeert klikken, swipen en navigeren terwijl een actie bezig is.
+========================================================= */
+.app-busy-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: rgba(255, 248, 251, 0.58);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+.app-busy-overlay.hidden {
+  display: none !important;
+}
+
+body.app-is-busy {
+  cursor: wait;
+}
+
+body.app-is-busy .app-shell,
+body.app-is-busy .fab,
+body.app-is-busy .client-action-bar,
+body.app-is-busy .revenue-action-bar {
+  pointer-events: none;
+  user-select: none;
+}
+
+.app-busy-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 170px;
+  justify-content: center;
+  padding: 15px 18px;
+  border: 1px solid rgba(217, 145, 171, 0.28);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--primary-dark);
+  box-shadow: 0 18px 42px rgba(84, 48, 65, 0.18);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.app-busy-spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 3px solid rgba(217, 145, 171, 0.28);
+  border-top-color: var(--primary-dark);
+  animation: appBusySpin 0.8s linear infinite;
+}
+
+@keyframes appBusySpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Correctie: busy-overlay moet onmiddellijk alles blokkeren op iPhone/Android. */
+.app-busy-overlay {
+  pointer-events: auto !important;
+  z-index: 2147483000 !important;
+}
+
+body.app-is-busy {
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+body.app-is-busy *:not(#appBusyOverlay):not(#appBusyOverlay *) {
+  touch-action: none !important;
+}
+
+/* =========================================================
+   OMZET: verticale swipe op periodeknoppen
+   - Omhoog = volgende dag/week/maand/jaar
+   - Omlaag = vorige dag/week/maand/jaar
+========================================================= */
+.revenue-screen-shell .revenue-period-tile {
+  transform: translate3d(0, var(--revenue-swipe-y, 0px), 0) !important;
+  opacity: var(--revenue-swipe-opacity, 1);
+  will-change: transform, opacity;
+  touch-action: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.revenue-screen-shell .revenue-period-tile.is-revenue-swiping {
+  transition: none !important;
+  cursor: grabbing;
+}
+
+.revenue-screen-shell .revenue-period-tile.is-revenue-swipe-committing,
+.revenue-screen-shell .revenue-period-tile.is-revenue-swipe-settling {
+  transition:
+    transform 120ms cubic-bezier(0.22, 0.72, 0.18, 1),
+    opacity 65ms ease !important;
+}
+
+.revenue-screen-shell .revenue-period-tile.is-revenue-swipe-committing {
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   OMZET: extra overzichtstegels afspraken
+========================================================= */
+.revenue-appointment-summary-top {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+
+.revenue-appointment-summary-top .revenue-summary-item {
+  background: #fffafb;
+}
+
+.revenue-appointment-summary-top .revenue-summary-item strong {
+  font-size: 22px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+@media (max-width: 420px) {
+  .revenue-appointment-summary-top {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .revenue-appointment-summary-top .revenue-summary-item {
+    padding: 10px 4px;
+    text-align: center;
+    gap: 4px;
+  }
+
+  .revenue-appointment-summary-top .revenue-summary-item strong {
+    font-size: clamp(17px, 5vw, 22px);
+  }
+}
+
+.appointment-private-end-date-field .field {
+  min-height: 48px;
+}
+
+.private-appointment-row {
+  border-top: 1px solid #f4e7ed;
+}
+
+/* =========================================================
+   FIX: privé-afspraak datums/tijden logisch onder elkaar
+   Datum → Tijd van → Datum tot → Tijd tot
+========================================================= */
+#appointmentForm.appointment-private-mode .appointment-time-start-field,
+#appointmentForm.appointment-private-mode .appointment-private-end-date-field,
+#appointmentForm.appointment-private-mode .appointment-private-end-field {
+  grid-column: 1 / -1 !important;
+}
+
+
+/* =========================================================
+   FIX: overzichtslijsten terug compact houden
+   - voorkomt dat afspraak-, klanten- en dienstenlijsten groter ogen
+========================================================= */
+#agendaList .main-name,
+#clientsList .client-name,
+#servicesList .client-name {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+#agendaList .meta,
+#clientsList .meta,
+#servicesList .meta {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+#agendaList .time {
+  font-size: 17px;
+}
+
+/* =========================================================
+   ACCOUNT ICON: sleutel als outline, niet gevuld
+========================================================= */
+.header-account-icon .header-key-icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+  color: currentColor;
+}
+
+.header-account-icon .header-key-icon path {
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 0.18 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+
+/* =========================================================
+   FIX V24: accounticoon + omzetlayout
+========================================================= */
+.header-account-btn {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.header-account-btn:hover,
+.header-account-btn:active {
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.header-account-icon {
+  width: 30px;
+  height: 30px;
+  color: #b86d87;
+}
+
+.header-account-icon .header-account-svg {
+  width: 30px;
+  height: 30px;
+  display: block;
+  color: currentColor;
+}
+
+.header-account-icon .header-account-svg path {
+  fill: currentColor !important;
+  stroke: none !important;
+}
+
+.revenue-appointment-summary-top .revenue-summary-item strong {
+  font-size: 17px !important;
+  line-height: 1.1;
+}
+
+@media (max-width: 420px) {
+  .revenue-appointment-summary-top .revenue-summary-item strong {
+    font-size: clamp(15px, 4.2vw, 18px) !important;
+  }
+}
+
+.revenue-chart-card .revenue-method-breakdown {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #f0e4ea;
+}
+
+/* =========================================================
+   KOSTEN PAGINA
+========================================================= */
+#costsScreen {
+  grid-template-rows: 1fr;
+  min-height: 0;
+  background: #fbf7f9;
+}
+
+.costs-screen-shell {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 8px 108px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.costs-period-strip {
+  margin-bottom: 10px;
+}
+
+.costs-native-date-picker {
+  position: absolute;
+  inset: auto;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.costs-summary-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.costs-summary-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 12px;
+  background: #ffffff;
+  border: 0px solid var(--line);
+  /* box-shadow: var(--shadow-card); */
+}
+
+.costs-summary-item strong {
+  font-size: 20px;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.costs-list-panel {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: 1fr;
+  overflow: visible;
+}
+
+.costs-scroll-list {
+  padding: 0 0 96px;
+}
+
+.cost-card {
+  background: var(--card);
+  border-bottom: 2px solid var(--line);
+  /* box-shadow: var(--shadow-card); */
+  margin-bottom: 6px;
+}
+
+.cost-main-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  padding: 14px;
+}
+
+.cost-row-top,
+.cost-row-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cost-row-top strong {
+  min-width: 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.cost-row-top span {
+  flex: 0 0 auto;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.cost-row-meta {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cost-standard-suggestions {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  max-height: 190px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cost-standard-suggestion {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #ffffff;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.cost-standard-suggestion:hover,
+.cost-standard-suggestion:active {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  transform: none;
+}
+
+.cost-standard-suggestion span {
+  min-width: 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.cost-standard-suggestion small {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+
+
+.standard-costs-card {
+  max-height: min(78vh, 620px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.standard-costs-manager-list {
+  min-height: 0;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  display: grid;
+  gap: 8px;
+  padding: 4px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.standard-cost-manager-item {
+  border: 1px solid var(--line);
+  background: #ffffff;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  box-shadow: var(--shadow-soft);
+}
+
+.standard-cost-manager-main {
+  display: grid;
+  gap: 4px;
+}
+
+.standard-cost-manager-main strong {
+  font-size: 15px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.standard-cost-manager-main small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.standard-cost-manager-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.standard-cost-manager-actions .btn {
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .costs-summary-card {
+    gap: 6px;
+  }
+
+  .costs-summary-item {
+    padding: 12px 8px;
+    text-align: center;
+  }
+
+  .costs-summary-item strong {
+    font-size: clamp(16px, 4.8vw, 19px);
+    white-space: nowrap;
+  }
+}
+
+
+/* Kosten: tweede zwevende knop links van de plus-knop */
+.fab-secondary {
+  left: calc(50% - 38px);
+  transform: translateX(-50%);
+  width: 58px;
+  height: 58px;
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 10px);
+  font-size: 24px;
+  display: grid;
+  place-items: center;
+}
+
+body.costs-fab-pair #floatingAddBtn {
+  left: calc(50% + 38px);
+}
+
+.fab-secondary span {
+  display: block;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.cost-standard-picker {
+  position: relative;
+}
+
+.cost-standard-suggestions {
+  z-index: 20;
+}
+
+.cost-standard-suggestion.appointment-service-result {
+  width: 100%;
+}
+
+/* =========================================================
+   KOSTEN - standaardkosten overzicht als lijst
+========================================================= */
+.standard-costs-card {
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.standard-costs-search {
+  margin: 4px 0 0;
+}
+
+.standard-costs-alphabet-filter {
+  margin-top: 12px;
+  padding-bottom: 8px;
+}
+
+.standard-costs-manager-list {
+  gap: 0;
+  padding: 4px 0 0;
+}
+
+.standard-cost-manager-row {
+  padding: 0;
+  gap: 0;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 6px;
+}
+
+.standard-cost-manager-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  padding: 16px;
+}
+
+.standard-cost-manager-btn:hover,
+.standard-cost-manager-btn:active {
+  background: var(--primary-soft);
+  transform: none;
+}
+
+.standard-cost-manager-actions {
+  display: none;
+}
+
+
+/* =========================================================
+   AGENDA SNEL TOEVOEGEN MENU ROND FAB
+========================================================= */
+.agenda-fab-menu {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 39px);
+  z-index: 39;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.agenda-fab-menu-item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  box-shadow: 0 8px 18px rgba(185, 109, 135, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.52);
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s cubic-bezier(.2,.9,.25,1.2),
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.agenda-fab-menu.open {
+  pointer-events: auto;
+}
+
+.agenda-fab-menu.open .agenda-fab-menu-item {
+  opacity: 1;
+  pointer-events: auto;
+  transform:
+    translate(calc(-50% + var(--fab-x)), calc(-50% + var(--fab-y)))
+    scale(1);
+}
+
+.agenda-fab-menu-item:hover,
+.agenda-fab-menu-item:active {
+  box-shadow: 0 10px 22px rgba(185, 109, 135, 0.30);
+  transform:
+    translate(calc(-50% + var(--fab-x)), calc(-50% + var(--fab-y)))
+    scale(1.05);
+}
+
+.agenda-fab-menu-icon {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  color: currentColor;
+  pointer-events: none;
+}
+
+.agenda-fab-menu-icon svg {
+  width: 27px;
+  height: 27px;
+  display: block;
+}
+
+.agenda-fab-menu-icon path,
+.agenda-fab-menu-icon circle,
+.agenda-fab-menu-icon rect,
+.agenda-fab-menu-icon polygon {
+  fill: currentColor !important;
+  stroke: none;
+}
+
+.agenda-fab-menu-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.fab.fab-menu-open {
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 0 10px 22px rgba(185, 109, 135, 0.30);
+}
+
+@media (max-width: 360px) {
+  .agenda-fab-menu-item {
+    width: 46px;
+    height: 46px;
+  }
+
+  .agenda-fab-menu-icon,
+  .agenda-fab-menu-icon svg {
+    width: 25px;
+    height: 25px;
+  }
+}
+
+/* =========================================================
+   KOSTEN: periodeknoppen identiek aan Omzet
+========================================================= */
+.costs-screen-shell .revenue-period-strip.app-control-card {
+  container-type: inline-size;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: clamp(5px, 1.8cqw, 12px) !important;
+  padding: 4px 0 14px !important;
+  margin-bottom: 10px !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.costs-screen-shell .revenue-period-tile {
+  min-width: 0 !important;
+  min-height: clamp(88px, 21cqw, 124px) !important;
+  height: auto !important;
+  border: 1px solid var(--primary-dark) !important;
+  border-radius: clamp(16px, 4.5cqw, 24px) !important;
+  background: #ffffff !important;
+  color: #3f3b42 !important;
+  display: grid !important;
+  grid-template-columns: auto auto !important;
+  grid-template-rows: auto auto !important;
+  justify-content: center !important;
+  justify-items: center !important;
+  align-content: center !important;
+  align-items: center !important;
+  column-gap: clamp(5px, 1.25cqw, 9px) !important;
+  row-gap: clamp(6px, 1.55cqw, 11px) !important;
+  padding: clamp(10px, 2.7cqw, 20px) clamp(4px, 1.45cqw, 12px) !important;
+  font-family: 'Montserrat', sans-serif !important;
+  text-align: center !important;
+  box-shadow: 0 8px 22px rgba(170, 120, 145, 0.12) !important;
+  overflow: hidden !important;
+  transform: translate3d(0, var(--revenue-swipe-y, 0px), 0) !important;
+  opacity: var(--revenue-swipe-opacity, 1);
+  will-change: transform, opacity;
+  touch-action: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.costs-screen-shell .revenue-period-tile:hover,
+.costs-screen-shell .revenue-period-tile:active {
+  background: #ffffff !important;
+  border-color: var(--primary-dark) !important;
+  color: #3f3b42 !important;
+  transform: translate3d(0, var(--revenue-swipe-y, 0px), 0) !important;
+}
+
+.costs-screen-shell .revenue-period-tile.active {
+  background: var(--primary-soft) !important;
+  border: 2px solid var(--primary-dark) !important;
+  color: #3f3b42 !important;
+  box-shadow: 0 8px 22px rgba(170, 120, 145, 0.12) !important;
+}
+
+.costs-screen-shell .revenue-period-icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: clamp(12px, 2.9cqw, 18px) !important;
+  height: clamp(12px, 2.9cqw, 18px) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  justify-self: end !important;
+  color: #bf5174 !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  transform: translateY(-0.08em);
+}
+
+.costs-screen-shell .revenue-period-icon svg {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+.costs-screen-shell .revenue-period-icon path {
+  fill: currentColor !important;
+  stroke-width: 0 !important;
+}
+
+.costs-screen-shell .revenue-period-title {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: clip !important;
+  font-size: clamp(12px, 3.05cqw, 19px) !important;
+  font-weight: 600 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.025em !important;
+  color: #3f3b42 !important;
+  align-self: center !important;
+  justify-self: start !important;
+}
+
+.costs-screen-shell .revenue-period-sub {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  display: block !important;
+  justify-self: center !important;
+  align-self: center !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: clamp(10px, 2.35cqw, 14px) !important;
+  font-weight: 600 !important;
+  line-height: 1.08 !important;
+  color: #3f3b42 !important;
+  text-align: center !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  hyphens: auto !important;
+}
+
+.costs-screen-shell .revenue-period-year {
+  font-size: clamp(18px, 4.55cqw, 27px) !important;
+  font-weight: 700 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.costs-screen-shell .revenue-period-tile.is-revenue-swiping {
+  transition: none !important;
+  cursor: grabbing;
+}
+
+.costs-screen-shell .revenue-period-tile.is-revenue-swipe-committing,
+.costs-screen-shell .revenue-period-tile.is-revenue-swipe-settling {
+  transition:
+    transform 120ms cubic-bezier(0.22, 0.72, 0.18, 1),
+    opacity 65ms ease !important;
+}
+
+.costs-screen-shell .revenue-period-tile.is-revenue-swipe-committing {
+  pointer-events: none;
+}
+
+@media (max-width: 390px) {
+  .costs-screen-shell .revenue-period-strip.app-control-card {
+    gap: 5px !important;
+  }
+
+  .costs-screen-shell .revenue-period-tile {
+    min-height: 86px !important;
+    padding: 10px 3px 9px !important;
+    column-gap: 4px !important;
+    row-gap: 5px !important;
+  }
+
+  .costs-screen-shell .revenue-period-icon {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .costs-screen-shell .revenue-period-title {
+    font-size: 12px !important;
+    letter-spacing: -0.04em !important;
+  }
+
+  .costs-screen-shell .revenue-period-sub {
+    font-size: 10px !important;
+    line-height: 1.05 !important;
+  }
+
+  .costs-screen-shell .revenue-period-year {
+    font-size: 18px !important;
+  }
+}
+
+@media (max-width: 340px) {
+  .costs-screen-shell .revenue-period-tile {
+    min-height: 82px !important;
+    padding: 9px 2px 8px !important;
+  }
+
+  .costs-screen-shell .revenue-period-icon {
+    width: 11px !important;
+    height: 11px !important;
+  }
+
+  .costs-screen-shell .revenue-period-title {
+    font-size: 11px !important;
+  }
+
+  .costs-screen-shell .revenue-period-sub {
+    font-size: 9px !important;
+  }
+
+  .costs-screen-shell .revenue-period-year {
+    font-size: 17px !important;
+  }
+}
+
+/* =========================================================
+   KOSTEN - titel en totalentegels zoals Omzet
+========================================================= */
+.costs-summary-card.revenue-summary-card {
+  display: block;
+  padding: 16px;
+  margin-bottom: 10px;
+  background: #ffffff;
+  border: 0px solid var(--line);
+  /* box-shadow: var(--shadow-card); */
+}
+
+.costs-summary-head {
+  padding: 0 2px 12px;
+}
+
+.costs-summary-head h2,
+#costsTitle {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.costs-summary-top.revenue-summary-top {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.costs-summary-item.revenue-summary-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 12px;
+  border: 1px solid #f0e4ea;
+  background: #fbf7f9;
+  box-shadow: none;
+}
+
+.costs-summary-item.revenue-summary-item strong {
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--text);
+}
+
+@media (max-width: 420px) {
+  .costs-summary-card.revenue-summary-card {
+    padding: 12px 10px;
+  }
+
+  .costs-summary-head {
+    padding-bottom: 10px;
+  }
+
+  .costs-summary-head h2,
+  #costsTitle {
+    font-size: 15px;
+  }
+
+  .costs-summary-top.revenue-summary-top {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .costs-summary-item.revenue-summary-item {
+    padding: 10px 4px;
+    text-align: center;
+    gap: 4px;
+  }
+
+  .costs-summary-item.revenue-summary-item strong {
+    font-size: clamp(14px, 4.2vw, 17px);
+    white-space: nowrap;
+  }
+}
+
+/* Kosten: exportknoppen links naast de + knop */
+.costs-action-bar {
+  left: calc(50% - 176px);
+  transform: none;
+}
+
+.costs-action-bar .revenue-action-btn-report {
+  order: 1;
+}
+
+.costs-action-bar .revenue-action-btn-csv {
+  order: 2;
+}
+
+body.costs-action-mode:not(.costs-fab-pair) #floatingAddBtn {
+  left: calc(50% + 38px);
+}
+
+body.costs-action-mode.costs-fab-pair #standardCostsBtn {
+  left: calc(50% - 38px);
+}
+
+body.costs-action-mode.costs-fab-pair #floatingAddBtn {
+  left: calc(50% + 38px);
+}
+
+body.app-is-busy .costs-action-bar {
+  pointer-events: none;
+  user-select: none;
+}
+
+.cost-standard-checkbox-row {
+  margin-top: 14px;
+}
+
+/* Statistieken: bovenste tegels gelijk aan Omzet/Kosten totalentegels */
+.statistics-kpi-grid {
+  background: #fff;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.statistics-kpi {
+  display: grid;
+  gap: 6px;
+  align-content: center;
+  justify-items: start;
+  text-align: left;
+  min-height: 76px;
+  aspect-ratio: auto;
+  padding: 14px 12px;
+  border: 1px solid #f0e4ea;
+  background: #fbf7f9;
+}
+
+.statistics-kpi-label {
+  display: block;
+  margin: 0;
+  color: #59525a;
+  font-size: 14px;
+  line-height: 1.2;
+  text-transform: none;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.statistics-kpi strong {
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--text);
+}
+
+@media (max-width: 420px) {
+  .costs-action-bar {
+    left: calc(50% - 162px);
+    gap: 10px;
+  }
+
+  .statistics-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding: 12px 10px;
+  }
+
+  .statistics-kpi {
+    padding: 10px 8px;
+    min-height: 70px;
+    text-align: center;
+    justify-items: center;
+  }
+
+  .statistics-kpi-label {
+    font-size: 13px;
+  }
+
+  .statistics-kpi strong {
+    font-size: clamp(14px, 4.2vw, 17px);
+    white-space: nowrap;
+  }
+}
+
+/* Correcte horizontale volgorde Kosten-acties: PDF, CSV, standaardkosten, + */
+.costs-action-bar {
+  left: calc(50% - 131px);
+  transform: none;
+}
+
+body.costs-action-mode:not(.costs-fab-pair) #floatingAddBtn {
+  left: calc(50% + 34px);
+}
+
+body.costs-action-mode.costs-fab-pair #standardCostsBtn {
+  left: calc(50% + 34px);
+}
+
+body.costs-action-mode.costs-fab-pair #floatingAddBtn {
+  left: calc(50% + 102px);
+}
+
+@media (max-width: 420px) {
+  .costs-action-bar {
+    left: calc(50% - 131px);
+  }
+}
+
+/* =========================================================
+   OMZET STATUSFILTERS + AGENDA UREN
+========================================================= */
+#agendaList .time {
+  font-size: 16px;
+}
+
+.revenue-status-filter-card {
+  padding: 10px 12px;
+}
+
+.revenue-status-filter-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.revenue-status-checkbox {
+  min-width: 0;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.revenue-status-checkbox span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.revenue-status-checkbox strong {
+  font-size: 14px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.revenue-status-checkbox small {
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.revenue-status-checkbox input {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--primary-dark);
+}
+
+.revenue-status-checkbox:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+@media (max-width: 420px) {
+  .revenue-status-filter-card {
+    padding: 10px;
+  }
+
+  .revenue-status-filter-row {
+    gap: 8px;
+  }
+
+  .revenue-status-checkbox {
+    min-height: 58px;
+    padding: 10px 10px;
+    gap: 8px;
+  }
+
+  .revenue-status-checkbox strong {
+    font-size: 13px;
+  }
+
+  .revenue-status-checkbox small {
+    display: none;
+  }
+}
+
+/* =========================================================
+   LAATSTE FIJNREGELINGEN: AGENDA / KOSTEN / STATISTIEKEN
+========================================================= */
+body.costs-action-mode #standardCostsBtn,
+body.costs-action-mode .costs-action-bar .client-action-btn {
+  width: 58px;
+  height: 58px;
+  min-width: 58px;
+  max-width: 58px;
+  padding: 0;
+}
+
+body.costs-action-mode #standardCostsBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statistics-kpi-label {
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+@media (max-width: 420px) {
+  .statistics-kpi-label {
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   KOSTEN: FIJNREGELING ACTIEKNOPPEN
+   - CSV helemaal links
+   - CSV/PDF/Standaard even groot als de + knop
+========================================================= */
+.costs-action-bar {
+  left: calc(50% - 131px);
+  gap: 10px;
+  transform: none;
+}
+
+.costs-action-bar .revenue-action-btn-csv {
+  order: 1;
+}
+
+.costs-action-bar .revenue-action-btn-report {
+  order: 2;
+}
+
+body.costs-action-mode .costs-action-bar .client-action-btn,
+body.costs-action-mode #standardCostsBtn {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  max-width: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+  padding: 0 !important;
+  flex: 0 0 58px;
+  border-radius: 999px;
+}
+
+body.costs-action-mode #standardCostsBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.costs-action-mode.costs-fab-pair #standardCostsBtn {
+  left: calc(50% + 32px);
+}
+
+body.costs-action-mode.costs-fab-pair #floatingAddBtn {
+  left: calc(50% + 100px);
+}
+
+body.costs-action-mode:not(.costs-fab-pair) #floatingAddBtn {
+  left: calc(50% + 32px);
+}
+
+@media (max-width: 420px) {
+  .costs-action-bar {
+    left: calc(50% - 131px);
+    gap: 10px;
+  }
+}
+
+
+/* =========================================================
+   DEFINITIEVE FIX KOSTENKNOPPEN
+   CSV / PDF / Standaard krijgen exact dezelfde diameter
+   als de + knop, ook op mobiel waar de + knop 52px is.
+========================================================= */
+
+/* Desktop / grotere schermen: + knop = 58px */
+#costsExportCsvBtn,
+#costsExportReportBtn,
+#standardCostsBtn {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  max-width: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+  flex: 0 0 58px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  box-sizing: border-box !important;
+}
+
+#costsActionBar.costs-action-bar {
+  left: calc(50% - 131px) !important;
+  gap: 10px !important;
+  transform: none !important;
+}
+
+#costsExportCsvBtn { order: 1 !important; }
+#costsExportReportBtn { order: 2 !important; }
+
+body.costs-action-mode.costs-fab-pair #standardCostsBtn {
+  left: calc(50% + 32px) !important;
+}
+
+body.costs-action-mode.costs-fab-pair #floatingAddBtn {
+  left: calc(50% + 100px) !important;
+}
+
+#costsActionBar .revenue-action-export-label,
+#costsActionBar .revenue-action-report-label {
+  font-size: 11px !important;
+  line-height: 1 !important;
+}
+
+#standardCostsBtn .fab-menu-lines,
+#standardCostsBtn svg {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* Mobiel: in deze stylesheet wordt .fab naar 52px gezet.
+   Daarom moeten CSV / PDF / Standaard hier ook 52px zijn. */
+@media (max-width: 420px) {
+  #costsExportCsvBtn,
+  #costsExportReportBtn,
+  #standardCostsBtn {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    flex: 0 0 52px !important;
+    padding: 0 !important;
+  }
+
+  #costsActionBar.costs-action-bar {
+    left: calc(50% - 119px) !important;
+    gap: 10px !important;
+  }
+
+  body.costs-action-mode.costs-fab-pair #standardCostsBtn {
+    left: calc(50% + 31px) !important;
+  }
+
+  body.costs-action-mode.costs-fab-pair #floatingAddBtn {
+    left: calc(50% + 93px) !important;
+  }
+
+  body.costs-action-mode:not(.costs-fab-pair) #floatingAddBtn {
+    left: calc(50% + 31px) !important;
+  }
+
+  #costsActionBar .revenue-action-export-label,
+  #costsActionBar .revenue-action-report-label {
+    font-size: 10px !important;
+  }
+
+  #standardCostsBtn .fab-menu-lines,
+  #standardCostsBtn svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+}
+
+
+/* =========================================================
+   FINALE CORRECTIE KOSTENKNOPPEN
+   - CSV/PDF op Kosten gebruiken dezelfde typografie als Omzet
+   - Standaardkostenknop exact even groot als de + knop
+========================================================= */
+
+/* CSV/PDF: tekst opnieuw identiek aan Omzet */
+#costsActionBar #costsExportCsvBtn .revenue-action-export-label,
+#costsActionBar #costsExportReportBtn .revenue-action-report-label {
+  font-size: 12px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Standaardkostenknop: exact de huidige + knop volgen */
+#standardCostsBtn {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  max-width: 58px !important;
+  min-height: 58px !important;
+  max-height: 58px !important;
+  flex: 0 0 58px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+/* Streepjes iets kleiner zodat de knop optisch niet groter lijkt */
+#standardCostsBtn .fab-menu-lines,
+#standardCostsBtn svg,
+#standardCostsBtn .standard-costs-icon {
+  width: 22px !important;
+  height: 22px !important;
+  max-width: 22px !important;
+  max-height: 22px !important;
+}
+
+@media (max-width: 420px) {
+  /* Op mobiel is de + knop 52px, dus standaardkosten ook 52px */
+  #standardCostsBtn {
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    max-width: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    flex: 0 0 52px !important;
+    padding: 0 !important;
+  }
+
+  /* CSV/PDF tekst NIET verkleinen op Kosten: identiek aan Omzet */
+  #costsActionBar #costsExportCsvBtn .revenue-action-export-label,
+  #costsActionBar #costsExportReportBtn .revenue-action-report-label {
+    font-size: 12px !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+  }
+
+  #standardCostsBtn .fab-menu-lines,
+  #standardCostsBtn svg,
+  #standardCostsBtn .standard-costs-icon {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+  }
+}
+
+
+/* =========================================================
+   AGENDA: inklapbare maandkalender / dagkalender
+========================================================= */
+.agenda-calendar-mode-toggle {
+  width: 100%;
+  height: 26px;
+  min-height: 26px;
+  border: none;
+  border-top: 1px solid #f4e8ee;
+  border-bottom: 1px solid #f4e8ee;
+  background: #fff4f8;
+  color: var(--primary-dark);
+  display: grid;
+  place-items: center;
+  margin: 8px -14px -10px;
+  width: calc(100% + 28px);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.agenda-calendar-toggle-chevrons {
+  transform: translateY(-1px);
+  letter-spacing: -2px;
+}
+
+body.agenda-day-mode #agendaScreen {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+body.agenda-day-mode #agendaScreen .calendar-panel {
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  padding-bottom: 0;
+}
+
+body.agenda-day-mode #agendaScreen .agenda-list-panel {
+  display: none !important;
+}
+
+.agenda-day-calendar {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #f1e5eb;
+  background: #ffffff;
+  margin-top: 8px;
+}
+
+.agenda-day-scroll {
+  height: 100%;
+  min-height: 0;
+  max-height: calc(100vh - var(--bottom-nav-height) - 158px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  background: #ffffff;
+}
+
+.agenda-day-grid {
+  position: relative;
+  min-height: 1344px;
+}
+
+.agenda-day-hour-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: start;
+}
+
+.agenda-day-hour-label {
+  padding-top: 6px;
+  padding-left: 6px;
+  color: #2f2a31;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.agenda-day-hour-line {
+  border-top: 1px solid #e8e0e4;
+  margin-top: 10px;
+}
+
+.agenda-day-appointments-layer {
+  position: absolute;
+  top: 0;
+  left: 52px;
+  right: 8px;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.agenda-day-appointment {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  border: 1px solid #eecbd8;
+  background: #f9dce6;
+  color: #4e4650;
+  border-radius: 10px;
+  padding: 5px 8px;
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(170, 120, 145, 0.12);
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.agenda-day-appointment strong {
+  font-size: 12px;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agenda-day-appointment span {
+  font-size: 10px;
+  line-height: 1.15;
+  color: #7f7480;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agenda-day-appointment.private {
+  background: #fff1f6;
+  border-color: #e3b4c5;
+}
+
+body.agenda-day-mode #agendaCalendarModeToggle {
+  margin-bottom: 0;
+}
+
+@media (max-width: 420px) {
+  .agenda-calendar-mode-toggle {
+    margin-left: -10px;
+    margin-right: -10px;
+    width: calc(100% + 20px);
+  }
+
+  .agenda-day-scroll {
+    max-height: calc(100vh - var(--bottom-nav-height) - 148px);
+  }
+
+  .agenda-day-hour-row {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .agenda-day-appointments-layer {
+    left: 50px;
+    right: 6px;
+  }
+}
+
+
+/* =========================================================
+   AGENDA DAGKALENDER: toggle-knop bovenaan in dagweergave
+   + 2 pijltjes netjes boven elkaar, dezelfde vorm als ‹/›
+========================================================= */
+.agenda-calendar-mode-toggle {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.agenda-calendar-toggle-chevrons {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  width: 24px !important;
+  height: 22px !important;
+  line-height: 1 !important;
+  letter-spacing: 0 !important;
+  transform: none !important;
+  color: var(--primary-dark) !important;
+}
+
+.agenda-calendar-toggle-chevrons span {
+  display: block !important;
+  font-size: 26px !important;
+  font-weight: 400 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  line-height: 0.55 !important;
+  height: 10px !important;
+  transform-origin: center center !important;
+}
+
+.agenda-calendar-toggle-chevrons.is-up span {
+  transform: rotate(-90deg) !important;
+}
+
+.agenda-calendar-toggle-chevrons.is-down span {
+  transform: rotate(90deg) !important;
+}
+
+body.agenda-day-mode #agendaScreen .calendar-panel {
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+}
+
+body.agenda-day-mode #agendaCalendarModeToggle {
+  grid-row: 2 !important;
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
+}
+
+body.agenda-day-mode #agendaDayCalendar {
+  grid-row: 3 !important;
+  margin-top: 0 !important;
+}
+
+
+/* =========================================================
+   AGENDA DAGKALENDER: pijltjes dichter + afspraken zoals lijst
+========================================================= */
+.agenda-calendar-toggle-chevrons {
+  height: 18px !important;
+}
+
+.agenda-calendar-toggle-chevrons span {
+  line-height: 0.38 !important;
+  height: 7px !important;
+}
+
+.agenda-day-appointment.appointment-card {
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow-card) !important;
+  color: inherit !important;
+}
+
+.agenda-day-appointment.private {
+  background: #fff8fb !important;
+}
+
+.agenda-day-appointment-row.appointment-row {
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+}
+
+.agenda-day-appointment .time {
+  font-size: 16px;
+}
+
+.agenda-day-appointment .time-end {
+  font-size: 10px;
+}
+
+.agenda-day-appointment .main-name {
+  font-size: 13px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agenda-day-appointment .meta {
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agenda-day-appointment .price-chip {
+  align-self: center;
+  padding: 8px 9px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.agenda-day-appointment-main {
+  min-width: 0;
+}
+
+@media (max-width: 420px) {
+  .agenda-day-appointment-row.appointment-row {
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    gap: 7px;
+    padding: 7px;
+  }
+
+  .agenda-day-appointment .price-chip {
+    padding: 7px 8px;
+    font-size: 11px;
+  }
+}
+
+
+/* =========================================================
+   AGENDA DAGKALENDER: privé conform lijst + overlapkolommen
+========================================================= */
+.agenda-day-calendar.has-pinned-private-day .agenda-day-scroll,
+.agenda-day-calendar.has-pinned-private-day .agenda-day-grid {
+  background: #fff8fb !important;
+}
+
+.agenda-day-pinned-private-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: grid;
+  gap: 4px;
+  padding: 6px 8px 6px 50px;
+  background: #fff8fb;
+  border-bottom: 1px solid #efd7e1;
+}
+
+.agenda-day-pinned-private.appointment-card {
+  width: 100%;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  background: #fff8fb !important;
+  border: 1px solid #eecbd8 !important;
+  box-shadow: var(--shadow-card) !important;
+  color: inherit !important;
+  text-align: left;
+}
+
+.agenda-day-pinned-private .appointment-row {
+  height: 100%;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 8px;
+  padding: 8px;
+}
+
+.agenda-day-appointment.private.appointment-card {
+  background: #fff8fb !important;
+  border-color: #eecbd8 !important;
+}
+
+.agenda-day-appointment.private .appointment-row {
+  grid-template-columns: 58px minmax(0, 1fr);
+}
+
+.agenda-day-appointment.private .main-name,
+.agenda-day-pinned-private .main-name {
+  color: var(--text);
+}
+
+.agenda-day-appointment.private .meta,
+.agenda-day-pinned-private .meta {
+  color: var(--muted);
+}
+
+.agenda-day-appointment {
+  right: auto !important;
+}
+
+.agenda-day-appointments-layer {
+  right: 6px !important;
+}
+
+@media (max-width: 420px) {
+  .agenda-day-pinned-private-wrap {
+    padding-left: 50px;
+    padding-right: 6px;
+  }
+
+  .agenda-day-pinned-private .appointment-row,
+  .agenda-day-appointment.private .appointment-row {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
+
+  .agenda-day-appointment .price-chip {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   DAGKALENDER: warme kalenderkleuren + betaalchip + swipegevoel
+========================================================= */
+.agenda-day-calendar,
+.agenda-day-scroll,
+.agenda-day-grid {
+  background: #fffdf7 !important;
+}
+
+.agenda-day-hour-line {
+  border-top-color: #eadfcb !important;
+}
+
+.agenda-day-hour-label {
+  color: #5f5647 !important;
+}
+
+.agenda-day-appointment.appointment-card {
+  background: #fffaf0 !important;
+  border-color: #eadbbd !important;
+}
+
+.agenda-day-appointment.private.appointment-card,
+.agenda-day-pinned-private.appointment-card,
+.agenda-day-calendar.has-pinned-private-day .agenda-day-scroll,
+.agenda-day-calendar.has-pinned-private-day .agenda-day-grid,
+.agenda-day-pinned-private-wrap {
+  background: #fff4d8 !important;
+}
+
+.agenda-day-pinned-private-wrap {
+  border-bottom-color: #ead6aa !important;
+}
+
+.agenda-day-appointment.private.appointment-card,
+.agenda-day-pinned-private.appointment-card {
+  border-color: #e5c987 !important;
+}
+
+.agenda-day-appointment .price-chip {
+  pointer-events: auto;
+  cursor: pointer;
+  justify-self: end;
+  background: #f8e2c1;
+  color: #7a5631;
+}
+
+.agenda-day-appointment .price-chip.paid {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.agenda-day-scroll {
+  touch-action: pan-y;
+}
+
+.agenda-day-appointment-row.appointment-row {
+  overflow: hidden;
+}
+
+.agenda-day-appointment .time-block,
+.agenda-day-pinned-private .time-block {
+  min-width: 0;
+}
+
+.agenda-day-appointment .time,
+.agenda-day-pinned-private .time {
+  color: #3f372d;
+}
+
+.agenda-day-appointment .time-end,
+.agenda-day-pinned-private .time-end,
+.agenda-day-appointment .meta,
+.agenda-day-pinned-private .meta {
+  color: #7d715f;
+}
+
+.agenda-day-appointment .main-name,
+.agenda-day-pinned-private .main-name {
+  color: #4e4650;
+}
+
+
+/* =========================================================
+   DAGKALENDER: gewone afspraken = gewone lijststijl
+   Betaalchip gebruikt dezelfde popoverfunctie als overzicht.
+========================================================= */
+.agenda-day-appointment.normal.appointment-card {
+  background: #ffffff !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: var(--shadow-card) !important;
+  color: inherit !important;
+}
+
+.agenda-day-appointment.normal .agenda-day-appointment-row.appointment-row {
+  grid-template-columns: 58px minmax(0, 1fr) auto !important;
+}
+
+.agenda-day-appointment.normal .time,
+.agenda-day-appointment.normal .main-name {
+  color: var(--text) !important;
+}
+
+.agenda-day-appointment.normal .time-end,
+.agenda-day-appointment.normal .meta {
+  color: var(--muted) !important;
+}
+
+.agenda-day-appointment.normal .price-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: none !important;
+  background: var(--primary-soft) !important;
+  color: var(--primary-dark) !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  white-space: nowrap !important;
+}
+
+.agenda-day-appointment.normal .price-chip.paid {
+  background: var(--success-bg) !important;
+  color: var(--success-text) !important;
+}
+
+.agenda-day-appointment.normal .price-chip.no-show {
+  background: #f5f1f3 !important;
+  color: var(--muted) !important;
+}
+
+.agenda-day-appointment.private.appointment-card,
+.agenda-day-pinned-private.appointment-card {
+  background: #fff4d8 !important;
+  border-color: #e5c987 !important;
+}
+
+.agenda-day-appointment.private .time,
+.agenda-day-pinned-private .time,
+.agenda-day-appointment.private .main-name,
+.agenda-day-pinned-private .main-name {
+  color: #4e4650 !important;
+}
+
+.agenda-day-appointment.private .time-end,
+.agenda-day-pinned-private .time-end,
+.agenda-day-appointment.private .meta,
+.agenda-day-pinned-private .meta {
+  color: #7d715f !important;
+}
+
+@media (max-width: 420px) {
+  .agenda-day-appointment.normal .agenda-day-appointment-row.appointment-row {
+    grid-template-columns: 54px minmax(0, 1fr) auto !important;
+  }
+
+  .agenda-day-appointment.normal .price-chip {
+    display: inline-flex !important;
+    padding: 7px 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+
+/* =========================================================
+   DAGKALENDER: finale fijnregeling
+   - globale achtergrond opnieuw wit zoals maand-overzicht
+   - tijd kleiner in tegel
+   - toggle stabieler bovenaan
+========================================================= */
+.agenda-day-calendar,
+.agenda-day-scroll,
+.agenda-day-grid,
+.agenda-day-calendar.has-pinned-private-day .agenda-day-scroll,
+.agenda-day-calendar.has-pinned-private-day .agenda-day-grid {
+  background: #ffffff !important;
+}
+
+.agenda-day-calendar.has-pinned-private-day .agenda-day-grid {
+  background:
+    linear-gradient(#fff4d8, #fff4d8) 50px 0 / calc(100% - 50px) 100% no-repeat,
+    #ffffff !important;
+}
+
+.agenda-day-hour-line {
+  border-top-color: #e8e0e4 !important;
+}
+
+body.agenda-day-mode #agendaCalendarModeToggle {
+  position: relative !important;
+  z-index: 20 !important;
+  touch-action: manipulation !important;
+}
+
+.agenda-day-appointment .time,
+.agenda-day-pinned-private .time {
+  font-size: 14px !important;
+  line-height: 1.05 !important;
+}
+
+.agenda-day-appointment .time-end,
+.agenda-day-pinned-private .time-end {
+  font-size: 9px !important;
+  line-height: 1.05 !important;
+}
+
+.agenda-day-appointment-row.appointment-row,
+.agenda-day-pinned-private .appointment-row {
+  grid-template-columns: 50px minmax(0, 1fr) auto !important;
+  gap: 8px !important;
+}
+
+.agenda-day-appointment.private .appointment-row,
+.agenda-day-pinned-private .appointment-row {
+  grid-template-columns: 50px minmax(0, 1fr) !important;
+}
+
+@media (max-width: 420px) {
+  .agenda-day-appointment .time,
+  .agenda-day-pinned-private .time {
+    font-size: 13px !important;
+  }
+
+  .agenda-day-appointment .time-end,
+  .agenda-day-pinned-private .time-end {
+    font-size: 9px !important;
+  }
+
+  .agenda-day-appointment-row.appointment-row,
+  .agenda-day-pinned-private .appointment-row,
+  .agenda-day-appointment.normal .agenda-day-appointment-row.appointment-row,
+  .agenda-day-appointment.private .appointment-row {
+    grid-template-columns: 46px minmax(0, 1fr) auto !important;
+    gap: 7px !important;
+  }
+
+  .agenda-day-appointment.private .appointment-row,
+  .agenda-day-pinned-private .appointment-row {
+    grid-template-columns: 46px minmax(0, 1fr) !important;
+  }
+}
+
+
+/* =========================================================
+   DAGKALENDER: stabiele toggle + huidige tijdlijn
+========================================================= */
+.agenda-day-now-line {
+  position: absolute;
+  left: 50px;
+  right: 8px;
+  height: 0;
+  border-top: 2px solid #d46a8a;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.agenda-day-now-line span {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #d46a8a;
+}
+
+body.agenda-day-mode #agendaCalendarModeToggle {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 420px) {
+  .agenda-day-now-line {
+    left: 50px;
+    right: 6px;
+  }
+}
+
+/* =========================================================
+   DAGKALENDER: soepele swipe tussen dagen
+========================================================= */
+.agenda-day-calendar.is-day-swiping,
+.agenda-day-calendar.is-day-swipe-animating {
+  position: relative;
+  overflow: hidden !important;
+  touch-action: pan-y;
+}
+
+.agenda-day-calendar.is-day-swiping > :not(.agenda-day-swipe-preview),
+.agenda-day-calendar.is-day-swipe-animating > :not(.agenda-day-swipe-preview) {
+  transform: translate3d(var(--agenda-day-current-x, 0px), 0, 0);
+  will-change: transform;
+}
+
+.agenda-day-swipe-preview {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  background: #ffffff;
+  transform: translate3d(var(--agenda-day-preview-x, 100%), 0, 0);
+  opacity: var(--agenda-day-preview-opacity, 0.45);
+  will-change: transform, opacity;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.agenda-day-swipe-preview .agenda-day-scroll {
+  height: 100%;
+  overflow-y: hidden !important;
+}
+
+.agenda-day-calendar.is-day-swipe-animating > :not(.agenda-day-swipe-preview),
+.agenda-day-calendar.is-day-swipe-animating .agenda-day-swipe-preview {
+  transition: transform 0.24s ease, opacity 0.24s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenda-day-calendar.is-day-swipe-animating > :not(.agenda-day-swipe-preview),
+  .agenda-day-calendar.is-day-swipe-animating .agenda-day-swipe-preview {
+    transition-duration: 0.01ms;
+  }
+}
+
+/* =========================================================
+   DAGKALENDER: afspraakblokken exact van begin- tot einduur
+   - hoogte wordt volledig door JS berekend
+   - inhoud start bovenaan en behandeling mag over meerdere regels lopen
+========================================================= */
+.agenda-day-appointment.appointment-card {
+  box-sizing: border-box !important;
+}
+
+.agenda-day-appointment-row.appointment-row {
+  align-items: start !important;
+  align-content: start !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.agenda-day-appointment .time-block,
+.agenda-day-pinned-private .time-block,
+.agenda-day-appointment-main {
+  align-self: start !important;
+}
+
+.agenda-day-appointment .meta {
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: clip !important;
+  line-height: 1.25 !important;
+  display: block !important;
+}
+
+.agenda-day-appointment .price-chip {
+  align-self: start !important;
+}
+
+
+/* =========================================================
+   FIX: OMZETGRAFIEK ROBUUSTE BAR-OPBOUW
+   - staven blijven zichtbaar ondanks oudere .revenue-bar-stack regels
+   - lichte achtergrond alleen bij betaald + onbetaald
+   - breedte blijft dynamisch volgens aantal x-waarden
+========================================================= */
+.revenue-chart-plot-v2 {
+  grid-template-columns: var(--revenue-y-axis-width, 42px) minmax(0, 1fr) !important;
+  gap: 4px !important;
+  min-width: 100%;
+}
+
+.revenue-chart-area-v2 {
+  position: relative;
+  min-width: 0;
+  padding-bottom: 22px;
+}
+
+.revenue-bars-v2 {
+  height: calc(var(--revenue-chart-height, 220px) + 22px) !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: var(--revenue-bar-gap, 2px) !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: none !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  padding: 0 4px 0 8px !important;
+  scrollbar-width: none;
+}
+
+.revenue-bars-v2::-webkit-scrollbar {
+  display: none;
+}
+
+.revenue-bars-v2 .revenue-bar-col {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  height: calc(var(--revenue-chart-height, 220px) + 22px) !important;
+  display: grid !important;
+  grid-template-rows: var(--revenue-chart-height, 220px) 22px !important;
+  gap: 0 !important;
+  justify-items: center !important;
+  align-items: stretch !important;
+}
+
+.revenue-bars-v2.revenue-bars-day .revenue-bar-col {
+  flex: 0 0 var(--revenue-bar-column-width, 48px) !important;
+  min-width: var(--revenue-bar-column-width, 48px) !important;
+}
+
+.revenue-bar-cell {
+  position: relative;
+  width: var(--revenue-bar-group-width, 10px);
+  height: var(--revenue-chart-height, 220px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.revenue-bar-total-bg {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: var(--revenue-bar-group-width, 10px);
+  transform: translateX(-50%);
+  background: #f3e7ec;
+  z-index: 0;
+}
+
+.revenue-bar-pair {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  width: var(--revenue-bar-group-width, 10px);
+  height: var(--revenue-chart-height, 220px);
+}
+
+.revenue-bar-fill {
+  display: block;
+  width: var(--revenue-bar-single-width, 8px);
+  min-height: 0;
+  border-radius: 0;
+  animation: revenueBarGrow 0.45s ease-out both;
+  transform-origin: bottom;
+}
+
+.revenue-bar-pair.has-both .revenue-bar-fill {
+  width: var(--revenue-bar-split-width, 4px);
+}
+
+.revenue-bar-fill.paid {
+  background: #2d8b4e;
+}
+
+.revenue-bar-fill.unpaid {
+  background: #d46a6a;
+}
+
+.revenue-bars-v2 .revenue-bar-label {
+  align-self: start;
+  line-height: 1;
+  padding-top: 8px;
+  font-size: 10px;
+  color: #453f46;
+  white-space: nowrap;
+}
+
+.revenue-bars-v2 .revenue-bar-col.is-empty .revenue-bar-label {
+  visibility: hidden;
+}
+
+@media (max-width: 420px) {
+  .revenue-bars-v2.revenue-bars-month {
+    gap: 1px !important;
+  }
+
+  .revenue-bars-v2.revenue-bars-month .revenue-bar-label {
+    font-size: 9px;
+  }
+}
+
+/* =========================================================
+   FIX KOSTEN: achtergrond + compacte standaardkostenknop
+   - Enkel Kosten-pagina: witte achtergrond zoals de andere pagina's
+   - Standaardkostenknop terug compact, zonder layout/functionality impact
+========================================================= */
+#costsScreen,
+#costsScreen .costs-screen-shell {
+  background: #ffffff !important;
+}
+
+#standardCostsBtn.fab.fab-secondary {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  max-width: 52px !important;
+  min-height: 52px !important;
+  max-height: 52px !important;
+  flex: 0 0 52px !important;
+  padding: 0 !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  place-items: center !important;
+  overflow: hidden !important;
+}
+
+body:not(.costs-action-mode) #standardCostsBtn.fab.fab-secondary,
+#standardCostsBtn.fab.fab-secondary.hidden {
+  display: none !important;
+}
+
+body.costs-action-mode #standardCostsBtn.fab.fab-secondary:not(.hidden) {
+  display: grid !important;
+}
+
+#standardCostsBtn.fab.fab-secondary > span {
+  display: grid !important;
+  place-items: center !important;
+  width: 20px !important;
+  height: 20px !important;
+  line-height: 1 !important;
+  transform: translateY(-1px) !important;
+}
+
+#standardCostsBtn.fab.fab-secondary .fab-menu-lines,
+#standardCostsBtn.fab.fab-secondary svg,
+#standardCostsBtn.fab.fab-secondary .standard-costs-icon {
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+}
+
+/* =========================================================
+   DAGKALENDER: ... knoppen voor verborgen afspraken
+========================================================= */
+.agenda-day-hidden-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  min-width: 52px;
+  height: 26px;
+  border: 1px solid #ead6aa;
+  border-radius: 999px;
+  background: rgba(255, 250, 240, 0.96);
+  color: #7a5631;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 12px 4px;
+  box-shadow: 0 2px 8px rgba(84, 48, 65, 0.14);
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.agenda-day-hidden-nav-top {
+  top: 8px;
+}
+
+.agenda-day-hidden-nav-bottom {
+  bottom: 8px;
+}
+
+.agenda-day-hidden-nav:hover,
+.agenda-day-hidden-nav:active {
+  background: #fff4d8;
+  transform: translateX(-50%);
+}
+
+
+/* =========================================================
+   FIX: dagkalender ... knoppen subtiel links + kleiner
+   - niet meer gecentreerd
+   - compact en net naast de uurkolom
+========================================================= */
+.agenda-day-hidden-nav {
+  left: 56px !important;
+  transform: none !important;
+  min-width: 34px !important;
+  width: 34px !important;
+  height: 20px !important;
+  border-radius: 999px !important;
+  padding: 0 0 3px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 4px rgba(84, 48, 65, 0.12) !important;
+}
+
+.agenda-day-hidden-nav:hover,
+.agenda-day-hidden-nav:active {
+  transform: none !important;
+}
+
+.agenda-day-hidden-nav-top {
+  top: 6px !important;
+}
+
+.agenda-day-hidden-nav-bottom {
+  bottom: 6px !important;
+}
+
+@media (max-width: 420px) {
+  .agenda-day-hidden-nav {
+    left: 52px !important;
+    min-width: 32px !important;
+    width: 32px !important;
+    height: 19px !important;
+    font-size: 12px !important;
+  }
+}
+
+
+/* =========================================================
+   FIX: bovenste ...-knop dagkalender onder de smalle switchknop
+   Het knopje positioneert nu relatief t.o.v. de dagkalender zelf,
+   niet meer t.o.v. het volledige kalenderpaneel.
+========================================================= */
+body.agenda-day-mode #agendaDayCalendar {
+  position: relative !important;
+}
+
+body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
+  top: 6px !important;
+}
+
+/* =========================================================
+   AGENDA: dagen van vorige/volgende maand opnieuw zichtbaar
+========================================================= */
+.day-cell.other-month {
+  background: #fbf7f9;
+  border-color: #f1e7ed;
+  color: #b7a9b2;
+  opacity: 0.72;
+}
+
+.day-cell.other-month .day-dots {
+  opacity: 0.55;
+}
+
+.day-cell.other-month.selected {
+  opacity: 1;
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+/* =========================================================
+   REGISTRATIE WIZARD
+========================================================= */
+.register-modal {
+  width: min(94vw, 430px);
+}
+
+.register-wizard-card {
+  max-height: min(86vh, 720px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.register-wizard-head {
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.register-wizard-head h3 {
+  margin-bottom: 4px;
+}
+
+.register-wizard-subtitle,
+.register-step-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.register-progress {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+
+.register-progress-dot {
+  height: 6px;
+  border-radius: 999px;
+  background: #f0e3e9;
+  transition: background-color 0.18s ease, opacity 0.18s ease;
+}
+
+.register-progress-dot.active,
+.register-progress-dot.done {
+  background: var(--primary);
+}
+
+.register-step {
+  display: none;
+}
+
+.register-step.active {
+  display: block;
+}
+
+.register-step .field-label:not(:first-child) {
+  margin-top: 14px;
+}
+
+.register-step-hint {
+  margin-top: 10px;
+}
+
+.register-wizard-actions {
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.register-wizard-actions .btn {
+  flex: 1 1 0;
+}
+
+
+/* ===================== WELKOM / RONDLEIDING ===================== */
+.welcome-guide-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(42, 31, 38, 0.32);
+  backdrop-filter: blur(6px);
+}
+
+.welcome-guide-overlay.hidden {
+  display: none;
+}
+
+.welcome-guide-card {
+  position: relative;
+  width: min(100%, 430px);
+  max-height: min(88vh, 720px);
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid #efd8e2;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #fffafd 0%, #ffffff 68%);
+  box-shadow: 0 22px 56px rgba(98, 56, 78, 0.24);
+  animation: welcomeGuideIn 0.28s ease both;
+}
+
+@keyframes welcomeGuideIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.welcome-guide-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: #f7e8ef;
+  color: var(--primary-dark);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.welcome-guide-hero {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 14px;
+  border-radius: 24px;
+  background: #f9e6ef;
+  color: var(--primary-dark);
+  box-shadow: inset 0 0 0 1px rgba(168, 91, 127, 0.12);
+}
+
+.welcome-guide-calendar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 16px;
+  background: #fff;
+  font-size: 25px;
+  font-weight: 900;
+  animation: welcomePulse 1.6s ease-in-out infinite;
+}
+
+.welcome-guide-sparkle {
+  position: absolute;
+  top: 7px;
+  right: 12px;
+  font-size: 18px;
+  animation: welcomeSparkle 1.8s ease-in-out infinite;
+}
+
+@keyframes welcomePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes welcomeSparkle {
+  0%, 100% { opacity: 0.45; transform: scale(0.9) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(12deg); }
+}
+
+.welcome-guide-card h3 {
+  margin: 0 34px 8px;
+  text-align: center;
+  color: var(--text);
+  font-size: 22px;
+}
+
+.welcome-guide-intro {
+  margin: 0 0 18px;
+  text-align: center;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.welcome-guide-steps {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.welcome-guide-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid #f0dce5;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.welcome-guide-step strong {
+  display: block;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.welcome-guide-step small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.welcome-guide-check {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #f3e5ec;
+  color: transparent;
+  font-weight: 900;
+}
+
+.welcome-guide-step.done .welcome-guide-check {
+  background: var(--primary);
+  color: #fff;
+}
+
+.welcome-guide-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 16px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.welcome-guide-toggle input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary);
+}
+
+.welcome-guide-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.welcome-guide-actions .btn {
+  min-width: 0;
+}
+
+@media (max-width: 420px) {
+  .welcome-guide-card {
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+
+  .welcome-guide-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   ADMIN PAGINA BINNEN APP
+========================================================= */
+.admin-page-shell {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  background: #fbf7f9;
+  overflow: hidden;
+}
+
+.admin-page-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  display: block;
+  background: #fbf7f9;
+}
+
+/* =========================================================
+   ADMIN PAGINA BINNEN APP - geïntegreerd
+========================================================= */
+.admin-page-shell {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 14px 14px 34px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fbf7f9;
+}
+
+.admin-overview-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.admin-section-headline {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-section-headline-compact {
+  margin-bottom: 12px;
+}
+
+.admin-section-headline h2 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--primary-dark);
+  font-weight: 500;
+  font-size: 22px;
+  margin: 0 0 6px;
+}
+
+.admin-section-headline p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-stat-card {
+  display: grid;
+  gap: 7px;
+  padding: 13px 10px;
+  border: 1px solid #f0e4ea;
+  border-radius: var(--radius-md);
+  background: #fbf7f9;
+}
+
+.admin-stat-card span {
+  color: #59525a;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.admin-stat-card strong {
+  color: var(--primary-dark);
+  font-size: 26px;
+  line-height: 1;
+}
+
+.admin-toolbar {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-users-list {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-user-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.admin-user-card-main {
+  padding: 13px 12px 11px;
+  display: grid;
+  gap: 10px;
+}
+
+.admin-user-topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-user-name {
+  font-weight: 700;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.admin-user-email,
+.admin-user-small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.admin-status-pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eaf7ef;
+  color: #287a45;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-status-pill.blocked {
+  background: #fff0f1;
+  color: #b32635;
+}
+
+.admin-user-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-user-field {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 9px;
+  border-radius: var(--radius-md);
+  background: #fbf7f9;
+}
+
+.admin-user-field span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.admin-user-field strong {
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.admin-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--line);
+  background: #fffdfd;
+}
+
+.admin-empty-state {
+  padding: 16px;
+  text-align: center;
+  color: var(--muted);
+  background: #fff;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.admin-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  z-index: 9999;
+  transform: translateX(-50%);
+  width: min(92vw, 430px);
+  padding: 12px 14px;
+  border-radius: 999px;
+  background: rgba(45, 35, 42, 0.94);
+  color: #fff;
+  font-size: 13px;
+  text-align: center;
+  box-shadow: 0 14px 32px rgba(70, 35, 51, 0.24);
+}
+
+@media (max-width: 420px) {
+  .admin-user-grid,
+  .admin-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   SUPPORT-PAGINA
+========================================================= */
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.header-support-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(184, 109, 135, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--primary-dark);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(54, 22, 36, 0.08);
+  cursor: pointer;
+}
+
+.header-support-btn:hover,
+.header-support-btn:active {
+  background: var(--primary-soft);
+  transform: none;
+}
+
+.support-page {
+  min-height: 0;
+  display: grid;
+}
+
+.support-scroll {
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.support-hero,
+.support-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: var(--shadow-soft);
+}
+
+.support-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+}
+
+.support-kicker {
+  margin: 0 0 4px;
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.support-hero h2,
+.support-card h3 {
+  margin: 0 0 8px;
+  color: var(--primary-dark);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.support-hero h2 {
+  font-size: 22px;
+}
+
+.support-hero p:not(.support-kicker),
+.support-card p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.support-hero-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 18px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.support-card {
+  padding: 16px;
+}
+
+.support-card-wide {
+  grid-row: span 2;
+}
+
+.support-faq-item {
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+
+.support-faq-item:first-of-type {
+  border-top: 0;
+}
+
+.support-faq-item summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.support-form {
+  display: grid;
+  gap: 10px;
+}
+
+.support-textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.support-diagnostics-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.support-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.support-muted {
+  font-size: 13px;
+}
+
+.support-info-table {
+  display: grid;
+  gap: 8px;
+}
+
+.support-info-table div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.support-info-table span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.support-info-table strong {
+  color: var(--text);
+  font-size: 13px;
+  text-align: right;
+  word-break: break-word;
+}
+
+@media (max-width: 760px) {
+  .support-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .support-actions {
+    flex-direction: column;
+  }
+
+  .support-actions .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-support-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+}
+
+/* =========================================================
+   SUPPORT-PAGINA - verfijning snelle hulp + headerknop
+========================================================= */
+.topbar-actions {
+  align-items: flex-start;
+}
+
+.header-support-btn {
+  margin-top: 4px;
+}
+
+.support-card h3 {
+  margin-bottom: 14px;
+}
+
+.support-faq-item {
+  padding: 14px 0;
+}
+
+.support-faq-item summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style-position: inside;
+  padding: 2px 0;
+  line-height: 1.35;
+}
+
+.support-faq-item summary::-webkit-details-marker {
+  color: var(--primary);
+}
+
+.support-answer {
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid rgba(184, 109, 135, 0.16);
+  border-radius: 16px;
+  background: rgba(251, 246, 248, 0.78);
+}
+
+.support-answer p {
+  margin: 0 0 12px;
+}
+
+.support-steps {
+  margin: 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 12px;
+}
+
+.support-steps li {
+  padding-left: 4px;
+  color: var(--primary-dark);
+}
+
+.support-steps li::marker {
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.support-steps strong {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.support-steps span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.support-steps em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+@media (max-width: 480px) {
+  .header-support-btn {
+    margin-top: 2px;
+  }
+
+  .support-answer {
+    padding: 12px;
+  }
+}
+
+/* =========================================================
+   FULLSCREEN MODALS
+   Alle echte dialog/pop-upvensters worden schermvullend getoond.
+   Agenda-popovers gebruiken geen .modal en blijven hierdoor ongemoeid.
+========================================================= */
+dialog.modal {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+}
+
+dialog.modal.modal-small,
+dialog.modal.payment-qr-dialog,
+dialog.modal.revenue-wheel-dialog,
+dialog.modal.appointment-wheel-dialog,
+#appointmentDialog.modal,
+#registerDialog.modal {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+}
+
+dialog.modal > .modal-card,
+dialog.modal > form.modal-card,
+dialog.modal > div.modal-card,
+#appointmentForm.modal-card,
+#registerForm.modal-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  max-height: 100dvh !important;
+  min-height: 100% !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 700px) {
+  dialog.modal > .modal-card,
+  dialog.modal > form.modal-card,
+  dialog.modal > div.modal-card {
+    padding: 28px;
+  }
+}
+
+
+
+/* =========================================================
+   MODAL ACTIONS ONDERAAN
+   Actieknoppen blijven onderaan zichtbaar in fullscreen popups.
+   Agenda-popovers gebruiken geen .modal-actions en blijven ongemoeid.
+========================================================= */
+dialog.modal .modal-actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  margin: 0 !important;
+  padding: 10px 18px calc(10px + env(safe-area-inset-bottom));
+  background: #ffffff;
+  border-top: none !important;
+  box-shadow: none !important;
+}
+
+@media (min-width: 700px) {
+  dialog.modal .modal-actions {
+    padding: 12px 28px calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+/* =========================================================
+   KLANTDETAIL ALS FULLSCREEN POPUP
+   Alleen de detailfiche van één klant opent als popup.
+   Het overzicht Klanten blijft een gewone pagina.
+========================================================= */
+.client-detail-dialog .client-detail-modal-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom)) !important;
+  background: #fbf8fa;
+}
+
+.client-detail-dialog .client-detail-modal-head {
+  margin-bottom: 10px;
+  flex: 0 0 auto;
+}
+
+.client-detail-modal-content {
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0 104px;
+}
+
+.client-detail-dialog .client-detail-page {
+  padding-top: 0;
+}
+
+@media (min-width: 700px) {
+  .client-detail-dialog .client-detail-modal-card {
+    padding: 28px 28px calc(28px + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Klantdetail popup: contactknoppen zichtbaar binnen het fullscreen dialog */
+.client-detail-dialog .client-action-bar {
+  z-index: 2;
+  bottom: calc(env(safe-area-inset-bottom) + 18px);
+}
+
+@media (min-width: 700px) {
+  .client-detail-dialog .client-action-bar {
+    bottom: calc(env(safe-area-inset-bottom) + 28px);
+  }
+}
+
+/* Fix: verborgen actieknoppen moeten echt verborgen blijven,
+   ook nadat ze de app-action-nav-btn stijl hebben gekregen. */
+.modal-actions .btn.app-action-nav-btn.hidden,
+.modal-actions > .btn.app-action-nav-btn.hidden,
+.right-actions .btn.app-action-nav-btn.hidden,
+.btn.app-action-nav-btn.hidden,
+.app-action-nav-btn.hidden {
+  display: none !important;
+}
+
+/* Nieuwe/bewerk klant: opmerkingenveld ruimer tonen */
+#clientNote.client-note-textarea {
+  min-height: 150px;
+}
+
+/* =========================================================
+   HEADER TAALKEUZE
+========================================================= */
+.header-language-select {
+  height: 28px;
+  min-width: 46px;
+  border: 1px solid rgba(184, 109, 135, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--primary-dark);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 18px 0 8px;
+  box-shadow: 0 8px 18px rgba(54, 22, 36, 0.07);
+  outline: none;
+  cursor: pointer;
+}
+
+.header-language-select:focus {
+  border-color: rgba(184, 109, 135, 0.62);
+  box-shadow: 0 0 0 3px rgba(184, 109, 135, 0.14);
+}
+
+/* =========================================================
+   APP-HEADER IN FULLSCREEN POPUPS
+   Geen extra sticky titelbalk; de echte modal-inhoud start onder de app-header.
+========================================================= */
+dialog.modal[open].has-app-topbar {
+  display: flex !important;
+  flex-direction: column;
+  background: #fbf8fa;
+}
+
+.modal-app-topbar {
+  flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: calc(12px + env(safe-area-inset-top));
+}
+
+.modal-app-topbar .modal-app-close-btn {
+  visibility: visible;
+}
+
+.modal-app-topbar .modal-app-title {
+  font-size: 19px;
+}
+
+dialog.modal.has-app-topbar > .modal-card,
+dialog.modal.has-app-topbar > form.modal-card,
+dialog.modal.has-app-topbar > div.modal-card,
+dialog.modal.has-app-topbar #appointmentForm.modal-card,
+dialog.modal.has-app-topbar #registerForm.modal-card {
+  flex: 1 1 auto;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+@media (max-width: 480px) {
+  .header-language-select {
+    height: 26px;
+    min-width: 42px;
+    font-size: 10px;
+    padding-left: 7px;
+    padding-right: 16px;
+  }
+}
+
+
+/* =========================================================
+   HEADER VERFIJNING
+   Terugpijl weg, logo links, compacte taalselectie.
+========================================================= */
+#backBtn,
+.modal-app-close-btn {
+  display: none !important;
+}
+
+.topbar-left {
+  gap: 0;
+}
+
+.topbar-title-wrap {
+  gap: 8px;
+}
+
+.topbar-logo {
+  margin-left: 0 !important;
+  margin-right: 8px !important;
+}
+
+.modal-app-topbar .modal-app-title {
+  font-size: 20px;
+}
+
+.header-language-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 34px;
+  min-width: 34px;
+  max-width: 34px;
+  height: 24px;
+  padding: 0 4px !important;
+  text-align: center;
+  text-align-last: center;
+  font-size: 10px;
+  background-image: none !important;
+}
+
+.header-language-select::-ms-expand {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .header-language-select {
+    width: 32px;
+    min-width: 32px;
+    max-width: 32px;
+    height: 23px;
+    padding: 0 3px !important;
+    font-size: 9.5px;
+  }
+}
+
+/* =========================================================
+   DEFINITIEVE HEADERGELIJKHEID
+   Popupvensters gebruiken visueel exact dezelfde topbar als gewone vensters.
+========================================================= */
+.modal-app-topbar.topbar,
+dialog.modal[open] > .modal-app-topbar.topbar {
+  padding: 12px 16px 10px !important;
+  margin: 0 !important;
+  min-height: 68px !important;
+  align-items: center !important;
+}
+
+.modal-app-topbar .topbar-left,
+.modal-app-topbar .topbar-title-wrap,
+.modal-app-topbar .topbar-actions {
+  margin: 0 !important;
+}
+
+.modal-app-topbar .topbar-title-wrap h1,
+.modal-app-topbar .modal-app-title {
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 20px !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  color: var(--primary-dark) !important;
+}
+
+.header-language-select,
+.modal-app-topbar .header-language-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  width: 34px !important;
+  min-width: 34px !important;
+  max-width: 34px !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  padding: 0 3px !important;
+  border-radius: 4px !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  text-align-last: center !important;
+  background-image: none !important;
+}
+
+.header-language-select::-ms-expand {
+  display: none !important;
+}
+
+.header-language-select + .app-select-button,
+.header-language-select ~ .app-select-button,
+.app-select-wrap:has(.header-language-select) {
+  display: contents !important;
+}
+
+.app-select-wrap:has(.header-language-select) .app-select-button,
+.app-select-wrap:has(.header-language-select) .app-select-options {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  .modal-app-topbar.topbar,
+  dialog.modal[open] > .modal-app-topbar.topbar {
+    padding: 12px 16px 10px !important;
+    min-height: 68px !important;
+  }
+
+  .header-language-select,
+  .modal-app-topbar .header-language-select {
+    width: 30px !important;
+    min-width: 30px !important;
+    max-width: 30px !important;
+    height: 23px !important;
+    min-height: 23px !important;
+    font-size: 9px !important;
+    padding: 0 2px !important;
+  }
+}
+
+
+/* =========================================================
+   DEFINITIEF: ÉÉN GEDEELDE HEADER VOOR SCHERMEN EN POPUPS
+   De echte #appTopbar wordt via JS verplaatst naar het open dialog.
+   Er bestaat dus geen aparte popup-header meer.
+========================================================= */
+#appTopbar.topbar {
+  padding: 12px 16px 10px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-items: center !important;
+}
+
+#appTopbar .topbar-left,
+#appTopbar .topbar-title-wrap,
+#appTopbar .topbar-actions {
+  margin: 0 !important;
+}
+
+#appTopbar .topbar-title-wrap h1,
+#appTopbar #screenTitle {
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 20px !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  color: var(--primary-dark) !important;
+}
+
+#appTopbar .header-language-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  width: 30px !important;
+  min-width: 30px !important;
+  max-width: 30px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  padding: 0 2px !important;
+  border-radius: 3px !important;
+  font-size: 9px !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  text-align-last: center !important;
+  background-image: none !important;
+}
+
+#appTopbar .header-language-select::-ms-expand {
+  display: none !important;
+}
+
+dialog.modal[open].has-app-topbar {
+  display: flex !important;
+  flex-direction: column !important;
+  background: #fbf8fa;
+}
+
+dialog.modal.has-app-topbar > #appTopbar.topbar {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+}
+
+dialog.modal.has-app-topbar > .modal-card,
+dialog.modal.has-app-topbar > form.modal-card,
+dialog.modal.has-app-topbar > div.modal-card,
+dialog.modal.has-app-topbar #appointmentForm.modal-card,
+dialog.modal.has-app-topbar #registerForm.modal-card {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+@media (max-width: 480px) {
+  #appTopbar .header-language-select {
+    width: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    height: 21px !important;
+    min-height: 21px !important;
+    font-size: 8.5px !important;
+  }
+}
+
+
+/* =========================================================
+   DEFINITIEVE KLEINE HEADER-TITEL + KOSTEN DATUMPICKER
+========================================================= */
+#appTopbar .topbar-title-wrap h1,
+#appTopbar #screenTitle {
+  font-size: 18px !important;
+}
+
+#costForm .appointment-picker-display {
+  margin-bottom: 0;
+}
+
+/* =========================================================
+   HEADER TAALKNOP LINKS
+========================================================= */
+#appTopbar .topbar-left {
+  gap: 8px !important;
+}
+
+.header-language-menu {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  z-index: 60;
+}
+
+.header-language-btn,
+.header-language-option {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  border: 1px solid rgba(184, 109, 135, 0.22);
+  border-radius: 999px;
+  background: #bd6d89;
+  color: #ffffff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  box-shadow: 0 8px 18px rgba(54, 22, 36, 0.08);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-language-btn:disabled,
+.header-language-menu.is-saving .header-language-btn,
+.header-language-menu.is-saving .header-language-option {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.header-language-overlay {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  display: grid;
+  gap: 6px;
+  z-index: 80;
+}
+
+.header-language-option {
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--primary-dark);
+}
+
+.header-language-option:hover,
+.header-language-option:active {
+  background: var(--primary-soft);
+  transform: none;
+}
+
+.header-language-status {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: rgba(45, 35, 42, 0.92);
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1;
+  padding: 8px 10px;
+  box-shadow: 0 10px 22px rgba(54, 22, 36, 0.16);
+  z-index: 90;
+}
+
+.header-language-select {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  #appTopbar .topbar-left {
+    gap: 7px !important;
+  }
+
+  .header-language-menu,
+  .header-language-btn,
+  .header-language-option {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 14px;
+  }
+
+  .header-language-overlay,
+  .header-language-status {
+    top: 38px;
+  }
+
+  .header-language-status {
+    left: 38px;
+  }
+}
+
+/* Iets kleinere titel in dezelfde gedeelde header. */
+#appTopbar .topbar-title-wrap h1,
+#appTopbar #screenTitle {
+  font-size: 17px !important;
+}
+
+/* Kosten: verberg native datuminput volledig; selectie loopt via app-wheelpicker. */
+#costsNativeDatePicker,
+.costs-native-date-picker {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-width: 1px !important;
+  min-height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  padding: 0 !important;
+  border: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+
+/* =========================================================
+   HEADER TAALMENU - ronde knop rechts
+========================================================= */
+#appTopbar .topbar-actions {
+  align-items: flex-start !important;
+  gap: 6px !important;
+}
+
+#appTopbar .header-language-select {
+  display: none !important;
+}
+
+.header-language-menu {
+  position: relative;
+  flex: 0 0 auto;
+  width: 32px;
+  min-width: 32px;
+  margin-top: 4px;
+  z-index: 100;
+}
+
+.header-language-btn,
+.header-language-option-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(184, 109, 135, 0.20);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--primary-dark);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 8px 18px rgba(54, 22, 36, 0.08);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.header-language-btn {
+  background: var(--primary-dark);
+  color: #ffffff;
+  border-color: var(--primary-dark);
+}
+
+.header-language-options {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  z-index: 200;
+}
+
+.header-language-options.hidden {
+  display: none !important;
+}
+
+.header-language-option-btn:hover,
+.header-language-option-btn:active {
+  background: var(--primary-soft);
+  transform: none;
+}
+
+.header-language-btn:disabled,
+.header-language-option-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+@media (max-width: 480px) {
+  .header-language-menu,
+  .header-language-btn,
+  .header-language-option-btn {
+    width: 32px;
+    min-width: 32px;
+  }
+}
+
+
+/* =========================================================
+   DEFINITIEF: RONDE TAALKNOP RECHTS IN HEADER
+========================================================= */
+#appTopbar .topbar-left {
+  gap: 0 !important;
+}
+
+#appTopbar .topbar-actions {
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+}
+
+#appTopbar .header-language-menu {
+  order: 99;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 32px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  margin: 4px 0 0 0 !important;
+  z-index: 300 !important;
+}
+
+#appTopbar .header-language-btn,
+#appTopbar .header-language-option {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 8px 18px rgba(54, 22, 36, 0.08) !important;
+  transform: none !important;
+}
+
+#appTopbar .header-language-btn {
+  background: #bd6d89 !important;
+  border: 1px solid #bd6d89 !important;
+  color: #ffffff !important;
+}
+
+#appTopbar .header-language-overlay {
+  position: absolute !important;
+  top: 38px !important;
+  right: 0 !important;
+  left: auto !important;
+  display: grid !important;
+  gap: 6px !important;
+  justify-items: center !important;
+  z-index: 400 !important;
+}
+
+#appTopbar .header-language-overlay.hidden {
+  display: none !important;
+}
+
+#appTopbar .header-language-option {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(184, 109, 135, 0.20) !important;
+  color: var(--primary-dark) !important;
+}
+
+#appTopbar .header-language-status {
+  position: absolute !important;
+  top: 38px !important;
+  right: 0 !important;
+  left: auto !important;
+  white-space: nowrap !important;
+  z-index: 410 !important;
+}
+
+
+/* =========================================================
+   DEFINITIEF: compacte taalknop tussen support en account
+========================================================= */
+#appTopbar .topbar-actions {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+}
+
+#appTopbar #headerSupportBtn {
+  order: 1 !important;
+}
+
+#appTopbar #headerLanguageMenu {
+  order: 2 !important;
+}
+
+#appTopbar #headerAccountBtn {
+  order: 3 !important;
+}
+
+#appTopbar .header-language-menu {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 28px !important;
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  margin: 4px 0 0 0 !important;
+  z-index: 300 !important;
+}
+
+#appTopbar .header-language-btn,
+#appTopbar .header-language-option {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  max-width: 28px !important;
+  max-height: 28px !important;
+  border-radius: 999px !important;
+  padding: 0 !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 6px 14px rgba(54, 22, 36, 0.08) !important;
+  transform: none !important;
+  cursor: pointer !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+#appTopbar .header-language-btn {
+  background: #bd6d89 !important;
+  border: 1px solid #bd6d89 !important;
+  color: #ffffff !important;
+}
+
+#appTopbar .header-language-overlay {
+  position: absolute !important;
+  top: 34px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  display: grid !important;
+  gap: 6px !important;
+  justify-items: center !important;
+  z-index: 400 !important;
+}
+
+#appTopbar .header-language-overlay.hidden {
+  display: none !important;
+}
+
+#appTopbar .header-language-option {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(184, 109, 135, 0.20) !important;
+  color: var(--primary-dark) !important;
+}
+
+#appTopbar .header-language-btn:disabled,
+#appTopbar .header-language-menu.is-saving .header-language-btn,
+#appTopbar .header-language-menu.is-saving .header-language-option {
+  opacity: 0.7 !important;
+  pointer-events: none !important;
+  cursor: wait !important;
+}
+
+#appTopbar .header-language-status {
+  position: absolute !important;
+  top: 34px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  white-space: nowrap !important;
+  z-index: 410 !important;
+}
+
+/* =========================================================
+   ABONNEMENT / PROEFPERIODE BADGE
+========================================================= */
+#appTopbar .topbar-actions {
+  position: relative !important;
+}
+
+#headerTrialBadge {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 520;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0;
+  border: 1px solid rgba(195, 158, 48, 0.45);
+  border-radius: 999px;
+  background: #f6d957;
+  color: #7a5d00;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(84, 48, 65, 0.12);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#headerTrialBadge.hidden {
+  display: none !important;
+}
+
+
+#headerTrialBadge.is-pro {
+  width: auto;
+  min-width: 20px;
+  height: 12px;
+  min-height: 12px;
+  padding: 0 2px;
+  border-radius: 999px;
+  border-color: rgba(195, 158, 48, 0.36);
+  background: #f6d957;
+  color: #7a5d00;
+  font-size: 6px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+#headerTrialBadge:hover,
+#headerTrialBadge:active {
+  transform: none;
+  background: #f4cf35;
+}
+
+.subscription-page {
+  min-height: 0;
+  height: 100%;
+  background: #fbf7f9;
+}
+
+.subscription-scroll {
+  height: 100%;
+  overflow: auto;
+  padding: 14px 16px 108px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.subscription-hero,
+.subscription-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.subscription-hero h2,
+.subscription-card h3 {
+  margin: 0 0 8px;
+  color: var(--primary-dark);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+.subscription-hero p,
+.subscription-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.subscription-current-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.subscription-plan-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.subscription-price {
+  flex: 0 0 auto;
+  color: var(--primary-dark);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: right;
+}
+
+.subscription-price span {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.subscription-feature-list {
+  margin: 14px 0 16px;
+  padding-left: 20px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+
+/* Definitieve verfijning PRO-label: kleiner zodat account-icoon zichtbaar blijft */
+#headerTrialBadge.is-pro {
+  min-width: 20px !important;
+  height: 12px !important;
+  min-height: 12px !important;
+  padding: 0 2px !important;
+  font-size: 6px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+}
+
+.subscription-cancel-btn {
+  margin-top: 12px;
+  color: var(--danger);
+  border-color: #f5c2d2;
+  background: var(--danger-soft);
+}
+
+.subscription-cancel-btn.hidden {
+  display: none !important;
+}
+
+
+/* =========================================================
+   JURIDISCHE LINKS / ACCOUNT
+========================================================= */
+.account-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #f2e8ed;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.account-legal-links a,
+.terms-checkbox-row a {
+  color: var(--primary-dark);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.account-legal-links a:hover,
+.account-legal-links a:active,
+.terms-checkbox-row a:hover,
+.terms-checkbox-row a:active {
+  color: #9f5f75;
+}
+
+.terms-checkbox-row span {
+  line-height: 1.35;
+}
+
+/* Rekeningnummer als textarea zodat browser-wallets het niet als bankrekening-autofillveld behandelen. */
+.settings-account-number-field {
+  min-height: 48px;
+  height: 48px;
+  resize: none;
+  overflow: hidden;
+  line-height: 22px;
+  white-space: nowrap;
+}
+
+
+/* Admin: vernieuw-knop stabiel houden en tekst binnen de knop laten passen */
+#adminRefreshBtn {
+  flex: 0 0 auto;
+  min-width: 104px;
+  max-width: 132px;
+  padding-inline: 10px;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.1;
+}
+
+.admin-section-headline > div {
+  min-width: 0;
+}
+
+/* Verwijderde afspraken */
+.settings-deleted-appointments-card {
+  margin-top: 16px;
+}
+
+.deleted-appointments-modal-card {
+  width: min(760px, calc(100vw - 24px));
+  max-height: min(86vh, 820px);
+}
+
+.deleted-appointments-toolbar {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.deleted-appointments-list {
+  display: grid;
+  gap: 10px;
+  max-height: min(54vh, 520px);
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.deleted-appointment-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 22px rgba(17, 24, 39, 0.06);
+}
+
+.deleted-appointment-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.deleted-appointment-main strong,
+.deleted-appointment-main span,
+.deleted-appointment-main p,
+.deleted-appointment-main small {
+  overflow-wrap: anywhere;
+}
+
+.deleted-appointment-main span,
+.deleted-appointment-main small,
+.deleted-appointment-muted {
+  color: var(--muted, #6b7280);
+}
+
+.deleted-appointment-main p {
+  margin: 4px 0 0;
+}
+
+.deleted-appointment-restore-btn {
+  flex: 0 0 auto;
+}
+
+.deleted-appointments-empty {
+  padding: 18px;
+  text-align: center;
+  color: var(--muted, #6b7280);
+}
+
+@media (max-width: 640px) {
+  .deleted-appointment-card {
+    flex-direction: column;
+  }
+
+  .deleted-appointment-restore-btn {
+    width: 100%;
   }
 }

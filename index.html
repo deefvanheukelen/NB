@@ -47,7 +47,7 @@
          - Links: terugknop + logo + screentitel
          - Rechts: accountknop met icoon + voornaam / "log in"
     ========================================================== -->
-    <header class="topbar">
+    <header id="appTopbar" class="topbar">
       <div class="topbar-left">
         <button
           id="backBtn"
@@ -68,19 +68,41 @@
         </div>
       </div>
 
-      <button
-        id="headerAccountBtn"
-        class="header-account-btn"
-        type="button"
-        aria-label="Account openen"
-      >
-        <span class="header-account-icon" aria-hidden="true">
-          <svg width="28" height="28" viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-login" aria-hidden="true" focusable="false">
-              <path id="path2" style="fill:currentColor;stroke-width:1" d="M 1.8124886,6.9333659 C 1.7864235,6.7804715 1.7675079,6.6355105 1.7704544,6.6112293 1.7743344,6.5791763 3.2588613,4.9500562 3.6672626,4.5296574 3.6940726,4.5020544 3.6817556,4.4755334 3.6188266,4.425408 3.5724096,4.388429 3.5335256,4.344646 3.5324256,4.328105 3.5313256,4.311564 3.5784656,4.24943 3.6371651,4.190023 L 3.743907,4.0820167 3.6711381,3.8171814 C 3.5432433,3.3517168 3.5840966,2.9635266 3.8048285,2.5468598 3.9526753,2.2677754 4.1120754,2.0888386 4.369907,1.9125214 4.6988872,1.6875506 5.174746,1.5806658 5.5623491,1.6446829 5.9455505,1.7079728 6.4213255,1.954885 6.385528,2.0718868 6.3560867,2.1681128 6.2487288,2.2797964 6.1129319,2.3554651 6.0094977,2.413101 5.9644173,2.4204328 5.9054735,2.3892065 5.808312,2.3377351 5.6135914,2.3202589 5.4920442,2.3521006 5.1460796,2.442733 4.9278982,2.9089857 5.0917653,3.2074952 5.2806656,3.5516062 5.6895166,3.6612769 5.9957466,3.4499807 6.0421964,3.4179296 6.1840751,3.3540262 6.3110328,3.3079697 6.4382469,3.2618206 6.6381177,3.1540276 6.7562874,3.0678378 L 6.9707089,2.9114445 6.9939334,3.0735519 C 7.0862544,3.7179479 6.8127652,4.3503043 6.2714299,4.7441086 5.914249,5.0039462 5.2762027,5.1209502 4.8933961,4.99681 4.722491,4.9413899 4.6931818,4.9477209 4.5685144,5.067006 4.4838016,5.1480612 4.4422798,5.1679996 4.4022548,5.1468401 4.3565878,5.1226989 4.3099551,5.1606477 4.078425,5.4103609 3.8295073,5.6788283 3.8015789,5.7004845 3.7281058,5.6820133 3.594652,5.6484652 3.4958483,5.6715865 3.4273062,5.7524076 c -0.057393,0.067676 -0.059392,0.091231 -0.016618,0.195882 0.042422,0.1037917 0.040434,0.1292321 -0.015596,0.1995756 -0.055858,0.070129 -0.084479,0.077642 -0.219925,0.057742 C 3.0361147,6.1851726 3.011994,6.192098 2.9496638,6.2703521 2.888426,6.3472338 2.8845914,6.3742424 2.9183956,6.4906524 2.9676806,6.6603784 2.9117465,6.7212636 2.712942,6.714319 l -0.1461225,-0.0051 0.02626,0.1371901 c 0.025352,0.132446 0.022775,0.1410274 -0.074519,0.2481344 -0.097084,0.1068766 -0.1110022,0.1110506 -0.3797304,0.1138782 l -0.2789518,0.00293 z M 0.09960021,5.0870474 0.11589215,4.7646101 1.3278707,3.9098107 c 0.666588,-0.4701393 1.218946,-0.8679514 1.2274616,-0.884026 0.00852,-0.016072 -0.00559,-0.05068 -0.031333,-0.076906 C 2.472748,2.8966862 2.5091547,2.8303121 2.6557246,2.7087317 2.7306989,2.6465361 2.7314386,2.6299145 2.6809931,2.1401865 2.6524125,1.862725 2.6407297,1.5926531 2.6550305,1.5400279 2.7663945,1.1302263 3.6377145,0.59092624 4.173342,0.60027388 c 0.1849952,0.003229 0.2622435,0.0686643 0.482957,0.40909022 0.1135274,0.175104 0.201693,0.3272804 0.1959249,0.3381686 -0.00577,0.010894 -0.057456,0.032381 -0.1148583,0.047752 C 4.4180462,1.4808097 3.9677633,1.7800491 3.7305645,2.0643631 3.4185721,2.4383276 3.2858035,3.0129759 3.3569496,3.6814435 3.3751936,3.852863 3.3694166,3.8865005 3.3144696,3.928804 3.2648716,3.966987 3.2398666,3.966848 3.200867,3.9281568 3.173367,3.9008678 3.135841,3.8677158 3.117484,3.8544798 3.097962,3.8403988 2.9354725,3.9319018 2.7259976,4.0749347 L 2.3678889,4.3194562 2.2230535,4.2720535 C 2.1027543,4.232676 2.0617043,4.2349153 1.9807172,4.2852716 l -0.097502,0.060623 0.022417,0.135099 c 0.021597,0.1301522 0.019205,0.1374826 -0.06535,0.2002618 -0.07645,0.05676 -0.1059088,0.058432 -0.2284586,0.012964 -0.12352,-0.045829 -0.1517074,-0.044023 -0.230969,0.014827 -0.086495,0.064221 -0.08997,0.073126 -0.082915,0.2125912 0.0089,0.1759408 -0.052824,0.2349933 -0.199976,0.1913195 -0.21334754,-0.063321 -0.20352337,-0.067493 -0.20591318,0.087464 l -0.00214,0.139313 -0.12557933,0.094597 C 0.63898081,5.5287487 0.63821642,5.528815 0.36102383,5.4692058 L 0.08330531,5.409483 Z M 5.3265891,3.0592103 C 5.3010296,3.0092112 5.3036646,2.958744 5.3348832,2.9004991 5.3922039,2.7935457 5.4165768,2.7813191 5.5913626,2.7718554 5.816862,2.7596463 6.1922715,2.6417936 6.3438787,2.5356152 6.5451665,2.3946435 6.7113544,2.1144278 6.743435,1.861909 6.7761353,1.6045091 6.6791806,1.2535598 6.5112082,1.0213137 6.3972027,0.86368469 6.3555062,0.82842208 6.1635999,0.72734506 5.8105691,0.54137617 5.5164609,0.55837155 5.1160516,0.78780471 4.8952048,0.91434919 4.8088969,0.92769622 4.7213306,0.84884547 4.5882933,0.72904661 4.6614868,0.58222964 4.9275521,0.43519154 5.5919044,0.06804531 6.2583927,0.15465655 6.7434354,0.67116792 7.0723054,1.0213743 7.2205795,1.5762025 7.1118315,2.0496729 7.0641943,2.2570766 6.9022819,2.5557179 6.756509,2.7050549 6.5001169,2.9677084 6.0480675,3.1526559 5.6291733,3.1662813 5.4129289,3.1733146 5.3787404,3.1612174 5.3265888,3.0592066 Z" />
-            </svg>
-        </span>
-        <span id="headerUserName" class="header-account-name">log in</span>
-      </button>
+      <div class="topbar-actions">
+        <button
+          id="headerSupportBtn"
+          class="header-support-btn"
+          type="button"
+          aria-label="Support openen"
+          title="Support"
+        >
+          <span aria-hidden="true">?</span>
+        </button>
+
+        <button
+          id="headerAccountBtn"
+          class="header-account-btn"
+          type="button"
+          aria-label="Account openen"
+        >
+          <span class="header-account-icon" aria-hidden="true">
+            <svg class="header-account-svg" width="28" height="28" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M 3.8617798 0.31005859 C 2.9582518 0.26493829 2.025428 0.58087526 1.2950114 1.333252 C -0.69412006 3.3821882 0.57271814 6.7574126 3.4437174 7.0579671 C 5.5379113 7.2772007 7.3912588 5.3012295 7.0631348 3.1992879 C 6.7922288 1.4638815 5.3676597 0.3852591 3.8617798 0.31005859 z M 3.716569 1.5673462 C 4.5693501 1.5673462 4.896384 2.2967116 4.8906576 2.740918 C 4.8906576 3.5393214 4.2681271 3.9021506 3.753776 3.9155233 C 3.1213517 3.9318815 2.5429972 3.4892773 2.5429972 2.740918 C 2.5429972 2.2320433 2.8406225 1.5755089 3.716569 1.5673462 z M 3.6958984 2.0102132 A 0.75140572 0.75140572 0 0 0 2.9445231 2.7615885 A 0.75140572 0.75140572 0 0 0 3.6958984 3.5129639 A 0.75140572 0.75140572 0 0 0 4.4472738 2.7615885 A 0.75140572 0.75140572 0 0 0 3.6958984 2.0102132 z M 3.8147542 4.0741699 L 4.3883626 4.0808879 L 4.4896484 4.104659 C 5.0513905 4.2380308 5.5324788 4.7773655 5.5324788 5.2730632 C 5.5324788 5.6237649 5.1140306 5.6046287 5.0462036 5.2508423 C 4.9819262 4.9155692 4.7152747 4.6477208 4.37441 4.5764648 L 4.2710571 4.5552775 L 3.6654093 4.5599284 L 3.0597616 4.5645793 L 2.949174 4.6043701 C 2.6609871 4.7095437 2.4412234 4.9624788 2.3869344 5.2508423 C 2.3633283 5.3762204 2.3262513 5.448053 2.2665283 5.483903 L 2.2665283 5.4833862 C 2.1507059 5.5529145 2.0199 5.5288422 1.9435506 5.4234416 L 1.9006592 5.3645304 L 1.9006592 5.2808146 C 1.9006592 4.8959817 2.2341795 4.4116338 2.6318807 4.2183472 C 2.9142584 4.0811219 3.0500538 4.0649184 3.8147542 4.0741699 z " fill="currentColor" />
+    </svg>
+          </span>
+          <span id="headerUserName" class="header-account-name">log in</span>
+        </button>
+
+        <div id="headerLanguageMenu" class="header-language-menu">
+          <button id="headerLanguageBtn" class="header-language-btn" type="button" aria-label="Taal kiezen" aria-expanded="false">
+            <span id="headerLanguageCurrent">NL</span>
+          </button>
+          <div id="headerLanguageOverlay" class="header-language-overlay hidden" role="menu" aria-label="Taal kiezen"></div>
+          <div id="headerLanguageStatus" class="header-language-status hidden" aria-live="polite">Even geduld...</div>
+        </div>
+
+        <button id="headerTrialBadge" class="header-trial-badge hidden" type="button" aria-label="Abonnement bekijken" title="Abonnement bekijken">30</button>
+      </div>
     </header>
 
     <!-- =========================================================
@@ -160,7 +182,7 @@
               id="serviceSearch"
               class="search-input"
               type="search"
-              placeholder="Zoek dienst..." data-i18n-placeholder="searchServicePlaceholder"
+              placeholder="Zoek op beschrijving of kernwoord" data-i18n-placeholder="searchServicePlaceholder"
             />
             <div id="serviceAlphabetFilter" class="alphabet-filter"></div>
           </div>
@@ -242,7 +264,24 @@
                 <h2 id="revenueTitle">Omzet</h2>
               </div>
 
-              <div class="revenue-summary-top">
+              <div class="revenue-appointment-summary-top">
+                <div class="revenue-summary-item revenue-summary-appointments">
+                  <span class="revenue-main-label">Afspraken</span>
+                  <strong id="revenueAppointmentCount">0</strong>
+                </div>
+
+                <div class="revenue-summary-item revenue-summary-completed">
+                  <span class="revenue-main-label">Afgerond</span>
+                  <strong id="revenueCompletedCount">0</strong>
+                </div>
+
+                <div class="revenue-summary-item revenue-summary-planned-count">
+                  <span class="revenue-main-label">Gepland</span>
+                  <strong id="revenuePlannedCount">0</strong>
+                </div>
+              </div>
+
+              <div class="revenue-summary-top revenue-money-summary-top">
                 <div class="revenue-summary-item revenue-summary-total">
                   <span class="revenue-main-label">Totaal</span>
                   <strong id="plannedRevenue">€ 0,00</strong>
@@ -258,43 +297,84 @@
                   <strong id="openRevenue">€ 0,00</strong>
                 </div>
               </div>
-
-              <div id="paymentMethodList" class="revenue-method-breakdown"></div>
             </div>
 
             <div class="revenue-chart-card">
               <div id="revenueChart" class="revenue-chart-wrap"></div>
+              <div id="paymentMethodList" class="revenue-method-breakdown"></div>
             </div>
           </section>
 
-          <section class="revenue-filter-card">
-            <div class="revenue-filter-grid revenue-filter-grid-two">
-              <select id="revenuePaymentFilter" class="field compact-field">
-                <option value="">Alle betaalwijzen</option>
-              </select>
-
-              <select id="revenuePaymentStatusFilter" class="field compact-field">
-                <option value="">Alle statussen</option>
-                <option value="paid">Betaald</option>
-                <option value="unpaid">Onbetaald</option>
-              </select>
-            </div>
-
-            <div class="revenue-hidden-inputs" aria-hidden="true">
-              <select id="revenuePeriodType" class="field compact-field">
-                <option value="day">Dag</option>
-                <option value="week">Week</option>
-                <option value="month" selected>Maand</option>
-                <option value="year">Jaar</option>
-              </select>
-              <input id="revenueDate" class="field compact-field" type="date" />
-              <input id="revenueNativeDatePicker" class="field compact-field" type="date" />
-            </div>
-          </section>
+          <div class="revenue-hidden-inputs" aria-hidden="true">
+            <select id="revenuePeriodType" class="field compact-field">
+              <option value="day">Dag</option>
+              <option value="week">Week</option>
+              <option value="month" selected>Maand</option>
+              <option value="year">Jaar</option>
+            </select>
+            <input id="revenueDate" class="field compact-field" type="date" />
+            <input id="revenueNativeDatePicker" class="field compact-field" type="date" />
+          </div>
         </section>
       </section>
 
 
+
+
+      <!-- ===================== KOSTEN ======================= -->
+      <section id="costsScreen" class="screen">
+        <section class="costs-screen-shell">
+          <section class="revenue-period-strip costs-period-strip app-control-card" aria-label="Kostenperiode kiezen">
+            <button id="costsDayBtn" class="revenue-period-tile costs-period-tile" type="button" aria-label="Dagkosten kiezen">
+              <span class="revenue-period-icon" aria-hidden="true">
+                <svg viewBox="0 0 7.4083331 7.4083333" focusable="false">
+                  <path d="M 2.3884847,0.08216553 C 2.2485983,0.08275648 2.1353444,0.1960104 2.1347534,0.33589681 V 0.86144613 H 1.5037842 c -0.4982302,0 -0.90433759,0.40765767 -0.90433759,0.90588787 v 4.5532104 c 0,0.4982302 0.40610739,0.9038208 0.90433759,0.9038208 h 4.6307251 c 0.4982303,0 0.9064046,-0.4055906 0.9064046,-0.9038208 V 1.767334 c 0,-0.4982302 -0.4081743,-0.90588788 -0.9064046,-0.90588787 H 5.5391968 V 0.33589681 C 5.5386022,0.19520402 5.4240914,0.08161853 5.2833984,0.08216553 5.1433102,0.08247325 5.0297431,0.19580957 5.0291504,0.33589681 V 0.86144613 H 2.644283 V 0.33589681 C 2.6436884,0.19520406 2.5291776,0.08161858 2.3884847,0.08216553 Z M 1.5037842,1.2071615 H 2.1347534 V 1.4588257 C 2.1350611,1.5989139 2.2483975,1.712481 2.3884847,1.7130737 2.5293788,1.7136205 2.6439733,1.5997205 2.644283,1.4588257 V 1.2071615 h 2.3848674 v 0.2516642 c 3.091e-4,0.1402891 0.1139589,0.2539389 0.254248,0.254248 0.1408942,5.469e-4 0.2554887,-0.1133531 0.2557984,-0.254248 V 1.2071615 h 0.5953125 c 0.3130678,0 0.5606893,0.2471047 0.5606893,0.5601725 V 1.9724894 H 0.94361165 V 1.767334 c 0,-0.3130678 0.24710485,-0.5601725 0.56017255,-0.5601725 z M 0.94361165,2.4277588 H 6.6951986 v 3.8927856 c 0,0.3130678 -0.2476215,0.5581055 -0.5606893,0.5581055 H 1.5037842 c -0.3130677,0 -0.56017255,-0.2450377 -0.56017255,-0.5581055 z" />
+                </svg>
+              </span>
+              <span class="revenue-period-title">Dag</span>
+              <span id="costsDayLabel" class="revenue-period-sub">Vandaag</span>
+            </button>
+            <button id="costsWeekBtn" class="revenue-period-tile costs-period-tile" type="button" aria-label="Weekkosten kiezen">
+              <span class="revenue-period-icon" aria-hidden="true"><svg viewBox="0 0 7.4083331 7.4083333" focusable="false"><path d="M 2.3884847,0.08216553 C 2.2485983,0.08275648 2.1353444,0.1960104 2.1347534,0.33589681 V 0.86144613 H 1.5037842 c -0.4982302,0 -0.90433759,0.40765767 -0.90433759,0.90588787 v 4.5532104 c 0,0.4982302 0.40610739,0.9038208 0.90433759,0.9038208 h 4.6307251 c 0.4982303,0 0.9064046,-0.4055906 0.9064046,-0.9038208 V 1.767334 c 0,-0.4982302 -0.4081743,-0.90588788 -0.9064046,-0.90588787 H 5.5391968 V 0.33589681 C 5.5386022,0.19520402 5.4240914,0.08161853 5.2833984,0.08216553 5.1433102,0.08247325 5.0297431,0.19580957 5.0291504,0.33589681 V 0.86144613 H 2.644283 V 0.33589681 C 2.6436884,0.19520406 2.5291776,0.08161858 2.3884847,0.08216553 Z M 1.5037842,1.2071615 H 2.1347534 V 1.4588257 C 2.1350611,1.5989139 2.2483975,1.712481 2.3884847,1.7130737 2.5293788,1.7136205 2.6439733,1.5997205 2.644283,1.4588257 V 1.2071615 h 2.3848674 v 0.2516642 c 3.091e-4,0.1402891 0.1139589,0.2539389 0.254248,0.254248 0.1408942,5.469e-4 0.2554887,-0.1133531 0.2557984,-0.254248 V 1.2071615 h 0.5953125 c 0.3130678,0 0.5606893,0.2471047 0.5606893,0.5601725 V 1.9724894 H 0.94361165 V 1.767334 c 0,-0.3130678 0.24710485,-0.5601725 0.56017255,-0.5601725 z M 0.94361165,2.4277588 H 6.6951986 v 3.8927856 c 0,0.3130678 -0.2476215,0.5581055 -0.5606893,0.5581055 H 1.5037842 c -0.3130677,0 -0.56017255,-0.2450377 -0.56017255,-0.5581055 z" /></svg></span>
+              <span class="revenue-period-title">Week</span>
+              <span id="costsWeekLabel" class="revenue-period-sub">Deze week</span>
+            </button>
+            <button id="costsMonthBtn" class="revenue-period-tile costs-period-tile active" type="button" aria-label="Maandkosten kiezen">
+              <span class="revenue-period-icon" aria-hidden="true"><svg viewBox="0 0 7.4083331 7.4083333" focusable="false"><path d="M 2.3884847,0.08216553 C 2.2485983,0.08275648 2.1353444,0.1960104 2.1347534,0.33589681 V 0.86144613 H 1.5037842 c -0.4982302,0 -0.90433759,0.40765767 -0.90433759,0.90588787 v 4.5532104 c 0,0.4982302 0.40610739,0.9038208 0.90433759,0.9038208 h 4.6307251 c 0.4982303,0 0.9064046,-0.4055906 0.9064046,-0.9038208 V 1.767334 c 0,-0.4982302 -0.4081743,-0.90588788 -0.9064046,-0.90588787 H 5.5391968 V 0.33589681 C 5.5386022,0.19520402 5.4240914,0.08161853 5.2833984,0.08216553 5.1433102,0.08247325 5.0297431,0.19580957 5.0291504,0.33589681 V 0.86144613 H 2.644283 V 0.33589681 C 2.6436884,0.19520406 2.5291776,0.08161858 2.3884847,0.08216553 Z M 1.5037842,1.2071615 H 2.1347534 V 1.4588257 C 2.1350611,1.5989139 2.2483975,1.712481 2.3884847,1.7130737 2.5293788,1.7136205 2.6439733,1.5997205 2.644283,1.4588257 V 1.2071615 h 2.3848674 v 0.2516642 c 3.091e-4,0.1402891 0.1139589,0.2539389 0.254248,0.254248 0.1408942,5.469e-4 0.2554887,-0.1133531 0.2557984,-0.254248 V 1.2071615 h 0.5953125 c 0.3130678,0 0.5606893,0.2471047 0.5606893,0.5601725 V 1.9724894 H 0.94361165 V 1.767334 c 0,-0.3130678 0.24710485,-0.5601725 0.56017255,-0.5601725 z M 0.94361165,2.4277588 H 6.6951986 v 3.8927856 c 0,0.3130678 -0.2476215,0.5581055 -0.5606893,0.5581055 H 1.5037842 c -0.3130677,0 -0.56017255,-0.2450377 -0.56017255,-0.5581055 z" /></svg></span>
+              <span class="revenue-period-title">Maand</span>
+              <span id="costsMonthLabel" class="revenue-period-sub">Deze maand</span>
+            </button>
+            <button id="costsYearBtn" class="revenue-period-tile costs-period-tile" type="button" aria-label="Jaarkosten kiezen">
+              <span class="revenue-period-icon" aria-hidden="true"><svg viewBox="0 0 7.4083331 7.4083333" focusable="false"><path d="M 2.3884847,0.08216553 C 2.2485983,0.08275648 2.1353444,0.1960104 2.1347534,0.33589681 V 0.86144613 H 1.5037842 c -0.4982302,0 -0.90433759,0.40765767 -0.90433759,0.90588787 v 4.5532104 c 0,0.4982302 0.40610739,0.9038208 0.90433759,0.9038208 h 4.6307251 c 0.4982303,0 0.9064046,-0.4055906 0.9064046,-0.9038208 V 1.767334 c 0,-0.4982302 -0.4081743,-0.90588788 -0.9064046,-0.90588787 H 5.5391968 V 0.33589681 C 5.5386022,0.19520402 5.4240914,0.08161853 5.2833984,0.08216553 5.1433102,0.08247325 5.0297431,0.19580957 5.0291504,0.33589681 V 0.86144613 H 2.644283 V 0.33589681 C 2.6436884,0.19520406 2.5291776,0.08161858 2.3884847,0.08216553 Z M 1.5037842,1.2071615 H 2.1347534 V 1.4588257 C 2.1350611,1.5989139 2.2483975,1.712481 2.3884847,1.7130737 2.5293788,1.7136205 2.6439733,1.5997205 2.644283,1.4588257 V 1.2071615 h 2.3848674 v 0.2516642 c 3.091e-4,0.1402891 0.1139589,0.2539389 0.254248,0.254248 0.1408942,5.469e-4 0.2554887,-0.1133531 0.2557984,-0.254248 V 1.2071615 h 0.5953125 c 0.3130678,0 0.5606893,0.2471047 0.5606893,0.5601725 V 1.9724894 H 0.94361165 V 1.767334 c 0,-0.3130678 0.24710485,-0.5601725 0.56017255,-0.5601725 z M 0.94361165,2.4277588 H 6.6951986 v 3.8927856 c 0,0.3130678 -0.2476215,0.5581055 -0.5606893,0.5581055 H 1.5037842 c -0.3130677,0 -0.56017255,-0.2450377 -0.56017255,-0.5581055 z" /></svg></span>
+              <span class="revenue-period-title">Jaar</span>
+              <span id="costsYearLabel" class="revenue-period-sub revenue-period-year">2026</span>
+            </button>
+            <input id="costsNativeDatePicker" class="field compact-field costs-native-date-picker" type="date" aria-hidden="true" />
+          </section>
+          <section class="costs-summary-card revenue-summary-card">
+            <div class="costs-summary-head revenue-summary-head">
+              <h2 id="costsTitle">Kosten</h2>
+            </div>
+            <div class="costs-summary-top revenue-summary-top">
+              <div class="costs-summary-item revenue-summary-item">
+                <span class="revenue-main-label">Totaal incl. btw</span>
+                <strong id="costsTotalInclAmount">€ 0,00</strong>
+              </div>
+              <div class="costs-summary-item revenue-summary-item">
+                <span class="revenue-main-label">Totaal excl. btw</span>
+                <strong id="costsTotalExclAmount">€ 0,00</strong>
+              </div>
+              <div class="costs-summary-item revenue-summary-item">
+                <span class="revenue-main-label">Btw</span>
+                <strong id="costsVatAmount">€ 0,00</strong>
+              </div>
+            </div>
+          </section>
+          <section class="costs-list-panel">
+            <div id="costsList" class="scroll-list costs-scroll-list"></div>
+          </section>
+        </section>
+      </section>
 
       <!-- ===================== TO DO ======================= -->
       <section id="todoScreen" class="screen">
@@ -315,87 +395,396 @@
 
       <!-- ===================== INSTELLINGEN ================ -->
       <section id="settingsScreen" class="screen">
-        <section class="detail-panel">
-          <div class="scroll-list">
-            <form id="settingsForm" class="settings-card" method="dialog">
-              <div class="settings-group">
-                <div class="detail-label">Planning</div>
-
-                <label class="field-label" for="settingsDefaultBreakMinutes">Standaard pauze tussen 2 afspraken (min)</label>
-                <input id="settingsDefaultBreakMinutes" class="field" type="number" min="0" step="1" />
-
-                <label class="settings-switch-row" for="settingsOverlapWarningsEnabled">
-                  <span>
-                    <strong>Overlapwaarschuwingen</strong>
-                    <small>Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.</small>
-                  </span>
-                  <input id="settingsOverlapWarningsEnabled" type="checkbox" />
-                </label>
+        <section class="settings-page">
+          <div class="settings-scroll">
+            <form id="settingsForm" class="settings-card settings-card-modern" method="dialog" autocomplete="off" data-form-type="other">
+              <div class="settings-hero settings-hero-compact">
+                <p>Beheer je planning, meldingen, app-voorkeuren, betaalgegevens en kalenderkoppeling op één overzichtelijke plaats.</p>
+                <span id="settingsDirtyBadge" class="settings-dirty-badge hidden">Niet opgeslagen</span>
               </div>
 
-              <div class="settings-group">
-                <div class="detail-label">Meldingen</div>
+              <div class="settings-section-grid">
+                <section class="settings-section-card">
+                  <div class="settings-section-head">
+                    <span class="settings-section-icon" aria-hidden="true"><svg class="settings-svg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.1-1.64a.5.5 0 0 0 .12-.64l-1.98-3.43a.5.5 0 0 0-.61-.22l-2.47 1a7.26 7.26 0 0 0-1.7-.98l-.38-2.63A.5.5 0 0 0 14.02 2h-4.04a.5.5 0 0 0-.49.42L9.11 5.1a7.26 7.26 0 0 0-1.7.98l-2.47-1a.5.5 0 0 0-.61.22L2.35 8.74a.5.5 0 0 0 .12.64l2.1 1.64c-.05.32-.07.65-.07.98s.02.66.07.98l-2.1 1.64a.5.5 0 0 0-.12.64l1.98 3.43a.5.5 0 0 0 .61.22l2.47-1c.52.4 1.09.73 1.7.98l.38 2.63a.5.5 0 0 0 .49.42h4.04a.5.5 0 0 0 .49-.42l.38-2.63c.61-.25 1.18-.58 1.7-.98l2.47 1a.5.5 0 0 0 .61-.22l1.98-3.43a.5.5 0 0 0-.12-.64l-2.1-1.64ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/></svg></span>
+                    <div>
+                      <div class="detail-label" data-i18n="appPreferences">App-voorkeuren</div>
+                      <p>Valuta en app-voorkeuren voor nieuwe gegevens.</p>
+                    </div>
+                  </div>
 
-                <label class="settings-switch-row" for="settingsNotificationsEnabled">
-                  <span>
-                    <strong>Meldingen inschakelen</strong>
-                    <small>Voorbereid voor afspraakherinneringen in de app.</small>
-                  </span>
-                  <input id="settingsNotificationsEnabled" type="checkbox" />
-                </label>
 
-                <div id="settingsReminderWrap">
-                  <label class="field-label" for="settingsReminderMinutes">Herinnering vóór afspraak</label>
-                  <select id="settingsReminderMinutes" class="field">
-                    <option value="5">5 minuten</option>
-                    <option value="10">10 minuten</option>
-                    <option value="15">15 minuten</option>
-                    <option value="30">30 minuten</option>
-                    <option value="60">1 uur</option>
-                    <option value="1440">24 uur</option>
-                  </select>
+                  <label class="field-label" for="settingsCurrency" data-i18n="currency">Valuta</label>
+                  <select id="settingsCurrency" class="field"></select>
+                  <p class="settings-info-text" data-i18n="currencyChangeWarning">Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.</p>
+
+                  <label class="field-label" for="settingsAgendaFabMenuEnabled" data-i18n="enableAgendaFabMenu">Tab-menu activeren</label>
+                  <label class="settings-switch-row" for="settingsAgendaFabMenuEnabled">
+                    <span>
+                      <small data-i18n="enableAgendaFabMenuHint">Toon rond de + knop snelle knoppen voor afspraak, kost, taak, klant, dienst en betaalwijze.</small>
+                    </span>
+                    <input id="settingsAgendaFabMenuEnabled" type="checkbox" />
+                  </label>
+                </section>
+
+                <section class="settings-section-card">
+                  <div class="settings-section-head">
+                    <span class="settings-section-icon" aria-hidden="true"><svg class="settings-svg-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="M2.39.08c-.14.001-.25.114-.255.254v.527h-.63c-.5 0-.906.407-.906.906V6.32c0 .498.407.904.906.904h4.63c.498 0 .906-.406.906-.904V1.767c0-.498-.408-.906-.906-.906h-.596V.336A.254.254 0 0 0 5.283.082a.254.254 0 0 0-.254.254v.525H2.644V.336A.254.254 0 0 0 2.39.082ZM1.504 1.207h.63v.252a.254.254 0 1 0 .51 0v-.252h2.385v.252a.254.254 0 1 0 .51 0v-.252h.595c.313 0 .561.247.561.56v.205H.944v-.205c0-.313.247-.56.56-.56Zm-.56 1.221h5.751v3.893c0 .313-.248.558-.561.558h-4.63c-.313 0-.56-.245-.56-.558Z"/><path d="M5.04 3.06a.33.33 0 0 0-.26.13L3.44 5.03l-.53-.55a.328.328 0 0 0-.463.457l1.07 1.11 1.792-2.47a.328.328 0 0 0-.273-.518Z"/></svg></span>
+                    <div>
+                      <div class="detail-label">Planning</div>
+                      <p>Standaardgedrag bij het maken en controleren van afspraken.</p>
+                    </div>
+                  </div>
+
+                  <label class="field-label" for="settingsDefaultBreakMinutes">Standaard pauze tussen 2 afspraken (min)</label>
+                  <input id="settingsDefaultBreakMinutes" class="field" type="number" min="0" step="1" />
+
+                  <label class="settings-switch-row" for="settingsOverlapWarningsEnabled">
+                    <span>
+                      <strong>Overlapwaarschuwingen</strong>
+                      <small>Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.</small>
+                    </span>
+                    <input id="settingsOverlapWarningsEnabled" type="checkbox" />
+                  </label>
+                </section>
+
+                <section class="settings-section-card">
+                  <div class="settings-section-head">
+                    <span class="settings-section-icon" aria-hidden="true"><svg class="settings-svg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 22a2.4 2.4 0 0 0 2.35-1.9h-4.7A2.4 2.4 0 0 0 12 22Zm7.2-5.35-1.35-1.8V10a5.86 5.86 0 0 0-4.45-5.7V3a1.4 1.4 0 1 0-2.8 0v1.3A5.86 5.86 0 0 0 6.15 10v4.85l-1.35 1.8A1.25 1.25 0 0 0 5.8 18.65h12.4a1.25 1.25 0 0 0 1-2Z"/></svg></span>
+                    <div>
+                      <div class="detail-label">Meldingen</div>
+                      <p>Voorbereid voor afspraakherinneringen in de app.</p>
+                    </div>
+                  </div>
+
+                  <label class="settings-switch-row" for="settingsNotificationsEnabled">
+                    <span>
+                      <strong>Meldingen inschakelen</strong>
+                      <small>Voorbereid voor afspraakherinneringen in de app.</small>
+                    </span>
+                    <input id="settingsNotificationsEnabled" type="checkbox" />
+                  </label>
+
+                  <div id="settingsReminderWrap">
+                    <label class="field-label" for="settingsReminderMinutes">Herinnering vóór afspraak</label>
+                    <select id="settingsReminderMinutes" class="field">
+                      <option value="5">5 minuten</option>
+                      <option value="10">10 minuten</option>
+                      <option value="15">15 minuten</option>
+                      <option value="30">30 minuten</option>
+                      <option value="60">1 uur</option>
+                      <option value="1440">24 uur</option>
+                    </select>
+                  </div>
+                </section>
+
+                <section class="settings-section-card">
+                  <div class="settings-section-head">
+                    <span class="settings-section-icon settings-section-icon-qr" aria-hidden="true"><svg class="settings-svg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 3h8v8H3V3Zm2 2v4h4V5H5Zm8-2h8v8h-8V3Zm2 2v4h4V5h-4ZM3 13h8v8H3v-8Zm2 2v4h4v-4H5Zm10-2h2v2h-2v-2Zm4 0h2v4h-4v-2h2v-2Zm-6 4h2v4h-2v-4Zm4 2h2v2h-2v-2Zm2-2h2v2h-2v-2Z"/></svg></span>
+                    <div>
+                      <div class="detail-label">Betaalgegevens QR-code</div>
+                      <p>Gegevens voor SEPA/bank-QR-codes bij betalingen.</p>
+                    </div>
+                  </div>
+
+                  <label class="field-label" for="settingsPaymentBeneficiaryName">Naam begunstigde</label>
+                  <input id="settingsPaymentBeneficiaryName" class="field" type="text" autocomplete="organization" placeholder="Bijv. Salonnaam" />
+
+                  <label class="field-label" for="settingsPaymentAccountNumber">Rekeningnummer</label>
+                  <textarea id="settingsPaymentAccountNumber" class="field settings-account-number-field" rows="1" inputmode="text" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" data-form-type="other" data-lpignore="true" data-1p-ignore="true" placeholder="BE.. .... .... ...."></textarea>
+
+
+                  <label class="field-label" for="settingsPaymentReferencePrefix">Mededeling</label>
+                  <input id="settingsPaymentReferencePrefix" class="field" type="text" autocomplete="off" inputmode="text" maxlength="140" pattern="[A-Za-z0-9 /\-?:().,'+]*" title="Gebruik alleen letters, cijfers, spaties en deze tekens: / - ? : ( ) . , ' +" placeholder="" />
+
+                  <p class="settings-info-text">Deze gegevens worden gebruikt om een SEPA/bank-QR-code te maken. Klanten scannen de QR met hun bankapp.</p>
+                </section>
+
+                <section class="settings-section-card settings-section-card-wide">
+                  <div class="settings-section-head">
+                    <span class="settings-section-icon" aria-hidden="true"><svg class="settings-svg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 22 6.5v12A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-12A2.5 2.5 0 0 1 4.5 4H6V3a1 1 0 0 1 1-1ZM4 9v9.5c0 .28.22.5.5.5h15a.5.5 0 0 0 .5-.5V9H4Zm11.2 2.6a1 1 0 0 1 1.4 1.43l-4.5 4.4a1 1 0 0 1-1.4 0l-2.25-2.2a1 1 0 1 1 1.4-1.43l1.55 1.52 3.8-3.72Z"/></svg></span>
+                    <div>
+                      <div class="detail-label">Google kalender</div>
+                      <p>Synchroniseer NailBooker-afspraken via een persoonlijke kalenderlink.</p>
+                    </div>
+                  </div>
+
+                  <p class="settings-info-text">Maak een persoonlijke kalenderlink en voeg die één keer toe in Google Calendar via <strong>Andere agenda’s → Via URL</strong>. Google haalt daarna automatisch de actuele NailBooker-afspraken op.</p>
+
+                  <label class="field-label" for="calendarFeedUrl">Persoonlijke kalenderlink</label>
+                  <div class="calendar-feed-row">
+                    <input id="calendarFeedUrl" class="field calendar-feed-url-field" type="text" readonly placeholder="Maak eerst een kalenderlink" />
+                    <button id="copyCalendarFeedUrlBtn" class="btn btn-secondary action-btn" type="button">Maak/kopieer link</button>
+                  </div>
+
+                  <div class="calendar-feed-actions">
+                    <button id="openGoogleCalendarSubscribeBtn" class="btn btn-secondary action-btn" type="button">Open Google Calendar</button>
+                    <button id="regenerateCalendarFeedUrlBtn" class="text-link-btn calendar-feed-reset-btn" type="button">Nieuwe link maken</button>
+                  </div>
+
+                  <p id="calendarFeedStatus" class="settings-info-text">Maak eerst een persoonlijke kalenderlink. Daarna kun je die één keer toevoegen in Google Calendar.</p>
+                  <p class="settings-info-text">Let op: Google Calendar ververst externe kalenderlinks niet onmiddellijk. Wijzigingen verschijnen meestal later automatisch.</p>
+                </section>
+              </div>
+
+              <section class="settings-section-card settings-section-card-wide settings-deleted-appointments-card">
+                <div class="settings-section-head">
+                  <span class="settings-section-icon" aria-hidden="true"><svg class="settings-svg-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 3h6l1 2h4v2H4V5h4l1-2Zm-3 6h12l-.8 11.1A2 2 0 0 1 15.2 22H8.8a2 2 0 0 1-2-1.9L6 9Zm4 2v8h2v-8h-2Zm4 0v8h2v-8h-2Z"/></svg></span>
+                  <div>
+                    <div class="detail-label">Verwijderde afspraken</div>
+                    <p>Bekijk en herstel afspraken die uit de agenda, omzet en statistieken verborgen zijn.</p>
+                  </div>
                 </div>
-              </div>
+                <button id="openDeletedAppointmentsBtn" class="btn btn-secondary action-btn" type="button">Verwijderde afspraken openen</button>
+              </section>
 
-
-              <div class="settings-group">
-                <div class="detail-label" data-i18n="appPreferences">App-voorkeuren</div>
-
-                <label class="field-label" for="settingsLanguage" data-i18n="language">Taal</label>
-                <select id="settingsLanguage" class="field"></select>
-
-                <label class="field-label" for="settingsCurrency" data-i18n="currency">Valuta</label>
-                <select id="settingsCurrency" class="field"></select>
-                <p class="settings-info-text" data-i18n="currencyChangeWarning">Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.</p>
-              </div>
-
-              <div class="settings-group">
-                <div class="detail-label">Betaalgegevens QR-code</div>
-
-                <label class="field-label" for="settingsPaymentBeneficiaryName">Naam begunstigde</label>
-                <input id="settingsPaymentBeneficiaryName" class="field" type="text" autocomplete="organization" placeholder="Bijv. Salonnaam" />
-
-                <label class="field-label" for="settingsPaymentIban">IBAN</label>
-                <input id="settingsPaymentIban" class="field" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="BE00 0000 0000 0000" />
-
-                <label class="field-label" for="settingsPaymentBic">BIC <span class="optional-label">optioneel</span></label>
-                <input id="settingsPaymentBic" class="field" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" placeholder="Bijv. GEBABEBB" />
-
-                <label class="field-label" for="settingsPaymentReferencePrefix">Mededeling/prefix</label>
-                <input id="settingsPaymentReferencePrefix" class="field" type="text" autocomplete="off" placeholder="Idle & Ease" />
-
-                <p class="settings-info-text">Deze gegevens worden gebruikt om een SEPA/bank-QR-code te maken. Klanten scannen de QR met hun bankapp.</p>
-              </div>
-              <div class="settings-actions">
+              <div class="settings-actions settings-actions-sticky">
                 <span id="settingsSaveHint" class="settings-save-hint">Instellingen worden per gebruiker bewaard.</span>
-                <button class="btn btn-primary action-btn" type="submit" data-i18n="saveSettings">Instellingen opslaan</button>
+                <button id="settingsSaveBtn" class="btn btn-primary action-btn" type="button" data-i18n="saveSettings">Instellingen opslaan</button>
               </div>
             </form>
           </div>
         </section>
       </section>
 
-      <!-- ===================== KLANTDETAIL ================= -->
+      <!-- ===================== SUPPORT ======================= -->
+      <section id="supportScreen" class="screen">
+        <section class="support-page">
+          <div class="support-scroll">
+            <section class="support-hero">
+              <div class="support-hero-icon" aria-hidden="true">?</div>
+              <div>
+                <p class="support-kicker">NailBooker support</p>
+                <h2>Waarmee kunnen we helpen?</h2>
+                <p>Vind snel hulp, meld een probleem of stuur technische info mee zodat ondersteuning eenvoudiger wordt.</p>
+              </div>
+            </section>
+
+            <section class="support-grid">
+              <article class="support-card">
+                <h3>Snelle hulp</h3>
+                <details class="support-faq-item" open>
+                  <summary>Een afspraak inboeken</summary>
+                  <div class="support-answer">
+                    <p>Voor je een afspraak kunt plannen, moeten er minstens één dienst en één klant bestaan.</p>
+                    <ol class="support-steps">
+                      <li>
+                        <strong>Voeg minstens één dienst toe</strong>
+                        <span>Ga naar <em>Diensten</em>, tik op de plusknop en vul naam, duurtijd en prijs in.</span>
+                      </li>
+                      <li>
+                        <strong>Voeg minstens één klant toe</strong>
+                        <span>Ga naar <em>Klanten</em>, tik op de plusknop en bewaar de klantgegevens.</span>
+                      </li>
+                      <li>
+                        <strong>Plan de afspraak in de agenda</strong>
+                        <span>Ga naar <em>Agenda</em>, tik op <em>+</em>, kies klant, dienst, datum, uur, status en betaalwijze en bewaar de afspraak.</span>
+                      </li>
+                    </ol>
+                  </div>
+                </details>
+                <details class="support-faq-item">
+                  <summary>Omzet filteren op dag, week, maand of jaar</summary>
+                  <div class="support-answer">
+                    <ol class="support-steps">
+                      <li>
+                        <strong>Open de pagina Omzet</strong>
+                        <span>Gebruik het menu onderaan om naar <em>Omzet</em> te gaan.</span>
+                      </li>
+                      <li>
+                        <strong>Kies de periode</strong>
+                        <span>Tik bovenaan op <em>Dag</em>, <em>Week</em>, <em>Maand</em> of <em>Jaar</em>.</span>
+                      </li>
+                      <li>
+                        <strong>Wijzig de datum of periode</strong>
+                        <span>Gebruik de pijltjes of datumkeuze om de gewenste periode te bekijken.</span>
+                      </li>
+                    </ol>
+                  </div>
+                </details>
+                <details class="support-faq-item">
+                  <summary>Klanten of diensten aanpassen</summary>
+                  <div class="support-answer">
+                    <ol class="support-steps">
+                      <li>
+                        <strong>Open Klanten of Diensten</strong>
+                        <span>Kies de juiste pagina via het menu.</span>
+                      </li>
+                      <li>
+                        <strong>Tik op het item dat je wilt wijzigen</strong>
+                        <span>Pas de gegevens aan en bewaar je wijziging.</span>
+                      </li>
+                      <li>
+                        <strong>Deactiveer in plaats van verwijderen</strong>
+                        <span>Bij diensten is deactiveren vaak veiliger, omdat oude afspraken zo correct bewaard blijven.</span>
+                      </li>
+                    </ol>
+                  </div>
+                </details>
+                <details class="support-faq-item">
+                  <summary>Bevestigingsmail of herinnering controleren</summary>
+                  <div class="support-answer">
+                    <ol class="support-steps">
+                      <li>
+                        <strong>Controleer het e-mailadres van de klant</strong>
+                        <span>Open de klant en kijk na of het e-mailadres correct ingevuld is.</span>
+                      </li>
+                      <li>
+                        <strong>Controleer de afspraak</strong>
+                        <span>Open de afspraak en kijk na of datum, uur, dienst en klant correct zijn.</span>
+                      </li>
+                      <li>
+                        <strong>Kijk ook in spam of ongewenste mail</strong>
+                        <span>Bij nieuwe verzendadressen kan een mail soms eerst in de spamfolder terechtkomen.</span>
+                      </li>
+                    </ol>
+                  </div>
+                </details>
+                <details class="support-faq-item">
+                  <summary>Waarom zie ik soms oude gegevens?</summary>
+                  <div class="support-answer">
+                    <p>Bij GitHub Pages of browsercache kan soms nog een oude versie van de app geladen worden.</p>
+                    <ol class="support-steps">
+                      <li>
+                        <strong>Vernieuw hard</strong>
+                        <span>Gebruik Ctrl+F5 op desktop of herlaad de pagina volledig op mobiel.</span>
+                      </li>
+                      <li>
+                        <strong>Test in een privévenster</strong>
+                        <span>Zo controleer je snel of het probleem door cache komt.</span>
+                      </li>
+                      <li>
+                        <strong>Wis browsergegevens indien nodig</strong>
+                        <span>Als het probleem blijft terugkomen, wis dan de cache van de browser.</span>
+                      </li>
+                    </ol>
+                  </div>
+                </details>
+              </article>
+
+              <article class="support-card support-card-wide">
+                <h3>Probleem melden</h3>
+                <p>Beschrijf kort wat er fout loopt. De technische info helpt om sneller te achterhalen wat er gebeurt.</p>
+                <form id="supportForm" class="support-form">
+                  <label class="field-label" for="supportSubject">Onderwerp</label>
+                  <input id="supportSubject" class="field" type="text" placeholder="Bijvoorbeeld: afspraak wordt niet opgeslagen" />
+
+                  <label class="field-label" for="supportMessage">Beschrijving</label>
+                  <textarea id="supportMessage" class="field support-textarea" rows="6" placeholder="Wat deed je? Wat verwachtte je? Wat gebeurde er?" required></textarea>
+
+                  <label class="support-diagnostics-row">
+                    <input id="supportIncludeDiagnostics" type="checkbox" checked />
+                    <span>Technische info meesturen</span>
+                  </label>
+
+                  <div class="support-actions">
+                    <button class="btn btn-primary action-btn" type="submit">Verzend supportmail</button>
+                    <button id="supportCopyDiagnosticsBtn" class="btn btn-secondary action-btn" type="button">Kopieer technische info</button>
+                  </div>
+                </form>
+              </article>
+
+              <article class="support-card">
+                <h3>Contact</h3>
+                <p>Je kunt support bereiken via:</p>
+                <p><strong>support@nailbooker.be</strong></p>
+                <p class="support-muted">Later kan dit formulier rechtstreeks als ticket in de Admin-pagina worden opgeslagen.</p>
+              </article>
+
+              <article class="support-card">
+                <h3>Over NailBooker</h3>
+                <div class="support-info-table">
+                  <div><span>Versie</span><strong id="supportAppVersion">1.0.0</strong></div>
+                  <div><span>Browser</span><strong id="supportBrowserInfo">-</strong></div>
+                  <div><span>Gebruiker</span><strong id="supportUserInfo">-</strong></div>
+                </div>
+              </article>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      <!-- ===================== ADMIN ======================= -->
+      <section id="adminScreen" class="screen">
+        <section class="admin-page-shell">
+          <section class="admin-overview-card">
+            <div class="admin-section-headline">
+              <div>
+                <h2>Dashboard</h2>
+                <p>Gebruikers, salons, abonnementen en accountstatus.</p>
+              </div>
+              <button id="adminRefreshBtn" class="btn btn-secondary small" type="button">Vernieuwen</button>
+            </div>
+
+            <div class="admin-stats-grid">
+              <article class="admin-stat-card"><span>Totaal gebruikers</span><strong id="adminTotalUsers">0</strong></article>
+              <article class="admin-stat-card"><span>Account actief</span><strong id="adminActiveUsers">0</strong></article>
+              <article class="admin-stat-card"><span>Geblokkeerd</span><strong id="adminBlockedUsers">0</strong></article>
+              <article class="admin-stat-card"><span>Abonnement actief</span><strong id="adminActiveSubscriptions">0</strong></article>
+            </div>
+          </section>
+
+          <section class="admin-overview-card">
+            <div class="admin-section-headline admin-section-headline-compact">
+              <div>
+                <h2>Accounts</h2>
+                <p>Blokkeren behoudt gegevens. Verwijderen wist alles definitief.</p>
+              </div>
+            </div>
+
+            <div class="admin-toolbar">
+              <input id="adminSearch" class="field" type="search" placeholder="Zoek op naam, e-mail, salon of locatie..." />
+              <select id="adminStatusFilter" class="field">
+                <option value="all">Alle accounts</option>
+                <option value="active">Actief</option>
+                <option value="blocked">Geblokkeerd</option>
+              </select>
+            </div>
+
+            <div id="adminUsersList" class="admin-users-list">
+              <div class="admin-empty-state">Open deze pagina met een admin-account om gebruikers te laden.</div>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <!-- ===================== ABONNEMENT ===================== -->
+      <section id="subscriptionScreen" class="screen">
+        <section class="subscription-page">
+          <div class="subscription-scroll">
+            <section class="subscription-hero">
+              <p class="support-kicker">Abonnement</p>
+              <h2 id="subscriptionHeroTitle">Upgrade naar NailBooker Pro</h2>
+              <p id="subscriptionHeroText">Je proefperiode is 30 dagen geldig. Met Pro behoud je volledige toegang tot alle functies.</p>
+            </section>
+
+            <section class="subscription-card subscription-current-card">
+              <h3>Huidig abonnement</h3>
+              <p id="subscriptionStatusText">Free proefperiode</p>
+              <strong id="subscriptionDaysText">Nog 30 dagen geldig</strong>
+              <button id="subscriptionCancelBtn" class="btn btn-secondary full-btn subscription-cancel-btn hidden" type="button">Abonnement opzeggen</button>
+            </section>
+
+            <section class="subscription-card subscription-pro-card">
+              <div class="subscription-plan-head">
+                <div>
+                  <h3>Pro</h3>
+                  <p>Voor zelfstandige nagelstylistes die NailBooker dagelijks gebruiken.</p>
+                </div>
+                <div class="subscription-price">€ 8,95<span>/maand</span></div>
+              </div>
+              <ul class="subscription-feature-list">
+                <li>Volledige agenda en klantenbeheer</li>
+                <li>Omzet, kosten en statistieken</li>
+                <li>Herinneringen en app-updates</li>
+              </ul>
+              <p id="subscriptionPaymentProviderText" class="settings-info-text">Betalingen worden binnenkort veilig verwerkt via Mollie.</p>
+              <button id="subscriptionUpgradeBtn" class="btn btn-primary action-btn full-btn" type="button" disabled>PRO activeren via Mollie – binnenkort</button>
+            </section>
+          </div>
+        </section>
+      </section>
+
       <section id="clientDetailScreen" class="screen">
         <section class="detail-panel">
           <div id="clientDetailContent" class="scroll-list"></div>
@@ -447,6 +836,12 @@
                       Nog geen account? Registreer hier
                     </button>
                   </div>
+
+                  <nav class="account-legal-links" aria-label="Juridische documenten">
+                    <a href="terms.html">Gebruiksvoorwaarden</a>
+                    <a href="privacy.html">Privacybeleid</a>
+                    <a href="cookies.html">Cookiebeleid</a>
+                  </nav>
                 </div>
               </div>
             </section>
@@ -500,10 +895,20 @@
 					Wachtwoord wijzigen
 				  </button>
 
+				  <button id="openSubscriptionBtn" class="btn btn-secondary action-btn full-btn" type="button" data-i18n="subscription">
+					Abonnement
+				  </button>
+
 				  <button id="logoutBtn" class="btn btn-danger action-btn full-btn" type="button" data-i18n="logout">
 					Uitloggen
 				  </button>
 				</div>
+
+                <nav class="account-legal-links" aria-label="Juridische documenten">
+                  <a href="terms.html">Gebruiksvoorwaarden</a>
+                  <a href="privacy.html">Privacybeleid</a>
+                  <a href="cookies.html">Cookiebeleid</a>
+                </nav>
 
 			  </div>
 			</section>
@@ -538,31 +943,6 @@
       </svg>
 		</span>
 		<span data-i18n="revenue">Omzet</span>
-	  </button>
-
-
-	  <button class="nav-btn" data-screen="todoScreen" data-title="To Do" type="button">
-		<span class="nav-ico">
-		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-todo" aria-hidden="true" focusable="false">
-			<g>
-			  <path
-       style="stroke-width:0.0710759"
-       d="M 1.6247915,7.0725217 C 1.4804859,7.0381223 1.3502631,6.9390025 1.2801002,6.8101514 1.2458306,6.7472182 1.2444177,6.6514452 1.2396366,4.068107 1.2362761,2.2576114 1.2410114,1.3677498 1.2542548,1.3185916 1.2834607,1.2101449 1.3833473,1.0916357 1.4991368,1.0280671 L 1.601898,0.9716487 2.095543,0.9658437 2.589188,0.9600387 V 0.8953565 c 0,-0.0396082 0.01458,-0.0792607 0.03761,-0.10229165 0.03351,-0.0335135 0.0627,-0.0376148 0.267978,-0.0376377 0.280107,-3.589e-5 0.338394,-0.0220037 0.409814,-0.154446 0.0985,-0.18267124 0.222751,-0.26562009 0.395652,-0.26414299 0.171004,0.001451 0.289975,0.0793638 0.37937,0.24841275 0.07688,0.14538866 0.110955,0.15946996 0.411825,0.17020527 0.293792,0.0104863 0.3168,0.0209879 0.3168,0.1446356 v 0.0622229 h 0.457322 c 0.509335,0 0.591779,0.0131365 0.71334,0.11367682 0.0388,0.032085 0.0938,0.097915 0.122235,0.1462831 l 0.0517,0.087942 v 2.7079933 c 0,2.640702 -9.17e-4,2.709817 -0.03642,2.7813982 -0.04944,0.099652 -0.149373,0.1958727 -0.253383,0.2439807 -0.08616,0.039853 -0.08976,0.039921 -2.126704,0.042938 -1.158581,0.00168 -2.0711395,-0.00428 -2.1115298,-0.013939 z M 5.804955,6.8171565 c 0.02906,-0.017169 0.07056,-0.06275 0.09223,-0.1012896 l 0.03939,-0.070074 V 4.0246915 c 0,-2.5003068 -0.0016,-2.6241218 -0.0343,-2.6866273 C 5.880965,1.2973482 5.836725,1.2565142 5.785457,1.2302255 5.706707,1.1898455 5.682522,1.1879135 5.255592,1.1879135 H 4.808245 v 0.056418 c 0,0.031344 -0.01672,0.073129 -0.03761,0.094028 -0.03671,0.036706 -0.06269,0.037607 -1.08025,0.037607 h -1.04264 l -0.02927,-0.041793 c -0.0161,-0.022989 -0.02928,-0.065301 -0.02928,-0.094028 V 1.1879125 H 2.141848 c -0.42693,0 -0.451114,0.00191 -0.5298649,0.042312 -0.051271,0.026288 -0.095506,0.067126 -0.1168174,0.1078387 -0.032719,0.062505 -0.0343,0.1862311 -0.0343,2.683848 0,2.8926044 -0.00845,2.6939929 0.1185259,2.784147 l 0.059596,0.042312 H 3.695554 c 1.882363,0 2.061043,-0.00267 2.109411,-0.031215 z M 2.229247,5.4851827 C 2.034481,5.2938291 2.006472,5.2372572 2.073377,5.1703525 c 0.05515,-0.05515 0.107964,-0.034208 0.233726,0.092684 0.06663,0.067233 0.129515,0.1222355 0.139739,0.1222355 0.01023,0 0.146484,-0.1269371 0.302799,-0.2820827 0.156315,-0.1551456 0.29652,-0.282082 0.311567,-0.282082 0.05297,0 0.110948,0.057411 0.110948,0.1098642 0,0.041548 -0.06557,0.1165356 -0.344355,0.3938495 -0.194789,0.1937579 -0.359292,0.3425338 -0.378745,0.3425338 -0.01891,0 -0.117828,-0.081977 -0.219809,-0.1821721 z M 3.599981,5.3273495 c -0.0383,-0.022309 -0.04505,-0.1292766 -0.01034,-0.1639823 0.03248,-0.032482 1.708911,-0.032482 1.74139,0 0.01241,0.012411 0.02257,0.048804 0.02257,0.080864 0,0.032062 -0.01015,0.068455 -0.02257,0.080864 -0.02939,0.029389 -1.680772,0.031535 -1.731047,0.00229 z M 2.419936,4.5059086 C 2.404426,4.5010986 2.313449,4.4199886 2.217776,4.3256959 2.069567,4.1796244 2.043826,4.1452533 2.043826,4.0934265 c 0,-0.063613 0.03929,-0.099761 0.108407,-0.099761 0.01961,0 0.08995,0.055006 0.156307,0.1222355 0.06635,0.067226 0.127966,0.1222355 0.136909,0.1222355 0.0089,0 0.143546,-0.1269371 0.29912,-0.2820827 C 3.037362,3.6640659 3.077981,3.6386894 3.141033,3.708362 3.210103,3.784684 3.187153,3.819336 2.838358,4.1653189 2.65477,4.347428 2.491867,4.5005336 2.476352,4.505553 c -0.01551,0.00504 -0.0409,0.00519 -0.05642,3.551e-4 z M 3.595608,4.1699584 c -0.04571,-0.045711 -0.03004,-0.1417395 0.02788,-0.1708858 0.06777,-0.034102 1.605942,-0.034094 1.67369,6.9e-6 0.0588,0.029595 0.07256,0.1148339 0.0267,0.1654982 -0.0311,0.034361 -0.06926,0.03595 -0.86512,0.03595 -0.743558,0 -0.835856,-0.00328 -0.863154,-0.030565 z M 2.218862,3.1792417 C 2.076011,3.036391 2.043826,2.9938584 2.043826,2.9479339 c 0,-0.070892 0.03005,-0.1014049 0.09985,-0.1014049 0.04187,0 0.08404,0.028503 0.179592,0.1213656 L 2.448144,3.089261 2.731595,2.8080481 C 3.029325,2.5126692 3.07317,2.4862372 3.141033,2.5612255 3.208133,2.6353705 3.185223,2.6699632 2.837965,3.0186803 2.557067,3.30076 2.495013,3.3542777 2.448836,3.3542777 c -0.04424,0 -0.08902,-0.034079 -0.229974,-0.175036 z M 3.598195,3.0189988 c -0.04442,-0.049086 -0.03929,-0.1270074 0.01067,-0.162001 0.03626,-0.025395 0.149087,-0.029275 0.851467,-0.029275 0.893278,0 0.893261,-2.3e-6 0.893261,0.112833 0,0.1129658 0.0011,0.1128329 -0.903934,0.1128329 -0.770852,0 -0.822221,-0.00206 -0.851466,-0.034392 z M 3.811997,0.77874776 c 0.02044,-0.0259829 0.03716,-0.0676379 0.03716,-0.0925706 0,-0.064728 -0.0797,-0.13765033 -0.150444,-0.13765033 -0.07074,0 -0.150445,0.0729231 -0.150445,0.13765033 0,0.0589082 0.0645,0.1401203 0.11791,0.14847117 0.06599,0.0103183 0.105715,-0.004888 0.145822,-0.055899 z" />
-			</g>
-		  </svg>
-		</span>
-		<span data-i18n="todo">To Do</span>
-	  </button>
-
-	  <button class="nav-btn" data-screen="statisticsScreen" data-title="Statistieken" type="button">
-		<span class="nav-ico">
-		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-statistieken">
-			<g>
-			  <path d="m 3.7695418,1.4464233 7.29e-5,2.384677 2.3845316,-0.007 -2.919e-4,-0.100655 C 6.1501925,2.4660113 5.1275658,1.4465693 3.8701238,1.4465693 Z m 0.2012377,0.211442 c 1.0670389,0.05176 1.9166733,0.898832 1.9714878,1.965729 l -1.971342,0.0058 z m -0.6621674,0.173249 a 2.1830753,2.1830753 0 0 0 -2.0085139,1.499188 2.1830753,2.1830753 0 0 0 0.7245576,2.399327 2.1830753,2.1830753 0 0 0 2.5025338,0.137026 L 3.3736263,4.0132423 Z m 0.6154476,2.350057 1.1438696,1.859389 a 2.1830753,2.1830753 0 0 0 1.038987,-1.828267 z" id="path-statistieken" />
-			</g>
-		  </svg>
-		</span>
-		<span data-i18n="statistics">Statistieken</span>
 	  </button>
 	  
 
@@ -599,6 +979,41 @@
 		<span data-i18n="paymentMethods">Betaalwijze</span>
 	  </button>
 
+
+	  <button class="nav-btn" data-screen="costsScreen" data-title="Kosten" type="button">
+		<span class="nav-ico">
+		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-kosten" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <path d="m 1.4382433,6.4980677 c -0.07321,-0.036566 -0.1626,-0.1286166 -0.198635,-0.2045558 l -0.06552,-0.1380716 0.236153,-1.7738516 0.236152,-1.7738515 0.08227,-0.073279 c 0.05974,-0.053211 0.154006,-0.073279 0.344215,-0.073279 h 0.261941 l 0.01975,-0.4101711 c -0.017718,-0.2429813 0.018258,-0.407626 0.135712,-0.6080452 0.113571,-0.193796 0.380343,-0.4427997 0.546645,-0.51023649 0.063709,-0.0258351 0.2447045,-0.0366429 1.4237003,-0.0562941 l 0.167494,0.0739511 c 0.339758,0.15000819 0.578871,0.48541599 0.663492,0.93069339 l 0.04658,0.245114 h 0.198314 0.198313 l 0.04276,0.079888 c 0.02351,0.043938 0.148926,0.8659984 0.278691,1.8268001 l 0.235936,1.7469124 -0.04794,0.1599929 c -0.0596,0.1989342 -0.258594,0.402092 -0.50603,0.5166245 l -0.188901,0.08744 -1.9889923,0.01035 -1.988992,0.01035 z m 3.9133533,-0.207835 c 0.11253,-0.078818 -0.11906,-2.3965283 -0.350179,-3.5045331 l -0.02402,-0.1151521 h -0.226977 -0.226978 v 0.1294842 c 0,0.071216 0.03769,0.1773946 0.08375,0.2359514 0.15685,0.1994025 0.05577,0.4301614 -0.1884303,0.4301614 -0.244198,0 -0.345281,-0.2307589 -0.188431,-0.4301614 0.04606,-0.058557 0.08375,-0.1651098 0.08375,-0.2367842 v -0.130317 l -0.889812,0.011302 -0.889813,0.011302 -0.01413,0.099917 c -0.0078,0.055092 0.02509,0.1529544 0.07328,0.2181404 0.164454,0.2224358 0.069,0.456603 -0.186134,0.456603 -0.242509,0 -0.332928,-0.2817124 -0.152173,-0.4741169 0.0499,-0.053115 0.09073,-0.1471773 0.09073,-0.2090266 V 2.6705493 h -0.251241 c -0.138183,0 -0.251242,0.014647 -0.251242,0.03255 0,0.017902 -0.03855,0.3052593 -0.08567,0.6385713 -0.138172,0.9773765 -0.374279,2.7372331 -0.37462,2.792282 -1.74e-4,0.027891 0.04093,0.089131 0.09133,0.136089 l 0.09164,0.085378 h 1.846158 1.8461593 z m 0.474943,-0.1205428 c 0.08254,-0.056089 0.175098,-0.1623844 0.205678,-0.2362113 l 0.0556,-0.1342309 -0.0524,-0.4232966 C 5.9764076,4.8991825 5.6682546,2.6809654 5.6319586,2.4716482 l -0.0236,-0.1360889 h -0.434283 c -0.309775,0 -0.43952,-0.015006 -0.452543,-0.052342 -0.03832,-0.1098608 0.02301,-0.1570256 0.204189,-0.1570256 h 0.183951 V 2.0080304 c 0,-0.46604 -0.432032,-0.9286767 -0.8672433,-0.9286767 h -0.145166 l 0.110408,0.131212 c 0.2210233,0.2626716 0.2882463,0.4513431 0.3075813,0.8632841 l 0.01818,0.38733 h 0.260693 c 0.372687,0 0.373383,0.00133 0.501883,0.9630912 0.06,0.4490934 0.166662,1.2297157 0.237019,1.7347158 0.07036,0.5050002 0.119556,0.961945 0.109331,1.0154328 -0.02335,0.122144 -0.0017,0.1215884 0.184181,-0.00473 z M 4.3140753,2.3993821 v -0.061798 l -0.701381,-0.01148 -0.701381,-0.01148 v -0.083747 c 0,-0.054968 0.03238,-0.088345 0.09421,-0.097128 l 0.09422,-0.013381 V 2.0052594 c 0,-0.2065309 0.121995,-0.5322531 0.273824,-0.7310971 l 0.148747,-0.1948081 h -0.136607 c -0.505996,0 -0.869286,0.4727243 -0.87154,1.1340745 -8.86e-4,0.2607823 -0.04967,0.2477516 0.927543,0.2477516 h 0.872365 z m 0,-0.4411408 c 0,-0.2869324 -0.322089,-0.7951405 -0.503939,-0.7951405 -0.171748,0 -0.501025,0.5552933 -0.501025,0.8449296 v 0.1181614 h 0.502482 0.502482 z" />
+          </svg>
+		</span>
+		<span data-i18n="costs">Kosten</span>
+	  </button>
+
+
+	  <button class="nav-btn" data-screen="todoScreen" data-title="To Do" type="button">
+		<span class="nav-ico">
+		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-todo" aria-hidden="true" focusable="false">
+			<g>
+			  <path
+       style="stroke-width:0.0710759"
+       d="M 1.6247915,7.0725217 C 1.4804859,7.0381223 1.3502631,6.9390025 1.2801002,6.8101514 1.2458306,6.7472182 1.2444177,6.6514452 1.2396366,4.068107 1.2362761,2.2576114 1.2410114,1.3677498 1.2542548,1.3185916 1.2834607,1.2101449 1.3833473,1.0916357 1.4991368,1.0280671 L 1.601898,0.9716487 2.095543,0.9658437 2.589188,0.9600387 V 0.8953565 c 0,-0.0396082 0.01458,-0.0792607 0.03761,-0.10229165 0.03351,-0.0335135 0.0627,-0.0376148 0.267978,-0.0376377 0.280107,-3.589e-5 0.338394,-0.0220037 0.409814,-0.154446 0.0985,-0.18267124 0.222751,-0.26562009 0.395652,-0.26414299 0.171004,0.001451 0.289975,0.0793638 0.37937,0.24841275 0.07688,0.14538866 0.110955,0.15946996 0.411825,0.17020527 0.293792,0.0104863 0.3168,0.0209879 0.3168,0.1446356 v 0.0622229 h 0.457322 c 0.509335,0 0.591779,0.0131365 0.71334,0.11367682 0.0388,0.032085 0.0938,0.097915 0.122235,0.1462831 l 0.0517,0.087942 v 2.7079933 c 0,2.640702 -9.17e-4,2.709817 -0.03642,2.7813982 -0.04944,0.099652 -0.149373,0.1958727 -0.253383,0.2439807 -0.08616,0.039853 -0.08976,0.039921 -2.126704,0.042938 -1.158581,0.00168 -2.0711395,-0.00428 -2.1115298,-0.013939 z M 5.804955,6.8171565 c 0.02906,-0.017169 0.07056,-0.06275 0.09223,-0.1012896 l 0.03939,-0.070074 V 4.0246915 c 0,-2.5003068 -0.0016,-2.6241218 -0.0343,-2.6866273 C 5.880965,1.2973482 5.836725,1.2565142 5.785457,1.2302255 5.706707,1.1898455 5.682522,1.1879135 5.255592,1.1879135 H 4.808245 v 0.056418 c 0,0.031344 -0.01672,0.073129 -0.03761,0.094028 -0.03671,0.036706 -0.06269,0.037607 -1.08025,0.037607 h -1.04264 l -0.02927,-0.041793 c -0.0161,-0.022989 -0.02928,-0.065301 -0.02928,-0.094028 V 1.1879125 H 2.141848 c -0.42693,0 -0.451114,0.00191 -0.5298649,0.042312 -0.051271,0.026288 -0.095506,0.067126 -0.1168174,0.1078387 -0.032719,0.062505 -0.0343,0.1862311 -0.0343,2.683848 0,2.8926044 -0.00845,2.6939929 0.1185259,2.784147 l 0.059596,0.042312 H 3.695554 c 1.882363,0 2.061043,-0.00267 2.109411,-0.031215 z M 2.229247,5.4851827 C 2.034481,5.2938291 2.006472,5.2372572 2.073377,5.1703525 c 0.05515,-0.05515 0.107964,-0.034208 0.233726,0.092684 0.06663,0.067233 0.129515,0.1222355 0.139739,0.1222355 0.01023,0 0.146484,-0.1269371 0.302799,-0.2820827 0.156315,-0.1551456 0.29652,-0.282082 0.311567,-0.282082 0.05297,0 0.110948,0.057411 0.110948,0.1098642 0,0.041548 -0.06557,0.1165356 -0.344355,0.3938495 -0.194789,0.1937579 -0.359292,0.3425338 -0.378745,0.3425338 -0.01891,0 -0.117828,-0.081977 -0.219809,-0.1821721 z M 3.599981,5.3273495 c -0.0383,-0.022309 -0.04505,-0.1292766 -0.01034,-0.1639823 0.03248,-0.032482 1.708911,-0.032482 1.74139,0 0.01241,0.012411 0.02257,0.048804 0.02257,0.080864 0,0.032062 -0.01015,0.068455 -0.02257,0.080864 -0.02939,0.029389 -1.680772,0.031535 -1.731047,0.00229 z M 2.419936,4.5059086 C 2.404426,4.5010986 2.313449,4.4199886 2.217776,4.3256959 2.069567,4.1796244 2.043826,4.1452533 2.043826,4.0934265 c 0,-0.063613 0.03929,-0.099761 0.108407,-0.099761 0.01961,0 0.08995,0.055006 0.156307,0.1222355 0.06635,0.067226 0.127966,0.1222355 0.136909,0.1222355 0.0089,0 0.143546,-0.1269371 0.29912,-0.2820827 C 3.037362,3.6640659 3.077981,3.6386894 3.141033,3.708362 3.210103,3.784684 3.187153,3.819336 2.838358,4.1653189 2.65477,4.347428 2.491867,4.5005336 2.476352,4.505553 c -0.01551,0.00504 -0.0409,0.00519 -0.05642,3.551e-4 z M 3.595608,4.1699584 c -0.04571,-0.045711 -0.03004,-0.1417395 0.02788,-0.1708858 0.06777,-0.034102 1.605942,-0.034094 1.67369,6.9e-6 0.0588,0.029595 0.07256,0.1148339 0.0267,0.1654982 -0.0311,0.034361 -0.06926,0.03595 -0.86512,0.03595 -0.743558,0 -0.835856,-0.00328 -0.863154,-0.030565 z M 2.218862,3.1792417 C 2.076011,3.036391 2.043826,2.9938584 2.043826,2.9479339 c 0,-0.070892 0.03005,-0.1014049 0.09985,-0.1014049 0.04187,0 0.08404,0.028503 0.179592,0.1213656 L 2.448144,3.089261 2.731595,2.8080481 C 3.029325,2.5126692 3.07317,2.4862372 3.141033,2.5612255 3.208133,2.6353705 3.185223,2.6699632 2.837965,3.0186803 2.557067,3.30076 2.495013,3.3542777 2.448836,3.3542777 c -0.04424,0 -0.08902,-0.034079 -0.229974,-0.175036 z M 3.598195,3.0189988 c -0.04442,-0.049086 -0.03929,-0.1270074 0.01067,-0.162001 0.03626,-0.025395 0.149087,-0.029275 0.851467,-0.029275 0.893278,0 0.893261,-2.3e-6 0.893261,0.112833 0,0.1129658 0.0011,0.1128329 -0.903934,0.1128329 -0.770852,0 -0.822221,-0.00206 -0.851466,-0.034392 z M 3.811997,0.77874776 c 0.02044,-0.0259829 0.03716,-0.0676379 0.03716,-0.0925706 0,-0.064728 -0.0797,-0.13765033 -0.150444,-0.13765033 -0.07074,0 -0.150445,0.0729231 -0.150445,0.13765033 0,0.0589082 0.0645,0.1401203 0.11791,0.14847117 0.06599,0.0103183 0.105715,-0.004888 0.145822,-0.055899 z" />
+			</g>
+		  </svg>
+		</span>
+		<span data-i18n="todo">To Do</span>
+	  </button>
+
+	  <button class="nav-btn" data-screen="statisticsScreen" data-title="Statistieken" type="button">
+		<span class="nav-ico">
+		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-statistieken">
+			<g>
+			  <path d="m 3.7695418,1.4464233 7.29e-5,2.384677 2.3845316,-0.007 -2.919e-4,-0.100655 C 6.1501925,2.4660113 5.1275658,1.4465693 3.8701238,1.4465693 Z m 0.2012377,0.211442 c 1.0670389,0.05176 1.9166733,0.898832 1.9714878,1.965729 l -1.971342,0.0058 z m -0.6621674,0.173249 a 2.1830753,2.1830753 0 0 0 -2.0085139,1.499188 2.1830753,2.1830753 0 0 0 0.7245576,2.399327 2.1830753,2.1830753 0 0 0 2.5025338,0.137026 L 3.3736263,4.0132423 Z m 0.6154476,2.350057 1.1438696,1.859389 a 2.1830753,2.1830753 0 0 0 1.038987,-1.828267 z" id="path-statistieken" />
+			</g>
+		  </svg>
+		</span>
+		<span data-i18n="statistics">Statistieken</span>
+	  </button>
+
 	  <button class="nav-btn" data-screen="settingsScreen" data-title="Instellingen" type="button">
 		<span class="nav-ico">
 		  <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-instellingen">
@@ -609,6 +1024,15 @@
 		</span>
 		<span data-i18n="settings">Instellingen</span>
 	  </button>
+
+    <button id="adminNavBtn" class="nav-btn admin-nav-btn hidden" data-screen="adminScreen" data-title="Admin" type="button" aria-label="Admin">
+      <span class="nav-ico">
+        <svg viewBox="0 0 7.4083331 7.4083333" version="1.1" id="svg-admin" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <path d="m 3.1356426,7.3667997 c -0.067296,-0.02483 -0.1544836,-0.1016 -0.1859285,-0.163716 -0.014885,-0.02941 -0.046287,-0.171847 -0.071348,-0.323637 -0.024617,-0.149111 -0.048124,-0.287586 -0.052235,-0.307721 -0.00633,-0.03102 -0.023196,-0.04164 -0.11037,-0.06955 -0.056592,-0.01812 -0.1632268,-0.06104 -0.236967,-0.09538 -0.07374,-0.03434 -0.1404502,-0.06244 -0.1482443,-0.06244 -0.0078,0 -0.1226455,0.07747 -0.2552246,0.172152 -0.2688444,0.191999 -0.309341,0.213173 -0.4073229,0.212973 -0.1299022,-2.65e-4 -0.1821873,-0.03934 -0.5563477,-0.415752 -0.36962434,-0.37185 -0.40280254,-0.416607 -0.40338844,-0.544159 -4.531e-4,-0.09821 0.022349,-0.141999 0.2135007,-0.410047 0.094297,-0.13223 0.17144924,-0.246365 0.17144924,-0.253634 0,-0.0073 -0.024949,-0.06722 -0.055446,-0.133229 -0.030496,-0.06601 -0.073323,-0.171248 -0.095171,-0.233867 -0.021849,-0.06262 -0.041092,-0.115773 -0.042755,-0.11812 -0.00168,-0.0024 -0.1370258,-0.02656 -0.3007942,-0.05382 -0.1637688,-0.02725 -0.3166755,-0.05713 -0.3397932,-0.0664 -0.067606,-0.02709 -0.1383337,-0.0982 -0.1741247,-0.175059 -0.032839,-0.07052 -0.033276,-0.07793 -0.033412,-0.5692089 -9.74e-5,-0.3406254 0.00516,-0.5154412 0.016643,-0.5537692 0.022243,-0.074235 0.1118601,-0.1740205 0.181212,-0.20177 0.03067,-0.012274 0.1891767,-0.045129 0.3522297,-0.073015 0.1630536,-0.027886 0.2974987,-0.052293 0.2987677,-0.054241 0.00126,-0.00195 0.02018,-0.054774 0.042029,-0.1173931 0.021849,-0.062619 0.064675,-0.1678591 0.095171,-0.2338671 0.030497,-0.066007 0.055446,-0.1263252 0.055446,-0.1340388 0,-0.00772 -0.077049,-0.1216012 -0.17121924,-0.2530829 -0.1869556,-0.261025 -0.2140445,-0.3117748 -0.2140445,-0.4009952 0,-0.1391258 0.010085,-0.1530687 0.38426574,-0.5312152 0.1928237,-0.1948685 0.3772206,-0.37006702 0.4097703,-0.38933022 0.07938,-0.046976 0.18334,-0.058288 0.2686334,-0.029223 0.03666,0.01249 0.1745568,0.099995 0.3064397,0.1944528 0.1318828,0.094457 0.2461072,0.17174142 0.2538324,0.17174142 0.00773,0 0.067908,-0.025065 0.1337398,-0.055701 0.065832,-0.030633 0.1710637,-0.073462 0.2338473,-0.095171 0.062784,-0.021706 0.116072,-0.040834 0.1184189,-0.042502 0.00237,-0.00168 0.026507,-0.1370258 0.053687,-0.3007941 0.027181,-0.1637684 0.060181,-0.3223585 0.073333,-0.3524218 0.030365,-0.069416 0.1287237,-0.1565285 0.2012789,-0.1782666 0.038329,-0.011485 0.2131438,-0.016738 0.5537691,-0.016643 0.4935184,1.4e-4 0.4983681,4.259e-4 0.5691054,0.03387 0.083247,0.039355 0.1395932,0.094949 0.1699923,0.1677228 0.011927,0.028549 0.044055,0.1850143 0.071403,0.3477026 0.027344,0.1626883 0.05164,0.2971623 0.053987,0.2988303 0.00237,0.00168 0.0555,0.020912 0.1181199,0.042755 0.062618,0.021849 0.1678594,0.064675 0.2338674,0.095171 0.06601,0.030496 0.125961,0.055446 0.133229,0.055446 0.0073,0 0.122675,-0.078059 0.256459,-0.17346372 0.258359,-0.1842437 0.309301,-0.2103631 0.411248,-0.21086 0.122455,-5.789e-4 0.170045,0.034891 0.540133,0.40276212 0.376413,0.3741604 0.415485,0.4264456 0.415751,0.5563483 2.15e-4,0.098312 -0.02241,0.1416507 -0.213557,0.409301 -0.09436,0.1321302 -0.171567,0.2464015 -0.171567,0.2539362 0,0.00754 0.02506,0.067562 0.0557,0.1333945 0.03063,0.065832 0.07346,0.1710629 0.09517,0.2338465 0.02171,0.062784 0.04083,0.116072 0.0425,0.1184189 0.0017,0.00237 0.137025,0.026507 0.300794,0.053687 0.163768,0.027181 0.322358,0.060181 0.352421,0.073333 0.06942,0.030365 0.156528,0.1287237 0.178266,0.2012789 0.01148,0.038329 0.01674,0.2131438 0.01664,0.5537692 -1.62e-4,0.4912833 -5.79e-4,0.4986893 -0.03341,0.5692083 -0.0379,0.0814 -0.113068,0.153856 -0.182828,0.17625 -0.02618,0.0084 -0.147125,0.03181 -0.268768,0.052 -0.121643,0.0202 -0.253779,0.04312 -0.293635,0.05095 l -0.07246,0.01422 -0.02544,0.08154 c -0.014,0.04485 -0.05683,0.152174 -0.0952,0.2385 -0.03837,0.08633 -0.06975,0.162771 -0.06975,0.169875 0,0.0071 0.0771,0.12041 0.171336,0.251792 0.09423,0.131381 0.180919,0.26181 0.192631,0.289843 0.02956,0.07075 0.02608,0.175479 -0.0084,0.25165 -0.03531,0.07808 -0.689258,0.742784 -0.773945,0.786673 -0.0777,0.04027 -0.178889,0.04918 -0.256829,0.02262 -0.03543,-0.01207 -0.173588,-0.09958 -0.307015,-0.194452 -0.133426,-0.09488 -0.24794,-0.172503 -0.254473,-0.172503 -0.0065,0 -0.08251,0.03139 -0.168838,0.06975 -0.08633,0.03837 -0.193607,0.08119 -0.2384015,0.09516 -0.066982,0.0209 -0.082749,0.03195 -0.088799,0.06223 -0.00405,0.02025 -0.027096,0.155614 -0.051219,0.300801 -0.024128,0.145188 -0.051282,0.282891 -0.060347,0.30601 -0.023875,0.06089 -0.091984,0.133319 -0.1591797,0.169276 -0.056754,0.03037 -0.073343,0.03134 -0.5792464,0.03409 -0.3853358,0.0021 -0.5333017,-0.0018 -0.5688048,-0.01489 z m 0.9897411,-1.562371 c 0.1903351,-0.04292 0.3385494,-0.09623 0.5097282,-0.183328 0.5761443,-0.293152 0.9789913,-0.818793 1.1188543,-1.459901 0.02096,-0.09609 0.02646,-0.182062 0.02646,-0.4138019 0,-0.3204947 -0.01341,-0.4132832 -0.09548,-0.6608753 C 5.4493582,2.3758596 4.8539292,1.8482012 4.1013489,1.683168 3.9315934,1.645945 3.4487704,1.645945 3.2790149,1.683168 2.4518803,1.86455 1.8304741,2.4706334 1.6380636,3.2836543 1.6043566,3.426083 1.6008666,3.4683544 1.6003456,3.7402632 c -4.584e-4,0.2407455 0.00463,0.3234915 0.02597,0.4209365 0.1549973,0.7083 0.6337369,1.277663 1.297512,1.543125 0.1173957,0.04695 0.2482501,0.08365 0.4024979,0.112895 0.194568,0.03689 0.6081375,0.03026 0.7990653,-0.01279 z M 3.5083582,5.5165507 C 3.1099691,5.4753537 2.7344849,5.2969377 2.4405557,5.0091717 2.3322589,4.9031457 2.1919314,4.7255317 2.1919314,4.6944857 c 0,-0.03559 0.071824,-0.209855 0.1162388,-0.282039 0.1400133,-0.227551 0.3548142,-0.387194 0.6081483,-0.451986 0.099025,-0.025328 0.1623919,-0.027565 0.7799963,-0.027565 0.6311742,0 0.6785827,0.00179 0.7765009,0.028902 0.2532125,0.07017 0.4629475,0.227737 0.5992945,0.450234 0.04455,0.07269 0.116315,0.246973 0.116315,0.282457 0,0.03149 -0.139693,0.205865 -0.258843,0.323108 -0.3706236,0.364695 -0.9050838,0.552332 -1.421224,0.498958 z m 0.01278,-1.7549958 C 3.2941633,3.7134679 3.0934781,3.578626 2.971958,3.3925611 2.8531727,3.2106838 2.8110256,3.0573318 2.8232631,2.8515332 2.8516648,2.3739305 3.252693,2.015634 3.732988,2.0387495 4.0965915,2.0562505 4.4060861,2.2914968 4.5189857,2.6361877 4.5682257,2.7865273 4.5683257,3.024231 4.519201,3.1741764 4.435438,3.4298806 4.2294554,3.63962 3.975284,3.7280119 3.856993,3.7691509 3.6345308,3.7855809 3.5211332,3.7615559 Z" fill="currentColor" />
+          </svg>
+      </span>
+      <span>Admin</span>
+    </button>
 	</nav>
   </div>
 
@@ -616,6 +1040,9 @@
        FLOATING ACTION BUTTON
        Wordt door JS per screen anders gebruikt
   ========================================================== -->
+  <button id="standardCostsBtn" class="fab fab-secondary hidden" type="button" aria-label="Standaardkosten">
+    <span aria-hidden="true">☰</span>
+  </button>
   <button id="floatingAddBtn" class="fab" type="button" aria-label="Toevoegen">+</button>
 
   <!-- =========================================================
@@ -632,7 +1059,7 @@
       </div>
 
       <label class="field-label" for="monthSelect">Maand</label>
-      <select id="monthSelect" class="field"></select>
+      <select id="monthSelect" class="field"><option value="0">Januari</option><option value="1">Februari</option><option value="2">Maart</option><option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option><option value="6">Juli</option><option value="7">Augustus</option><option value="8">September</option><option value="9">Oktober</option><option value="10">November</option><option value="11">December</option></select>
 
       <label class="field-label" for="yearSelect">Jaar</label>
       <input id="yearSelect" class="field" type="number" min="2000" max="2100" />
@@ -649,6 +1076,109 @@
   </dialog>
 
 
+
+  <!-- ===================== KOSTEN ======================= -->
+  <dialog id="costDialog" class="modal">
+    <form method="dialog" id="costForm" class="modal-card">
+      <div class="modal-head">
+        <h3 id="costModalTitle">Nieuwe kost</h3>
+        <button class="icon-btn" type="button" data-close="costDialog">✕</button>
+      </div>
+
+      <input type="hidden" id="costId" />
+      <input type="hidden" id="costStandardCostId" />
+
+      <label class="field-label" for="costDescription">Omschrijving</label>
+      <div class="appointment-customer-picker cost-standard-picker">
+        <input
+          id="costDescription"
+          class="field appointment-service-search"
+          type="search"
+          autocomplete="off"
+          placeholder="Zoek of kies een standaardkost..."
+          aria-controls="costStandardSuggestions"
+          aria-expanded="false"
+        />
+        <div id="costStandardSuggestions" class="appointment-service-results cost-standard-suggestions hidden" role="listbox"></div>
+        <select id="costStandardCostSelect" class="field appointment-customer-select-fallback" aria-label="Standaardkost kiezen"></select>
+      </div>
+
+      <label class="field-label" for="costDate">Datum</label>
+      <input id="costDate" class="field appointment-native-picker-input" type="date" tabindex="-1" aria-hidden="true" />
+      <button id="costDateDisplayBtn" class="field appointment-picker-display" type="button" aria-label="Datum kiezen">Kies datum</button>
+
+      <label class="field-label" for="costAmountInclVat">Bedrag incl. btw</label>
+      <input id="costAmountInclVat" class="field" type="number" min="0" step="0.01" inputmode="decimal" />
+
+      <label class="field-label" for="costVatRate">Btw</label>
+      <select id="costVatRate" class="field">
+        <option value="6">6%</option>
+        <option value="12">12%</option>
+        <option value="21" selected>21%</option>
+      </select>
+
+      <label id="costStandardCostCheckboxRow" class="settings-switch-row cost-standard-checkbox-row" for="costSaveAsStandardCost">
+        <span>
+          <strong>Standaard kost</strong>
+          <small>Bewaar deze kost meteen als standaardkost voor later gebruik.</small>
+        </span>
+        <input id="costSaveAsStandardCost" type="checkbox" />
+      </label>
+
+      <div class="modal-actions triple-actions">
+        <button id="deleteCostBtn" class="btn btn-danger action-btn hidden" type="button">Verwijderen</button>
+        <div class="right-actions">
+          <button class="btn btn-secondary action-btn" type="button" data-close="costDialog">Annuleren</button>
+          <button class="btn btn-primary action-btn" type="submit">Opslaan</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
+
+
+
+  <dialog id="standardCostsDialog" class="modal modal-small">
+    <div class="modal-card standard-costs-card">
+      <div class="modal-head">
+        <h3>Standaardkosten</h3>
+        <button class="icon-btn" type="button" data-close="standardCostsDialog">✕</button>
+      </div>
+      <input
+        id="standardCostsSearch"
+        class="search-input standard-costs-search"
+        type="search"
+        autocomplete="off"
+        placeholder="Zoek standaardkost..."
+      />
+      <div id="standardCostsAlphabetFilter" class="alphabet-filter standard-costs-alphabet-filter"></div>
+      <div id="standardCostsManagerList" class="standard-costs-manager-list"></div>
+    </div>
+  </dialog>
+
+  <dialog id="standardCostEditDialog" class="modal modal-small">
+    <form method="dialog" id="standardCostEditForm" class="modal-card">
+      <div class="modal-head">
+        <h3>Standaardkost aanpassen</h3>
+        <button class="icon-btn" type="button" data-close="standardCostEditDialog">✕</button>
+      </div>
+      <input type="hidden" id="standardCostEditId" />
+      <label class="field-label" for="standardCostEditDescription">Omschrijving</label>
+      <input id="standardCostEditDescription" class="field" type="text" autocomplete="off" />
+      <label class="field-label" for="standardCostEditVatRate">Btw</label>
+      <select id="standardCostEditVatRate" class="field">
+        <option value="6">6%</option>
+        <option value="12">12%</option>
+        <option value="21" selected>21%</option>
+      </select>
+      <div class="modal-actions triple-actions">
+        <button id="deleteStandardCostBtn" class="btn btn-danger action-btn" type="button">Verwijderen</button>
+        <div class="right-actions">
+          <button class="btn btn-secondary action-btn" type="button" data-close="standardCostEditDialog">Annuleren</button>
+          <button class="btn btn-primary action-btn" type="submit">Opslaan</button>
+        </div>
+      </div>
+    </form>
+  </dialog>
   <!-- ===================== TO DO ======================= -->
   <dialog id="todoDialog" class="modal">
     <form method="dialog" id="todoForm" class="modal-card">
@@ -694,8 +1224,13 @@
 
       <input type="hidden" id="appointmentId" />
 
+      <label class="appointment-private-toggle" for="appointmentIsPrivate">
+        <input id="appointmentIsPrivate" type="checkbox" />
+        <span>Privé</span>
+      </label>
+
       <div class="appointment-form-grid">
-        <div class="appointment-form-field appointment-form-field-wide">
+        <div class="appointment-form-field appointment-form-field-wide appointment-normal-field">
           <label class="field-label" for="appointmentCustomerSearch">Klant</label>
           <div class="appointment-customer-picker">
             <input
@@ -711,35 +1246,32 @@
             <select id="appointmentCustomer" class="field appointment-customer-select-fallback" required aria-label="Klant kiezen"></select>
           </div>
           <button id="appointmentOpenCustomerBtn" class="appointment-open-customer-btn hidden" type="button" aria-label="Klantfiche openen" title="Klantfiche openen">
-              <svg class="appointment-open-customer-icon" viewBox="0 0 34 28" aria-hidden="true" focusable="false">
-                <path class="file-icon-sheet" d="M5.5 3.5h10.8L21 8.2v16.3H5.5z" />
-                <path class="file-icon-fold" d="M16.3 3.5v4.7H21" />
-                <path class="file-icon-line" d="M8.3 12.1h7.2M8.3 15.6h6" />
-                <path class="file-icon-arrow" d="M23.2 14h6.9m-2.9-3 2.9 3-2.9 3" />
+              <svg class="appointment-open-customer-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false">
+                <path d="M 2.9238525 0.79478353 C 2.1023789 0.79478353 1.4314372 1.4636581 1.4314372 2.2851318 C 1.4314372 3.1066054 2.1023789 3.7775472 2.9238525 3.7775472 C 4.8594282 3.6826322 4.8264612 0.94890102 2.9238525 0.79478353 z M 2.9238525 1.1916585 C 3.530839 1.1916586 4.0173258 1.6781453 4.0173258 2.2851318 C 4.0173258 2.8921182 3.530839 3.3806722 2.9238525 3.3806722 C 2.3168661 3.3806722 1.8283122 2.8921182 1.8283122 2.2851318 C 1.8283122 1.6781453 2.3168661 1.1916586 2.9238525 1.1916585 z M 5.7944784 2.7714071 A 0.175998 0.175998 0 0 0 5.6559855 2.841687 A 0.175998 0.175998 0 0 0 5.6911255 3.0876668 L 6.4352661 3.6447388 L 5.7593384 4.3201497 A 0.175998 0.175998 0 0 0 5.7593384 4.5681966 A 0.175998 0.175998 0 0 0 6.0073853 4.5681966 L 6.9701172 3.6054647 L 5.9019653 2.806547 A 0.175998 0.175998 0 0 0 5.7944784 2.7714071 z M 1.5136027 4.3123983 C 0.97347012 4.2986819 0.62537472 4.4613648 0.45681966 4.7345947 C 0.2882646 5.0078246 0.29638701 5.3205999 0.28887126 5.5955241 L 0.28887126 5.5975911 L 0.28887126 6.5272502 L 0.28887126 6.7267212 L 0.68574626 6.7267212 L 0.68574626 6.5272502 L 0.68574626 5.6074097 L 0.68574626 5.6017253 C 0.69343346 5.3259577 0.70901741 5.0823954 0.79478353 4.9433675 C 0.88129282 4.8031348 1.0375715 4.6969173 1.5037842 4.7087565 L 1.5058512 4.7087565 L 4.1056925 4.7087565 C 4.4971159 4.7189935 4.6340418 4.8211872 4.718575 4.9630046 C 4.803108 5.1048221 4.8256155 5.3373507 4.8322632 5.6053426 L 4.8322632 6.5158813 L 4.8322632 6.7148356 L 5.2306885 6.7148356 L 5.2306885 6.5158813 L 5.2306885 5.5996582 L 5.2306885 5.5955241 C 5.2238578 5.3201528 5.2169562 5.0221053 5.060673 4.7599162 C 4.9043898 4.4977272 4.5887051 4.3247334 4.1170614 4.3123983 L 4.113444 4.3123983 L 1.5136027 4.3123983 z" />
               </svg>
             </button>
         </div>
 
-        <div class="appointment-form-field">
+        <div class="appointment-form-field appointment-shared-field appointment-date-field">
           <label class="field-label" for="appointmentDate">Datum</label>
           <input id="appointmentDate" class="field appointment-native-picker-input" type="date" required tabindex="-1" aria-hidden="true" />
           <button id="appointmentDateDisplayBtn" class="field appointment-picker-display" type="button" aria-label="Datum kiezen">Kies datum</button>
         </div>
 
-        <div class="appointment-form-field">
-          <label class="field-label" for="appointmentTime">Tijd</label>
+        <div class="appointment-form-field appointment-shared-field appointment-time-start-field">
+          <label id="appointmentTimeLabel" class="field-label" for="appointmentTime">Tijd</label>
           <input id="appointmentTime" class="field appointment-native-picker-input" type="time" required tabindex="-1" aria-hidden="true" />
           <button id="appointmentTimeDisplayBtn" class="field appointment-picker-display" type="button" aria-label="Tijd kiezen">Kies tijd</button>
         </div>
 
-        <div class="appointment-form-field appointment-form-field-wide">
+        <div class="appointment-form-field appointment-form-field-wide appointment-normal-field">
           <label class="field-label" for="appointmentServiceSearch">Dienst</label>
           <div class="appointment-service-picker">
             <input
               id="appointmentServiceSearch"
               class="field appointment-service-search"
               type="search"
-              placeholder="Zoek dienst..." data-i18n-placeholder="searchServicePlaceholder"
+              placeholder="Zoek op beschrijving of kernwoord" data-i18n-placeholder="searchServicePlaceholder"
               autocomplete="off"
               aria-controls="appointmentServiceResults"
               aria-expanded="false"
@@ -749,17 +1281,17 @@
           </div>
         </div>
 
-        <div class="appointment-form-field">
+        <div class="appointment-form-field appointment-normal-field">
           <label class="field-label" for="appointmentDuration">Duur (min)</label>
-          <input id="appointmentDuration" class="field" type="number" min="0" required />
+          <input id="appointmentDuration" class="field" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" required />
         </div>
 
-        <div class="appointment-form-field">
+        <div class="appointment-form-field appointment-normal-field">
           <label class="field-label" for="appointmentPrice">Prijs</label>
-          <input id="appointmentPrice" class="field" type="number" min="0" step="0.01" required />
+          <input id="appointmentPrice" class="field" type="text" inputmode="decimal" autocomplete="off" required />
         </div>
 
-        <div id="appointmentStatusWrap" class="appointment-form-field appointment-form-field-wide">
+        <div id="appointmentStatusWrap" class="appointment-form-field appointment-form-field-wide appointment-normal-field">
           <label class="field-label" for="appointmentStatus">Status</label>
           <select id="appointmentStatus" class="field">
             <option value="gepland">Gepland</option>
@@ -768,16 +1300,53 @@
           </select>
         </div>
 
-        <div class="appointment-form-field appointment-form-field-wide">
+        <div class="appointment-form-field appointment-form-field-wide appointment-normal-field">
           <label class="field-label" for="appointmentRemarks">Opmerkingen</label>
           <textarea id="appointmentRemarks" class="field textarea" rows="3"></textarea>
+        </div>
+
+        <div class="appointment-form-field appointment-private-field appointment-private-end-date-field">
+          <label class="field-label" for="appointmentPrivateEndDate">Datum tot</label>
+          <input id="appointmentPrivateEndDate" class="field appointment-native-picker-input" type="date" tabindex="-1" aria-hidden="true" />
+          <button id="appointmentPrivateEndDateDisplayBtn" class="field appointment-picker-display" type="button" aria-label="Einddatum kiezen">Kies datum</button>
+        </div>
+
+        <div class="appointment-form-field appointment-private-field appointment-private-end-field">
+          <label class="field-label" for="appointmentPrivateEndTime">Tijd tot</label>
+          <input id="appointmentPrivateEndTime" class="field appointment-native-picker-input" type="time" tabindex="-1" aria-hidden="true" />
+          <button id="appointmentPrivateEndTimeDisplayBtn" class="field appointment-picker-display" type="button" aria-label="Eindtijd kiezen">Kies tijd</button>
+        </div>
+
+        <div class="appointment-form-field appointment-form-field-wide appointment-private-field">
+          <label class="field-label" for="appointmentPrivateRepeat">Herhalen</label>
+          <select id="appointmentPrivateRepeat" class="field">
+            <option value="none">Niet herhaald</option>
+            <option value="daily">Dagelijks</option>
+            <option value="weekly">Wekelijks</option>
+            <option value="biweekly">Om de 2 weken</option>
+            <option value="triweekly">Om de 3 weken</option>
+            <option value="monthly">Maandelijks</option>
+            <option value="quarterly">Om de 3 maanden</option>
+            <option value="semiannual">Om de 6 maanden</option>
+            <option value="yearly">Jaarlijks</option>
+          </select>
+        </div>
+
+        <div class="appointment-form-field appointment-form-field-wide appointment-private-field">
+          <label class="field-label" for="appointmentPrivateTitle">Titel</label>
+          <input id="appointmentPrivateTitle" class="field" type="text" autocomplete="off" />
+        </div>
+
+        <div class="appointment-form-field appointment-form-field-wide appointment-private-field">
+          <label class="field-label" for="appointmentPrivateDetails">Details</label>
+          <textarea id="appointmentPrivateDetails" class="field textarea" rows="4"></textarea>
         </div>
       </div>
 
       <div class="modal-actions triple-actions appointment-actions-row">
         <button
           id="deleteAppointmentBtn"
-          class="btn btn-danger action-btn"
+          class="btn btn-danger action-btn hidden"
           type="button"
         >
           Verwijderen
@@ -795,7 +1364,36 @@
     </form>
   </dialog>
 
+  <dialog id="deletedAppointmentsDialog" class="modal deleted-appointments-dialog">
+    <div class="modal-card deleted-appointments-modal-card">
+      <div class="modal-head">
+        <h3>Verwijderde afspraken</h3>
+        <button class="icon-btn" type="button" data-close="deletedAppointmentsDialog">✕</button>
+      </div>
+      <div class="deleted-appointments-toolbar">
+        <label class="field-label" for="deletedAppointmentsSearch">Filter</label>
+        <input id="deletedAppointmentsSearch" class="field" type="search" autocomplete="off" placeholder="Alle, klantnaam, dienst, datum, opmerking..." />
+        <p id="deletedAppointmentsCount" class="settings-info-text">-</p>
+      </div>
+      <div id="deletedAppointmentsList" class="deleted-appointments-list scroll-list"></div>
+
+    </div>
+  </dialog>
+
+
   <!-- ===================== KLANT ========================== -->
+
+
+  <dialog id="clientDetailDialog" class="modal client-detail-dialog">
+    <div class="modal-card client-detail-modal-card">
+      <div class="modal-head client-detail-modal-head">
+        <h3>Klant</h3>
+        <button class="icon-btn" type="button" data-close="clientDetailDialog">✕</button>
+      </div>
+      <div id="clientDetailModalContent" class="scroll-list client-detail-modal-content"></div>
+    </div>
+  </dialog>
+
   <dialog id="clientDialog" class="modal">
     <form method="dialog" id="clientForm" class="modal-card">
       <div class="modal-head">
@@ -824,7 +1422,7 @@
       <input id="clientEmail" class="field" type="email" />
 
       <label class="field-label" for="clientNote">Notitie</label>
-      <textarea id="clientNote" class="field textarea"></textarea>
+      <textarea id="clientNote" class="field textarea client-note-textarea" rows="6"></textarea>
 
       <div class="modal-actions end-only">
         <button class="btn btn-secondary action-btn" type="button" data-close="clientDialog">
@@ -853,12 +1451,12 @@
       <div class="field-row">
         <div>
           <label class="field-label" for="serviceDuration">Duur (min)</label>
-          <input id="serviceDuration" class="field" type="number" min="0" required />
+          <input id="serviceDuration" class="field" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" required />
         </div>
 
         <div>
           <label class="field-label" for="servicePrice">Prijs</label>
-          <input id="servicePrice" class="field" type="number" min="0" step="0.01" required />
+          <input id="servicePrice" class="field" type="text" inputmode="decimal" autocomplete="off" required />
         </div>
       </div>
 
@@ -871,7 +1469,7 @@
       </label>
 
       <div class="modal-actions triple-actions">
-        <button id="deleteServiceBtn" class="btn btn-danger action-btn" type="button">
+        <button id="deleteServiceBtn" class="btn btn-danger action-btn hidden" type="button">
           Verwijderen
         </button>
 
@@ -901,7 +1499,7 @@
       <input id="paymentMethodName" class="field" type="text" required />
 
       <div class="modal-actions triple-actions">
-        <button id="deletePaymentMethodBtn" class="btn btn-danger action-btn" type="button">
+        <button id="deletePaymentMethodBtn" class="btn btn-danger action-btn hidden" type="button">
           Verwijderen
         </button>
 
@@ -917,6 +1515,29 @@
     </form>
   </dialog>
 
+
+  <!-- ===================== VERVOLGAFSPRAAK ======================= -->
+  <dialog id="followUpAppointmentDialog" class="modal modal-small">
+    <form method="dialog" id="followUpAppointmentForm" class="modal-card">
+      <div class="modal-head">
+        <h3>Vervolgafspraak</h3>
+        <button class="icon-btn" type="button" data-close="followUpAppointmentDialog">✕</button>
+      </div>
+      <input type="hidden" id="followUpSourceAppointmentId" />
+      <label class="field-label" for="followUpAppointmentDate">Datum</label>
+      <input id="followUpAppointmentDate" class="field appointment-native-picker-input" type="date" tabindex="-1" aria-hidden="true" />
+      <button id="followUpAppointmentDateDisplayBtn" class="field appointment-picker-display" type="button">Kies datum</button>
+      <label class="field-label" for="followUpAppointmentTime">Tijd</label>
+      <input id="followUpAppointmentTime" class="field appointment-native-picker-input" type="time" tabindex="-1" aria-hidden="true" />
+      <button id="followUpAppointmentTimeDisplayBtn" class="field appointment-picker-display" type="button">Kies tijd</button>
+      <p id="followUpAppointmentInfo" class="settings-info-text"></p>
+      <div class="modal-actions two-buttons">
+        <button class="btn btn-secondary action-btn" type="button" data-close="followUpAppointmentDialog">Annuleren</button>
+        <button class="btn btn-primary action-btn" type="submit">Opslaan</button>
+      </div>
+    </form>
+  </dialog>
+
   <!-- ===================== AFSPRAAK ACTIES ======================= -->
   <div id="appointmentActionPopover" class="payment-popover appointment-action-popover hidden" aria-hidden="true">
     <div class="payment-popover-card">
@@ -928,11 +1549,20 @@
       </div>
 
       <div class="payment-method-popup-list appointment-action-list" role="menu" aria-label="Afspraak acties">
-        <button id="appointmentActionCustomerBtn" class="payment-method-popup-item" type="button" role="menuitem">
-          <span>Klantfiche</span>
+        <div class="appointment-action-details-row" role="none">
+          <button id="appointmentActionDetailsBtn" class="payment-method-popup-item appointment-action-details-btn" type="button" role="menuitem">
+            <span>Afspraak details</span>
+          </button>
+          <button id="appointmentActionDeleteBtn" class="appointment-action-delete-btn" type="button" aria-label="Afspraak verwijderen" title="Afspraak verwijderen">
+            <svg class="appointment-action-delete-svg app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="m 2.2698341,6.1775822 c -0.1094284,-0.04971 -0.231493,-0.164087 -0.290851,-0.272533 -0.037167,-0.0679 -0.041899,-0.221644 -0.052699,-1.711931 L 1.9144211,2.5557908 1.7067886,2.5489308 1.4991566,2.5420708 V 2.3545326 2.1669857 l 0.1008498,-0.0073 0.1008498,-0.0073 0.013669,-0.1423763 c 0.01596,-0.1662368 0.034542,-0.2158412 0.089015,-0.2376519 0.02183,-0.00874 0.2399086,-0.021819 0.4846179,-0.029062 L 2.7330836,1.7301305 V 1.6192114 c 0,-0.3484396 0.3062313,-0.68698353 0.5910897,-0.68179893 0.077671,0.00141 0.1969862,-0.00708 0.4182785,-0.00708 h 0.4780034 c 0.3249416,0.00541 0.5533562,0.39764923 0.5533562,0.71128873 v 0.095511 l 0.3025494,0.00123 c 0.3906803,0.00158 0.6135415,0.026715 0.6614465,0.07462 0.023407,0.023407 0.042463,0.097122 0.050279,0.1944918 l 0.012586,0.1567987 h 0.091669 0.091669 V 2.3541076 2.543943 H 5.7823104 5.5806105 l -5.209e-4,1.6076662 c -5.104e-4,1.566046 -0.00177,1.61043 -0.048858,1.714448 -0.062582,0.138254 -0.1489784,0.227906 -0.2879761,0.29883 l -0.1119258,0.05711 -1.3830257,-5.24e-4 c -1.288121,-4.9e-4 -1.3895764,-0.0035 -1.4784713,-0.04388 z m 2.8347098,-0.400527 0.070458,-0.06526 0.00704,-1.578004 0.00704,-1.5780044 -1.4415606,-0.00612 -1.4415606,-0.00612 v 1.5800134 1.580014 l 0.069363,0.06936 0.069363,0.06936 H 3.7393895 5.0340922 Z M 2.7330841,4.1931182 V 2.9710547 h 0.2016996 0.2017 v 1.2220635 1.222064 h -0.2017 -0.2016996 z m 0.8067992,0 V 2.9710547 h 0.2017 0.2016996 v 1.2220635 1.222064 h -0.2016996 -0.2017 z m 0.8305286,0 V 2.9710547 H 4.560247 4.7500825 v 1.2220635 1.222064 H 4.560247 4.3704119 Z M 4.3466819,1.6275524 C 4.3525019,1.4948826 4.3066309,1.3905375 4.2264459,1.3628251 4.1044771,1.3096741 4.063522,1.3135821 3.7620234,1.3163031 3.4605248,1.3190231 3.3539331,1.3387671 3.2833638,1.3817941 3.1976948,1.4340251 3.136483,1.5521229 3.136483,1.6651764 v 0.07195 h 0.6050997 0.6050992 z" /></svg>
+          </button>
+        </div>
+        <button id="appointmentActionFollowUpBtn" class="payment-method-popup-item" type="button" role="menuitem">
+          <span>Vervolgafspraak</span>
         </button>
-        <button id="appointmentActionDetailsBtn" class="payment-method-popup-item" type="button" role="menuitem">
-          <span>Afspraak details</span>
+        <button id="appointmentActionCustomerBtn" class="payment-method-popup-item appointment-action-customer-btn" type="button" role="menuitem">
+          <span>Klantfiche</span>
+          <svg class="appointment-action-customer-svg app-action-nav-icon" viewBox="0 0 7.4083331 7.4083333" aria-hidden="true" focusable="false"><path d="M 2.9238525 0.79478353 C 2.1023789 0.79478353 1.4314372 1.4636581 1.4314372 2.2851318 C 1.4314372 3.1066054 2.1023789 3.7775472 2.9238525 3.7775472 C 4.8594282 3.6826322 4.8264612 0.94890102 2.9238525 0.79478353 z M 2.9238525 1.1916585 C 3.530839 1.1916586 4.0173258 1.6781453 4.0173258 2.2851318 C 4.0173258 2.8921182 3.530839 3.3806722 2.9238525 3.3806722 C 2.3168661 3.3806722 1.8283122 2.8921182 1.8283122 2.2851318 C 1.8283122 1.6781453 2.3168661 1.1916586 2.9238525 1.1916585 z M 5.7944784 2.7714071 A 0.175998 0.175998 0 0 0 5.6559855 2.841687 A 0.175998 0.175998 0 0 0 5.6911255 3.0876668 L 6.4352661 3.6447388 L 5.7593384 4.3201497 A 0.175998 0.175998 0 0 0 5.7593384 4.5681966 A 0.175998 0.175998 0 0 0 6.0073853 4.5681966 L 6.9701172 3.6054647 L 5.9019653 2.806547 A 0.175998 0.175998 0 0 0 5.7944784 2.7714071 z M 1.5136027 4.3123983 C 0.97347012 4.2986819 0.62537472 4.4613648 0.45681966 4.7345947 C 0.2882646 5.0078246 0.29638701 5.3205999 0.28887126 5.5955241 L 0.28887126 5.5975911 L 0.28887126 6.5272502 L 0.28887126 6.7267212 L 0.68574626 6.7267212 L 0.68574626 6.5272502 L 0.68574626 5.6074097 L 0.68574626 5.6017253 C 0.69343346 5.3259577 0.70901741 5.0823954 0.79478353 4.9433675 C 0.88129282 4.8031348 1.0375715 4.6969173 1.5037842 4.7087565 L 1.5058512 4.7087565 L 4.1056925 4.7087565 C 4.4971159 4.7189935 4.6340418 4.8211872 4.718575 4.9630046 C 4.803108 5.1048221 4.8256155 5.3373507 4.8322632 5.6053426 L 4.8322632 6.5158813 L 4.8322632 6.7148356 L 5.2306885 6.7148356 L 5.2306885 6.5158813 L 5.2306885 5.5996582 L 5.2306885 5.5955241 C 5.2238578 5.3201528 5.2169562 5.0221053 5.060673 4.7599162 C 4.9043898 4.4977272 4.5887051 4.3247334 4.1170614 4.3123983 L 4.113444 4.3123983 L 1.5136027 4.3123983 z" /></svg>
         </button>
       </div>
     </div>
@@ -963,9 +1593,9 @@
         <span class="payment-qr-mini" aria-hidden="true">
           <span></span><span></span><span></span><span></span>
         </span>
-        <span>QR-code</span>
+        <span>QR code</span>
       </button>
-      <div id="paymentQrButtonHint" class="payment-qr-button-hint">Toon bank-QR</div>
+      <div id="paymentQrButtonHint" class="payment-qr-button-hint"></div>
     </div>
   </div>
 
@@ -989,93 +1619,107 @@
   </dialog>
 
   <!-- ===================== REGISTREREN ==================== -->
-  <dialog id="registerDialog" class="modal">
-    <form method="dialog" id="registerForm" class="modal-card">
-      <div class="modal-head">
-        <h3>Registreren</h3>
-        <button class="icon-btn" type="button" data-close="registerDialog">✕</button>
+  <dialog id="registerDialog" class="modal register-modal">
+    <form method="dialog" id="registerForm" class="modal-card register-wizard-card">
+      <div class="modal-head register-wizard-head">
+        <div>
+          <h3 id="registerDialogTitle">Registreren</h3>
+          <p id="registerDialogSubtitle" class="register-wizard-subtitle">Maak je NailBooker-account aan in enkele korte stappen.</p>
+        </div>
+        <button class="icon-btn" type="button" data-close="registerDialog" aria-label="Sluiten">✕</button>
       </div>
 
-      <label class="field-label" for="registerFirstName">Voornaam</label>
-      <input id="registerFirstName" class="field" type="text" required />
-
-      <label class="field-label" for="registerLastName">Naam</label>
-      <input id="registerLastName" class="field" type="text" required />
-
-      <label class="field-label" for="registerSalonName">Salonnaam <span class="optional-label">optioneel</span></label>
-      <input id="registerSalonName" class="field" type="text" autocomplete="organization" />
-
-      <label class="field-label" for="registerVatNumber">BTW-nummer <span class="optional-label">optioneel</span></label>
-      <input id="registerVatNumber" class="field" type="text" autocomplete="off" />
-
-      <label class="field-label" for="registerLanguage" data-i18n="language">Taal</label>
-      <select id="registerLanguage" class="field">
-        <option value="nl-BE" selected>Nederlands</option>
-        <option value="en-GB">English</option>
-        <option value="fr-FR">Français</option>
-      </select>
-
-      <label class="field-label" for="registerCurrency" data-i18n="currency">Valuta</label>
-      <select id="registerCurrency" class="field">
-        <option value="EUR" selected>Euro (€)</option>
-        <option value="USD">Dollar ($)</option>
-        <option value="GBP">Britse pond (£)</option>
-      </select>
-
-      <label class="field-label" for="registerEmail">E-mail</label>
-      <input id="registerEmail" class="field" type="email" required autocomplete="email" />
-
-      <label class="field-label" for="registerPassword">Wachtwoord</label>
-      <div class="password-field-wrap">
-        <input id="registerPassword" class="field password-field" type="password" required autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" />
-        <button class="password-toggle-btn" type="button" data-password-toggle="registerPassword" aria-label="Toon wachtwoord" aria-pressed="false">
-          <span class="password-toggle-icon" aria-hidden="true">
-                      <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                      <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-5.94"></path>
-                        <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.8 21.8 0 0 1-3.17 4.31"></path>
-                        <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
-                        <path d="m1 1 22 22"></path>
-                      </svg>
-                    </span>
-        </button>
+      <div class="register-progress" aria-hidden="true">
+        <span class="register-progress-dot active" data-register-progress="1"></span>
+        <span class="register-progress-dot" data-register-progress="2"></span>
+        <span class="register-progress-dot" data-register-progress="3"></span>
+        <span class="register-progress-dot" data-register-progress="4"></span>
       </div>
 
-      <label class="field-label" for="registerPasswordConfirm">Bevestig wachtwoord</label>
-      <div class="password-field-wrap">
-        <input id="registerPasswordConfirm" class="field password-field" type="password" required autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" />
-        <button class="password-toggle-btn" type="button" data-password-toggle="registerPasswordConfirm" aria-label="Toon wachtwoord" aria-pressed="false">
-          <span class="password-toggle-icon" aria-hidden="true">
-                      <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                      <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-5.94"></path>
-                        <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.8 21.8 0 0 1-3.17 4.31"></path>
-                        <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
-                        <path d="m1 1 22 22"></path>
-                      </svg>
-                    </span>
-        </button>
-      </div>
+      <section class="register-step active" data-register-step="1">
+        <label class="field-label" for="registerLanguage" data-i18n="language">Taal</label>
+        <select id="registerLanguage" class="field">
+          <option value="nl-BE" selected>Nederlands</option>
+          <option value="en-GB">English</option>
+          <option value="fr-FR">Français</option>
+        </select>
+        <p class="register-step-hint" id="registerLanguageHint">De app wordt meteen in deze taal gezet.</p>
+      </section>
 
+      <section class="register-step" data-register-step="2">
+        <label class="field-label" for="registerEmail">E-mail</label>
+        <input id="registerEmail" class="field" type="email" required autocomplete="email" />
+        <p class="register-step-hint" id="registerEmailHint">Dit e-mailadres gebruik je om in te loggen en om je account te verifiëren.</p>
+      </section>
 
-      <label class="terms-checkbox-row" for="registerTermsAccepted">
-        <input id="registerTermsAccepted" type="checkbox" required />
-        <span>Akkoord met gebruiksvoorwaarden</span>
-      </label>
+      <section class="register-step" data-register-step="3">
+        <label class="field-label" for="registerFirstName">Voornaam</label>
+        <input id="registerFirstName" class="field" type="text" required autocomplete="given-name" />
 
-      <div class="modal-actions end-only">
-        <button class="btn btn-secondary action-btn" type="button" data-close="registerDialog">
-          Annuleren
-        </button>
-        <button id="registerBtn" class="btn btn-primary action-btn" type="submit">
-          Registreren
-        </button>
+        <label class="field-label" for="registerLastName">Naam</label>
+        <input id="registerLastName" class="field" type="text" required autocomplete="family-name" />
+
+        <label class="field-label" for="registerSalonName">Salonnaam</label>
+        <input id="registerSalonName" class="field" type="text" required autocomplete="organization" />
+
+        <label class="field-label" for="registerCountry">Land</label>
+        <select id="registerCountry" class="field" required>
+          <option value="BE" selected>België</option>
+          <option value="NL">Nederland</option>
+        </select>
+
+        <label class="field-label" for="registerRegion">Regio</label>
+        <select id="registerRegion" class="field" required>
+          <option value="Flanders" selected>Vlaanderen</option>
+          <option value="Brussels">Brussel</option>
+        </select>
+
+        <label class="field-label" for="registerTimezone">Tijdzone</label>
+        <select id="registerTimezone" class="field" required>
+          <option value="Europe/Brussels" selected>Europe/Brussels</option>
+          <option value="Europe/Amsterdam">Europe/Amsterdam</option>
+        </select>
+
+        <label class="field-label" for="registerCurrency" data-i18n="currency">Valuta</label>
+        <select id="registerCurrency" class="field">
+          <option value="EUR" selected>Euro (€)</option>
+        </select>
+      </section>
+
+      <section class="register-step" data-register-step="4">
+        <label class="field-label" for="registerPassword">Wachtwoord</label>
+        <div class="password-field-wrap">
+          <input id="registerPassword" class="field password-field" type="password" required autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" />
+          <button class="password-toggle-btn" type="button" data-password-toggle="registerPassword" aria-label="Toon wachtwoord" aria-pressed="false">
+            <span class="password-toggle-icon" aria-hidden="true">
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.8 21.8 0 0 1-3.17 4.31"></path><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><path d="m1 1 22 22"></path></svg>
+            </span>
+          </button>
+        </div>
+
+        <label class="field-label" for="registerPasswordConfirm">Bevestig wachtwoord</label>
+        <div class="password-field-wrap">
+          <input id="registerPasswordConfirm" class="field password-field" type="password" required autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" />
+          <button class="password-toggle-btn" type="button" data-password-toggle="registerPasswordConfirm" aria-label="Toon wachtwoord" aria-pressed="false">
+            <span class="password-toggle-icon" aria-hidden="true">
+              <svg class="icon-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.77 21.77 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a21.8 21.8 0 0 1-3.17 4.31"></path><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><path d="m1 1 22 22"></path></svg>
+            </span>
+          </button>
+        </div>
+
+        <label class="terms-checkbox-row" for="registerTermsAccepted">
+          <input id="registerTermsAccepted" type="checkbox" required />
+          <span id="registerTermsLabel">Ik ga akkoord met de gebruiksvoorwaarden en het privacybeleid.</span>
+        </label>
+        <p class="register-step-hint" id="registerVerifyHint">Na registratie krijg je een e-mail om je account te voltooien.</p>
+      </section>
+
+      <div class="modal-actions register-wizard-actions">
+        <button id="registerBackBtn" class="btn btn-secondary action-btn hidden" type="button">Vorige</button>
+        <button id="registerNextBtn" class="btn btn-primary action-btn" type="button">Volgende</button>
+        <button id="registerBtn" class="btn btn-primary action-btn hidden" type="submit">Registreren</button>
       </div>
     </form>
   </dialog>
@@ -1100,11 +1744,36 @@
       <label class="field-label" for="editVatNumber">BTW-nummer <span class="optional-label">optioneel</span></label>
       <input id="editVatNumber" class="field" type="text" autocomplete="off" />
 
+      <label class="field-label" for="editCountry">Land</label>
+      <select id="editCountry" class="field" required>
+        <option value="BE">België</option>
+        <option value="NL">Nederland</option>
+      </select>
+
+      <label class="field-label" for="editRegion">Regio</label>
+      <select id="editRegion" class="field" required>
+        <option value="Flanders">Vlaanderen</option>
+        <option value="Brussels">Brussel</option>
+        <option value="NL">Nederland</option>
+      </select>
+
+      <label class="field-label" for="editTimezone">Tijdzone</label>
+      <select id="editTimezone" class="field" required>
+        <option value="Europe/Brussels">Europe/Brussels</option>
+        <option value="Europe/Amsterdam">Europe/Amsterdam</option>
+      </select>
+
       <label class="field-label" for="editLanguage" data-i18n="language">Taal</label>
-      <select id="editLanguage" class="field"></select>
+      <select id="editLanguage" class="field">
+        <option value="nl-BE" selected>Nederlands</option>
+        <option value="en-GB">English</option>
+        <option value="fr-FR">Français</option>
+      </select>
 
       <label class="field-label" for="editCurrency" data-i18n="currency">Valuta</label>
-      <select id="editCurrency" class="field"></select>
+      <select id="editCurrency" class="field">
+        <option value="EUR" selected>Euro (€)</option>
+      </select>
       <p class="settings-info-text" data-i18n="currencyChangeWarning">Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.</p>
 
       <div class="modal-actions end-only">
@@ -1259,6 +1928,13 @@
     </div>
   </dialog>
 
+  <div id="appBusyOverlay" class="app-busy-overlay hidden" aria-hidden="true">
+    <div class="app-busy-card" role="status" aria-live="polite">
+      <span class="app-busy-spinner" aria-hidden="true"></span>
+      <span class="app-busy-text">Even geduld...</span>
+    </div>
+  </div>
+
   <!-- =========================================================
        SCRIPTS
        Volgorde is belangrijk:
@@ -1325,6 +2001,16 @@
   });
 </script>
 
+  <div id="costsActionBar" class="revenue-action-bar costs-action-bar hidden" aria-label="Kostenacties">
+    <button id="costsExportCsvBtn" class="client-action-btn revenue-action-btn-csv" type="button" aria-label="Genereer CSV-bestand kosten">
+      <span class="client-action-icon revenue-action-export-label" aria-hidden="true">CSV</span>
+    </button>
+
+    <button id="costsExportReportBtn" class="client-action-btn revenue-action-btn-report" type="button" aria-label="Genereer stijlvol kostenrapport">
+      <span class="client-action-icon revenue-action-report-label" aria-hidden="true">PDF</span>
+    </button>
+  </div>
+
   <div id="revenueActionBar" class="revenue-action-bar hidden" aria-label="Omzetacties">
     <button id="revenueExportCsvBtn" class="client-action-btn revenue-action-btn-csv" type="button" aria-label="Genereer CSV-bestand">
       <span class="client-action-icon revenue-action-export-label" aria-hidden="true">CSV</span>
@@ -1358,6 +2044,57 @@
       </span>
     </a>
   </div>
+
+
+
+  <div id="welcomeGuideOverlay" class="welcome-guide-overlay hidden" aria-hidden="true">
+    <section class="welcome-guide-card" role="dialog" aria-modal="true" aria-labelledby="welcomeGuideTitle">
+      <button id="welcomeGuideCloseBtn" class="welcome-guide-close" type="button" aria-label="Rondleiding sluiten">×</button>
+      <div class="welcome-guide-hero" aria-hidden="true">
+        <span class="welcome-guide-sparkle">✦</span>
+        <span class="welcome-guide-calendar">✓</span>
+      </div>
+      <h3 id="welcomeGuideTitle">Welkom bij NailBooker</h3>
+      <p class="welcome-guide-intro">Om je eerste afspraak te kunnen inplannen, heb je minstens één klant en één dienst nodig.</p>
+
+      <div class="welcome-guide-steps">
+        <div id="welcomeGuideClientCheck" class="welcome-guide-step">
+          <span class="welcome-guide-check" aria-hidden="true">✓</span>
+          <div>
+            <strong>1. Klant toevoegen</strong>
+            <small>Bewaar naam en contactgegevens van je klant.</small>
+          </div>
+        </div>
+        <div id="welcomeGuideServiceCheck" class="welcome-guide-step">
+          <span class="welcome-guide-check" aria-hidden="true">✓</span>
+          <div>
+            <strong>2. Dienst toevoegen</strong>
+            <small>Maak behandelingen aan met duurtijd en prijs.</small>
+          </div>
+        </div>
+        <div id="welcomeGuideAppointmentCheck" class="welcome-guide-step">
+          <span class="welcome-guide-check" aria-hidden="true">✓</span>
+          <div>
+            <strong>3. Afspraak plannen</strong>
+            <small>Daarna kun je via Agenda je eerste afspraak maken.</small>
+          </div>
+        </div>
+      </div>
+
+      <label class="welcome-guide-toggle" for="welcomeGuideTipsToggle">
+        <input id="welcomeGuideTipsToggle" type="checkbox" checked />
+        <span>Toon tips bij openen van de app</span>
+      </label>
+
+      <div class="welcome-guide-actions">
+        <button id="welcomeGuideStartClientBtn" class="btn btn-primary action-btn" type="button">Klant toevoegen</button>
+        <button id="welcomeGuideStartServiceBtn" class="btn btn-secondary action-btn" type="button">Dienst toevoegen</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="adminToast" class="admin-toast hidden" role="status" aria-live="polite"></div>
+
 
 </body>
 
