@@ -25,7 +25,7 @@ const LEGAL_PRIVACY_VERSION = "1.0";
 // App-variant: wijzig alleen deze constante om dezelfde codebase voor beide versies te gebruiken.
 // true  = normale versie, betaalwijze "Andere" is zichtbaar
 // false = tweede versie, alles met betaalwijze "Andere" is volledig onzichtbaar
-const SHOW_ANDERE = false;
+const SHOW_ANDERE = true;
 
 const HIDDEN_PAYMENT_METHOD_NAMES = ["Andere"];
 
@@ -1812,12 +1812,37 @@ function showPastUnpaidAgendaAlertIfNeeded() {
 
   pastUnpaidAgendaAlertOpen = true;
   pastUnpaidAgendaAlertShown = true;
-  appAlert(message, {
+  const dialogPromise = appAlert(message, {
     title: "Melding",
     variant: "warning",
     confirmText: "OK",
     presentationClass: "agenda-unpaid-message-dialog"
-  }).finally(() => {
+  });
+
+  // Extra actie uitsluitend in deze melding, zonder de algemene dialoog te wijzigen.
+  const dialog = document.getElementById("appMessageDialog");
+  const actions = document.getElementById("appMessageDialogActions");
+  const jumpBtn = document.createElement("button");
+  jumpBtn.type = "button";
+  jumpBtn.className = "btn btn-primary action-btn agenda-unpaid-jump-btn";
+  jumpBtn.textContent = "Ga naar afspraak";
+  jumpBtn.addEventListener("click", () => {
+    const targetDate = String(first.date || first.appointment_date || "").slice(0, 10);
+    if (!isDateInputValue(targetDate)) return;
+    // Eerst de melding sluiten; pas daarna de agenda verplaatsen.
+    document.getElementById("appMessageConfirmBtn")?.click();
+    state.selectedDate = targetDate;
+    const date = new Date(targetDate + "T00:00:00");
+    state.currentYear = date.getFullYear();
+    state.currentMonth = date.getMonth();
+    state.revenueSyncSelectedDateOnOpen = true;
+    renderCalendar();
+    renderAgendaList();
+  });
+  if (dialog?.open && actions) actions.prepend(jumpBtn);
+
+  dialogPromise.finally(() => {
+    jumpBtn.remove();
     pastUnpaidAgendaAlertOpen = false;
   });
 }
@@ -7538,7 +7563,7 @@ function getStatisticsSummary(data = getData()) {
 
   return {
     appointmentCount: appointments.length,
-    customerCount: customers.length,
+    customerCount: SHOW_ANDERE ? customers.length : customers.filter(customer => appointments.some(app => String(app.customerId) === String(customer.id))).length,
     pastAppointmentCount: pastAppointments.length,
     futureAppointmentCount: futureAppointments.length,
     paidAppointmentCount: paidAppointments.length,
