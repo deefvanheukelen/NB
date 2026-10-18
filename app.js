@@ -25,7 +25,7 @@ const LEGAL_PRIVACY_VERSION = "1.0";
 // App-variant: wijzig alleen deze constante om dezelfde codebase voor beide versies te gebruiken.
 // true  = normale versie, betaalwijze "Andere" is zichtbaar
 // false = tweede versie, alles met betaalwijze "Andere" is volledig onzichtbaar
-const SHOW_ANDERE = true;
+const SHOW_ANDERE = false;
 
 const HIDDEN_PAYMENT_METHOD_NAMES = ["Andere"];
 
