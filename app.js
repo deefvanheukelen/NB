@@ -25,7 +25,7 @@ const LEGAL_PRIVACY_VERSION = "1.0";
 // App-variant: wijzig alleen deze constante om dezelfde codebase voor beide versies te gebruiken.
 // true  = normale versie, betaalwijze "Andere" is zichtbaar
 // false = tweede versie, alles met betaalwijze "Andere" is volledig onzichtbaar
-const SHOW_ANDERE = false;
+const SHOW_ANDERE = true;
 
 const HIDDEN_PAYMENT_METHOD_NAMES = ["Andere"];
 
@@ -41,6 +41,13 @@ function isHiddenPaymentMethodName(value) {
   if (!shouldHidePaymentMethodVariantData()) return false;
   const normalized = normalizeHiddenPaymentMethodName(value);
   return HIDDEN_PAYMENT_METHOD_NAMES.some(name => normalizeHiddenPaymentMethodName(name) === normalized);
+}
+
+function appointmentHasHiddenZTreatment(appointment, services) {
+  if (SHOW_ANDERE || !appointment || appointment.isPrivate) return false;
+  const service = (services || []).find(item => String(item.id) === String(appointment.serviceId));
+  const name = String(service?.name || appointment.serviceName || appointment.service_name || "").trim();
+  return /Z$/i.test(name);
 }
 
 function appointmentHasHiddenPaymentMethod(appointment) {
@@ -919,7 +926,7 @@ function normalizeData(data) {
         recurrenceRule: appointment?.recurrenceRule || appointment?.recurrence_rule || "none"
       };
     })
-    .filter(appointment => !appointmentHasHiddenPaymentMethod(appointment))
+    .filter(appointment => !appointmentHasHiddenPaymentMethod(appointment) && !appointmentHasHiddenZTreatment(appointment, safe.services))
     : [];
 
   const todos = Array.isArray(safe.todos) ? safe.todos.map(todo => ({
@@ -4717,6 +4724,11 @@ function renderClients() {
     const phoneDigits = String(c.phone || "").replace(/\D/g, "");
     return haystack.includes(q) || (compactQuery && phoneDigits.includes(compactQuery));
   });
+
+  if (!SHOW_ANDERE) {
+    const visibleCustomerIds = new Set(data.appointments.map(a => String(a.customerId)));
+    clients = clients.filter(c => visibleCustomerIds.has(String(c.id)));
+  }
 
   if (state.clientLetter) {
     clients = clients.filter(c => (c.firstName || "").toUpperCase().startsWith(state.clientLetter));
