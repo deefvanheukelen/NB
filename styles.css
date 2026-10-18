@@ -75,13 +75,12 @@ button {
   display: grid;
   place-items: center;
   padding: 24px;
-  background:
-    radial-gradient(circle at top, #fff8fb 0%, #f9eef3 42%, #f4e4eb 100%);
+  background: #f9eef3;
   opacity: 1;
   visibility: visible;
   transition:
-    opacity 0.55s ease,
-    visibility 0.55s ease;
+    opacity 0.5s ease,
+    visibility 0.5s ease;
 }
 
 .custom-splash.fade-out {
@@ -91,35 +90,72 @@ button {
 }
 
 .custom-splash-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: splashPopIn 0.7s ease-out both;
+  position: relative;
+  width: min(82vw, 330px);
+  height: 190px;
+  display: grid;
+  place-items: center;
 }
 
+/* Klein tussenicoon: bewust kleiner dan het Android-starticoon. */
+.custom-splash-app-icon {
+  position: absolute;
+  width: 78px;
+  height: 78px;
+  object-fit: contain;
+  opacity: 1;
+  transform: scale(1);
+  animation: splashIconOut 0.55s ease-in-out 0.25s forwards;
+}
+
+/* Landscape NailBooker-logo. */
 .custom-splash-logo {
+  position: absolute;
   display: block;
-  width: min(72vw, 300px);
+  width: min(74vw, 300px);
   max-width: 300px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 18px 32px rgba(185, 109, 135, 0.18));
+  opacity: 0;
+  transform: scale(0.96);
+  animation: splashLogoIn 0.7s cubic-bezier(.2,.75,.25,1) 0.55s forwards;
+  filter: drop-shadow(0 10px 20px rgba(185, 109, 135, 0.18));
 }
 
-@keyframes splashPopIn {
+@keyframes splashIconOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+}
+
+@keyframes splashLogoIn {
   0% {
     opacity: 0;
-    transform: scale(0.92) translateY(10px);
-  }
-  60% {
-    opacity: 1;
-    transform: scale(1.02) translateY(0);
+    transform: scale(0.96);
   }
   100% {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: scale(1);
   }
-}   
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .custom-splash-app-icon {
+    animation: none;
+    opacity: 0;
+  }
+
+  .custom-splash-logo {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
    
 
 /* =========================================================
@@ -353,7 +389,7 @@ button {
 
 .detail-block {
   padding: 16px;
-  border-bottom: 1px solid #f3e9ee;
+  border-bottom: 1px solid #ece9e6;
 }
 
 .detail-block:last-child {
@@ -635,7 +671,7 @@ button {
   border-radius: 2px;
   font-weight: 700;
   flex: 0 0 auto;
-  box-shadow: 0 4px 10px rgba(165, 116, 140, 0.06);
+  box-shadow: 0 4px 10px rgba(84, 79, 65, 0.06);
 }
 
 .alphabet-btn.active {
@@ -743,29 +779,29 @@ button {
 }
 
 .action-btn {
-  box-shadow: 0 2px 4px rgba(165, 116, 140, 0.14);
+  box-shadow: 0 2px 4px rgba(84, 79, 65, 0.14);
 }
 
 .btn-primary {
-  background: #e6b1c3; /* linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%); */
+  background: linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%);
   color: #ffffff;
-  /* box-shadow: 0 12px 22px rgba(201, 120, 150, 0.22); */
+  /* box-shadow: 0 12px 22px rgba(185, 109, 135, 0.22); */
 }
 
 .btn-primary:hover {
-  /* box-shadow: 0 16px 28px rgba(201, 120, 150, 0.28); */
+  /* box-shadow: 0 16px 28px rgba(185, 109, 135, 0.28); */
 }
 
 .btn-secondary {
   background: #f5f1f3;
   color: var(--text);
-  border: 1px solid #eee2e8;
+  border: 1px solid #e6e2de;
 }
 
 .btn-danger {
   background: var(--danger-soft);
   color: var(--danger);
-  border: 1px solid #f5c2d2;
+  border: 1px solid #d9d4cf;
 }
 
 .ghost-btn {
@@ -775,7 +811,7 @@ button {
   border-radius: 2px;
   padding: 10px 14px;
   font-weight: 700;
-  /* box-shadow: 0 6px 14px rgba(165, 116, 140, 0.08); */
+  /* box-shadow: 0 6px 14px rgba(84, 79, 65, 0.08); */
 }
 
 .full-btn {
@@ -803,12 +839,13 @@ button {
 
 .price-chip {
   border: none;
-  background: var(--primary-soft);
-  color: var(--primary-dark);
+  /* Onbetaalde afspraak: zelfde roodachtige stijl als "Onbetaald" bij Omzet */
+  background: var(--danger-soft);
+  color: var(--danger);
   border-radius: 999px;
   font-weight: 700;
   padding: 10px 12px;
-  /* box-shadow: 0 2px 4px rgba(165, 116, 140, 0.12); */
+  /* box-shadow: 0 2px 4px rgba(170, 120, 145, 0.12); */
 }
 
 .price-chip.paid {
@@ -1066,7 +1103,7 @@ button {
   background: #ffffff;
   border-radius: 2px;
   padding: 18px;
-  box-shadow: 0 24px 44px rgba(84, 48, 65, 0.25);
+  box-shadow: 0 24px 44px rgba(84, 79, 65, 0.25);
   overflow-x: hidden;
 }
 
@@ -1269,7 +1306,7 @@ button {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 2px;
-  box-shadow: 0 16px 32px rgba(84, 48, 65, 0.2);
+  box-shadow: 0 16px 32px rgba(84, 79, 65, 0.2);
   overflow: hidden;
 }
 
@@ -1309,14 +1346,14 @@ button {
   align-items: center;
   gap: 7px;
   min-height: 34px;
-  border: 1px solid #f0dce5;
+  border: 1px solid #f2f0ee;
   border-radius: 2px;
   padding: 6px 10px;
-  background: #fff8fb;
+  background: #f7f4f6;
   color: var(--primary-dark);
   font-size: 13px;
   font-weight: 700;
-  box-shadow: 0 4px 10px rgba(165, 116, 140, 0.08);
+  box-shadow: 0 4px 10px rgba(84, 79, 65, 0.08);
 }
 
 .payment-qr-toggle:hover,
@@ -1352,10 +1389,10 @@ button {
   width: 150px;
   margin-top: 8px;
   padding: 10px;
-  border: 1px solid #f1dfe7;
+  border: 1px solid #e5e1dd;
   border-radius: 2px;
   background: #ffffff;
-  box-shadow: 0 12px 24px rgba(84, 48, 65, 0.14);
+  box-shadow: 0 12px 24px rgba(84, 79, 65, 0.14);
 }
 
 .payment-qr-code-wrap {
@@ -1364,7 +1401,7 @@ button {
   padding: 6px;
   border-radius: 2px;
   background: #ffffff;
-  border: 1px solid #f4e8ee;
+  border: 1px solid #ece9e6;
 }
 
 .payment-qr-image {
@@ -1425,13 +1462,13 @@ button {
 }
 
 .payment-method-popup-item.active {
-  background: #f2d7e1;
+  background: #f2f0ee;
   color: var(--primary-dark);
   font-weight: 700;
 }
 
 .payment-method-popup-item + .payment-method-popup-item {
-  border-top: 1px solid #f6edf1;
+  border-top: 1px solid #efedea;
 }
 
 .payment-method-popup-item.is-unpaid {
@@ -1562,7 +1599,7 @@ button {
   gap: 4px;
   align-items: start;
   padding: 14px 0;
-  border-bottom: 1px solid #f2e8ed;
+  border-bottom: 1px solid #ebe8e5;
 }
 
 .account-data-row:last-child {
@@ -1617,7 +1654,7 @@ button {
 
 .text-link-btn:hover,
 .text-link-btn:active {
-  color: #9f5f75;
+  color: #544f41;
 }
 
 /* =========================================================
@@ -1688,7 +1725,7 @@ button {
   gap: 4px;
   align-items: start;
   padding: 14px 0;
-  border-bottom: 1px solid #f2e8ed;
+  border-bottom: 1px solid #ebe8e5;
 }
 
 .account-data-row:last-child {
@@ -1743,7 +1780,7 @@ button {
 
 .text-link-btn:hover,
 .text-link-btn:active {
-  color: #9f5f75;
+  color: #544f41;
 }
 }
 
@@ -1830,7 +1867,7 @@ button {
   padding: 10px 16px;
   border-radius: 8px;
   font-size: 14px;
-  box-shadow: 0 1px 2px rgba(165, 116, 140, 0.18);
+  box-shadow: 0 1px 2px rgba(84, 79, 65, 0.18);
 }
 
 .client-appointments-section {
@@ -1972,7 +2009,7 @@ button {
 }
 
 .client-detail-row-stacked {
-  border-bottom: 1px solid #f1e5eb;
+  border-bottom: 1px solid #e7e3df;
 }
 
 .client-detail-row-stacked:last-child {
@@ -2025,7 +2062,7 @@ button {
   align-items: baseline;
   gap: 18px;
   padding: 12px 14px 10px;
-  border-bottom: 1px solid #f1e5eb;
+  border-bottom: 1px solid #e7e3df;
 }
 
 .client-appointments-title {
@@ -2046,7 +2083,7 @@ button {
   gap: 12px;
   align-items: center;
   padding: 12px 14px;
-  border-bottom: 1px solid #f1e5eb;
+  border-bottom: 1px solid #e7e3df;
 }
 
 .client-appointment-row:last-child {
@@ -2165,7 +2202,7 @@ button {
   gap: 6px;
   padding: 12px 8px 10px;
   font-family: 'Montserrat', sans-serif;
-  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
+  box-shadow: 0 1px 2px rgba(84, 79, 65, 0.08);
   text-align: center;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -2249,8 +2286,8 @@ button {
   display: grid;
   gap: 6px;
   padding: 14px 12px;
-  border: 1px solid #f0e4ea;
-  background: #fbf7f9;
+  border: 1px solid #e7e3df;
+  background: #f7f4f6;
 }
 
 .revenue-summary-item strong {
@@ -2356,7 +2393,7 @@ button {
   flex-direction: column-reverse;
   justify-content: flex-start;
   overflow: hidden;
-  background: #f3e7ec;
+  background: #ebe8e5;
 }
 
 .revenue-bar-segment {
@@ -2491,8 +2528,8 @@ button {
   top: 50%;
   height: 48px;
   transform: translateY(-50%);
-  border-top: 1px solid #eadbe3;
-  border-bottom: 1px solid #eadbe3;
+  border-top: 1px solid #ded9d4;
+  border-bottom: 1px solid #ded9d4;
   background: rgba(245, 235, 240, 0.45);
   pointer-events: none;
   border-radius: 2px;
@@ -2542,7 +2579,7 @@ button {
 }
 
 .revenue-wheel-option.active {
-  color: #a5567a;
+  color: #544f41;
   opacity: 1;
   transform: scale(1.02);
   font-weight: 700;
@@ -2642,7 +2679,7 @@ button {
 #todoScreen {
   grid-template-rows: 1fr;
   min-height: 0;
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .todo-screen-shell {
@@ -2712,7 +2749,7 @@ button {
 
 .todo-check-btn {
   border: none;
-  border-right: 1px solid #f2e8ed;
+  border-right: 1px solid #ebe8e5;
   background: #fff;
   display: grid;
   place-items: center;
@@ -2791,12 +2828,12 @@ button {
 }
 
 .todo-card.is-overdue {
-  border-color: #f1bfd0;
+  border-color: #d7d1cc;
 }
 
 .todo-completed-row {
   margin-top: 10px;
-  border-top: 1px solid #f1e5eb;
+  border-top: 1px solid #e7e3df;
 }
 
 
@@ -2858,7 +2895,7 @@ button {
 }
 
 .settings-group {
-  border-bottom: 1px solid #f1e5eb;
+  border-bottom: 1px solid #e7e3df;
   padding-bottom: 14px;
 }
 
@@ -2963,7 +3000,7 @@ button {
 }
 
 .app-message-card[data-variant="danger"] .app-message-badge {
-  background: #f2bfd0;
+  background: #d7d1cc;
 }
 
 #appMessageDialogActions {
@@ -3012,7 +3049,7 @@ button {
 #statisticsScreen {
   grid-template-rows: 1fr;
   min-height: 0;
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .statistics-screen-shell {
@@ -3048,7 +3085,7 @@ button {
 
 .statistics-kpi {
   border: 1px solid var(--line);
-  background: #fffdfd;
+  background: #ffffff;
   padding: 10px 8px;
   aspect-ratio: 1 / 1;
   display: grid;
@@ -3136,7 +3173,7 @@ button {
   align-items: center;
   font-size: 14px;
   padding: 8px 0;
-  border-top: 1px solid #f1e5eb;
+  border-top: 1px solid #e7e3df;
   min-width: 0;
 }
 
@@ -3191,7 +3228,7 @@ button {
   align-items: center;
   padding: 14px 0;
   border: none;
-  border-top: 1px solid #f1e5eb;
+  border-top: 1px solid #e7e3df;
   background: transparent;
   color: inherit;
   text-align: left;
@@ -3472,7 +3509,7 @@ button {
   body {
     background:
       radial-gradient(circle at top left, rgba(248, 232, 238, 0.9), transparent 34%),
-      linear-gradient(135deg, #f7f4f6 0%, #fff 46%, #fbf7f9 100%);
+      linear-gradient(135deg, #f7f4f6 0%, #fff 46%, #f7f4f6 100%);
   }
 
   .app-shell {
@@ -3512,7 +3549,7 @@ button {
     overflow-x: hidden;
     overflow-y: auto;
     background:
-      linear-gradient(180deg, #fff 0%, #fff8fb 52%, #f8e8ee 100%);
+      linear-gradient(180deg, #fff 0%, #f7f4f6 52%, #f2f0ee 100%);
   }
 
   .nav-btn {
@@ -3717,7 +3754,7 @@ button {
   .clients-panel,
   .services-panel,
   .detail-panel {
-    background: #fbf7f9;
+    background: #f7f4f6;
   }
 
   .search-input {
@@ -4000,7 +4037,7 @@ button {
   background: #ffffff;
   border: 1px solid var(--line-strong);
   border-radius: 2px;
-  box-shadow: 0 16px 34px rgba(84, 48, 65, 0.18);
+  box-shadow: 0 16px 34px rgba(84, 79, 65, 0.18);
   padding: 6px;
 }
 
@@ -4131,7 +4168,7 @@ button {
 
 .main-layout.is-swiping,
 .main-layout.is-swipe-animating {
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .main-layout.is-swiping > .screen,
@@ -4472,7 +4509,7 @@ button {
   background: var(--primary-soft);
   border-color: var(--primary-dark);
   transform: scale(1.01);
-  box-shadow: 0 10px 24px rgba(170, 120, 145, 0.24);
+  box-shadow: 0 10px 24px rgba(84, 79, 65, 0.24);
   z-index: 10;
 }
 
@@ -5072,7 +5109,7 @@ button {
 }
 
 .revenue-summary-item.revenue-summary-total {
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 @media (max-width: 420px) {
@@ -5112,7 +5149,7 @@ button {
   display: inline-grid;
   place-items: center;
   padding: 0 0 3px;
-  box-shadow: 0 2px 4px rgba(165, 116, 140, 0.16);
+  box-shadow: 0 2px 4px rgba(84, 79, 65, 0.16);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -5134,7 +5171,7 @@ button {
 
 .client-detail-appointment-row {
   grid-template-columns: 72px 1fr auto;
-  border-bottom: 1px solid #f1e5eb;
+  border-bottom: 1px solid #e7e3df;
   cursor: pointer;
 }
 
@@ -6187,7 +6224,7 @@ button.is-action-locked .app-action-nav-label {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 46px;
   align-items: stretch;
-  border-bottom: 1px solid #f6edf1;
+  border-bottom: 1px solid #efedea;
 }
 
 .appointment-action-details-row .payment-method-popup-item {
@@ -6203,7 +6240,7 @@ button.is-action-locked .app-action-nav-label {
   width: 46px;
   min-width: 46px;
   border: none;
-  border-left: 1px solid #f6edf1;
+  border-left: 1px solid #efedea;
   background: #ffffff;
   color: var(--primary-dark);
   display: inline-flex;
@@ -6346,7 +6383,7 @@ button.is-action-locked .app-action-nav-label {
   justify-content: space-between;
   gap: 10px;
   text-align: left;
-  box-shadow: 0 2px 4px rgba(170, 120, 145, 0.08);
+  box-shadow: 0 2px 4px rgba(84, 79, 65, 0.08);
   cursor: pointer;
   transition:
     border-color 0.18s ease,
@@ -6415,7 +6452,7 @@ button.is-action-locked .app-action-nav-label {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 2px;
-  box-shadow: 0 16px 32px rgba(84, 48, 65, 0.18);
+  box-shadow: 0 16px 32px rgba(84, 79, 65, 0.18);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -6448,7 +6485,7 @@ button.is-action-locked .app-action-nav-label {
 }
 
 .app-select-option.is-selected {
-  background: #f2d7e1;
+  background: #f2f0ee;
   border-color: var(--primary);
   color: var(--primary-dark);
   font-weight: 400;
@@ -6531,7 +6568,7 @@ button.is-action-locked .app-action-nav-label {
   justify-content: center;
   text-decoration: none;
   color: #ffffff;
-  box-shadow: 0 2px 4px rgba(165, 116, 140, 0.14);
+  box-shadow: 0 2px 4px rgba(84, 79, 65, 0.14);
   transition:
     transform 0.14s ease,
     box-shadow 0.18s ease,
@@ -6541,7 +6578,7 @@ button.is-action-locked .app-action-nav-label {
 .appointment-action-contact-btn:hover,
 .appointment-action-contact-btn:active {
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(165, 116, 140, 0.16);
+  box-shadow: 0 4px 10px rgba(84, 79, 65, 0.16);
 }
 
 .appointment-action-contact-btn .client-action-icon {
@@ -6745,14 +6782,14 @@ button.is-action-locked .app-action-nav-label {
   place-items: center;
   padding: 0;
   font-weight: 700;
-  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
+  box-shadow: 0 1px 2px rgba(84, 79, 65, 0.08);
   -webkit-tap-highlight-color: transparent;
 }
 
 .revenue-calendar-day.is-other-month {
-  background: #fbf7f9;
+  background: #f7f4f6;
   color: #b2a8b1;
-  border-color: #f2e8ed;
+  border-color: #ebe8e5;
   box-shadow: none;
 }
 
@@ -6771,9 +6808,9 @@ button.is-action-locked .app-action-nav-label {
 
 .revenue-calendar-day.is-other-month.selected,
 .revenue-calendar-day.is-other-month.selected-week {
-  background: #f8e8ee;
+  background: #f2f0ee;
   color: var(--primary-dark);
-  border-color: #e6b1c3;
+  border-color: #d5819d;
 }
 
 .revenue-month-grid {
@@ -6793,7 +6830,7 @@ button.is-action-locked .app-action-nav-label {
   font-size: 14px;
   font-weight: 500;
   line-height: 1.1;
-  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
+  box-shadow: 0 1px 2px rgba(84, 79, 65, 0.08);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -6865,7 +6902,7 @@ button.is-action-locked .app-action-nav-label {
 #todoScreen {
   grid-template-rows: 1fr;
   min-height: 0;
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .todo-screen-shell {
@@ -6903,7 +6940,7 @@ button.is-action-locked .app-action-nav-label {
   border-radius: 2px;
   padding: 8px 14px;
   font-weight: 700;
-  box-shadow: 0 1px 2px rgba(170, 120, 145, 0.08);
+  box-shadow: 0 1px 2px rgba(84, 79, 65, 0.08);
 }
 
 .todo-filter-btn.active {
@@ -6957,7 +6994,7 @@ button.is-action-locked .app-action-nav-label {
 
 .todo-check-btn {
   border: none;
-  border-right: 1px solid #f2e8ed;
+  border-right: 1px solid #ebe8e5;
   background: #ffffff;
   display: grid;
   place-items: center;
@@ -7139,7 +7176,7 @@ button.is-action-locked .app-action-nav-label {
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 4px;
-  box-shadow: 0 16px 32px rgba(84, 48, 65, 0.18);
+  box-shadow: 0 16px 32px rgba(84, 79, 65, 0.18);
   padding: 12px;
 }
 
@@ -7158,8 +7195,8 @@ button.is-action-locked .app-action-nav-label {
   place-items: center;
   padding: 8px;
   border-radius: 14px;
-  background: #fff8fb;
-  border: 1px solid #f4e8ee;
+  background: #f7f4f6;
+  border: 1px solid #ece9e6;
 }
 
 .payment-qr-card .payment-qr-image {
@@ -7262,7 +7299,7 @@ button.is-action-locked .app-action-nav-label {
 .payment-qr-dialog-card {
   text-align: center;
   border: 1px solid var(--line);
-  box-shadow: 0 28px 58px rgba(84, 48, 65, 0.22);
+  box-shadow: 0 28px 58px rgba(84, 79, 65, 0.22);
 }
 
 .payment-qr-dialog-card .modal-head {
@@ -7285,7 +7322,7 @@ button.is-action-locked .app-action-nav-label {
   padding: 12px;
   border: 5px solid #f0e3ea;
   border-radius: 22px;
-  background: #fff8fb;
+  background: #f7f4f6;
 }
 
 .payment-qr-dialog-image {
@@ -7502,7 +7539,7 @@ button.is-action-locked .app-action-nav-label {
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 2px;
-  background: #fff8fb;
+  background: #f7f4f6;
   color: var(--primary-dark);
   font-weight: 700;
   user-select: none;
@@ -7641,15 +7678,15 @@ button.is-action-locked .app-action-nav-label {
 #settingsScreen {
   grid-template-rows: 1fr;
   min-height: 0;
-  background: #fbf7f9;
+  /* background: #f7f4f6; */
 }
 
 .settings-page {
   min-height: 0;
   overflow: hidden;
-  background:
+  /* background:
     radial-gradient(circle at top left, rgba(248, 232, 238, 0.88), transparent 34%),
-    linear-gradient(180deg, #fffdfd 0%, #fbf7f9 100%);
+    linear-gradient(180deg, #ffffff 0%, #f7f4f6 100%); */
 }
 
 .settings-scroll {
@@ -7746,7 +7783,7 @@ button.is-action-locked .app-action-nav-label {
 }
 
 .settings-section-card .field {
-  background: #fffdfd;
+  background: #ffffff;
 }
 
 .settings-section-head {
@@ -7774,7 +7811,7 @@ button.is-action-locked .app-action-nav-label {
   height: 42px;
   display: grid;
   place-items: center;
-  border: 1px solid #f0dce5;
+  border: 1px solid #f2f0ee;
   border-radius: 15px;
   background: var(--primary-soft);
   color: var(--primary-dark);
@@ -7898,7 +7935,7 @@ button.is-action-locked .app-action-nav-label {
   justify-content: space-between;
   gap: 10px;
   border-color: #e7bfd0;
-  background: #fff8fb;
+  background: #f7f4f6;
 }
 
 .settings-actions-sticky .action-btn {
@@ -8148,7 +8185,7 @@ body.app-is-busy .revenue-action-bar {
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.96);
   color: var(--primary-dark);
-  box-shadow: 0 18px 42px rgba(84, 48, 65, 0.18);
+  box-shadow: 0 18px 42px rgba(84, 79, 65, 0.18);
   font-family: 'Montserrat', sans-serif;
   font-size: 14px;
   font-weight: 700;
@@ -8206,8 +8243,8 @@ body.app-is-busy *:not(#appBusyOverlay):not(#appBusyOverlay *) {
 .revenue-screen-shell .revenue-period-tile.is-revenue-swipe-committing,
 .revenue-screen-shell .revenue-period-tile.is-revenue-swipe-settling {
   transition:
-    transform 120ms cubic-bezier(0.22, 0.72, 0.18, 1),
-    opacity 65ms ease !important;
+    transform 80ms cubic-bezier(0.22, 0.72, 0.18, 1),
+    opacity 45ms ease !important;
 }
 
 .revenue-screen-shell .revenue-period-tile.is-revenue-swipe-committing {
@@ -8332,7 +8369,7 @@ body.app-is-busy *:not(#appBusyOverlay):not(#appBusyOverlay *) {
 .header-account-icon {
   width: 30px;
   height: 30px;
-  color: #b86d87;
+  color: #544f41;
 }
 
 .header-account-icon .header-account-svg {
@@ -8361,7 +8398,7 @@ body.app-is-busy *:not(#appBusyOverlay):not(#appBusyOverlay *) {
 .revenue-chart-card .revenue-method-breakdown {
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 1px solid #f0e4ea;
+  border-top: 1px solid #e7e3df;
 }
 
 /* =========================================================
@@ -8370,7 +8407,7 @@ body.app-is-busy *:not(#appBusyOverlay):not(#appBusyOverlay *) {
 #costsScreen {
   grid-template-rows: 1fr;
   min-height: 0;
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .costs-screen-shell {
@@ -9012,8 +9049,8 @@ body.costs-fab-pair #floatingAddBtn {
   display: grid;
   gap: 6px;
   padding: 14px 12px;
-  border: 1px solid #f0e4ea;
-  background: #fbf7f9;
+  border: 1px solid #e7e3df;
+  background: #f7f4f6;
   box-shadow: none;
 }
 
@@ -9110,8 +9147,8 @@ body.app-is-busy .costs-action-bar {
   min-height: 76px;
   aspect-ratio: auto;
   padding: 14px 12px;
-  border: 1px solid #f0e4ea;
-  background: #fbf7f9;
+  border: 1px solid #e7e3df;
+  background: #f7f4f6;
 }
 
 .statistics-kpi-label {
@@ -9536,8 +9573,8 @@ body.costs-action-mode.costs-fab-pair #floatingAddBtn {
   height: 26px;
   min-height: 26px;
   border: none;
-  border-top: 1px solid #f4e8ee;
-  border-bottom: 1px solid #f4e8ee;
+  border-top: 1px solid #ece9e6;
+  border-bottom: 1px solid #ece9e6;
   background: #fff4f8;
   color: var(--primary-dark);
   display: grid;
@@ -9574,7 +9611,7 @@ body.agenda-day-mode #agendaScreen .agenda-list-panel {
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border: 1px solid #f1e5eb;
+  border: 1px solid #e7e3df;
   background: #ffffff;
   margin-top: 8px;
 }
@@ -9771,7 +9808,7 @@ body.agenda-day-mode #agendaDayCalendar {
 }
 
 .agenda-day-appointment.private {
-  background: #fff8fb !important;
+  background: #f7f4f6 !important;
 }
 
 .agenda-day-appointment-row.appointment-row {
@@ -9836,7 +9873,7 @@ body.agenda-day-mode #agendaDayCalendar {
 ========================================================= */
 .agenda-day-calendar.has-pinned-private-day .agenda-day-scroll,
 .agenda-day-calendar.has-pinned-private-day .agenda-day-grid {
-  background: #fff8fb !important;
+  background: #f7f4f6 !important;
 }
 
 .agenda-day-pinned-private-wrap {
@@ -9846,7 +9883,7 @@ body.agenda-day-mode #agendaDayCalendar {
   display: grid;
   gap: 4px;
   padding: 6px 8px 6px 50px;
-  background: #fff8fb;
+  background: #f7f4f6;
   border-bottom: 1px solid #efd7e1;
 }
 
@@ -9854,7 +9891,7 @@ body.agenda-day-mode #agendaDayCalendar {
   width: 100%;
   border-radius: 0 !important;
   padding: 0 !important;
-  background: #fff8fb !important;
+  background: #f7f4f6 !important;
   border: 1px solid #eecbd8 !important;
   box-shadow: var(--shadow-card) !important;
   color: inherit !important;
@@ -9869,7 +9906,7 @@ body.agenda-day-mode #agendaDayCalendar {
 }
 
 .agenda-day-appointment.private.appointment-card {
-  background: #fff8fb !important;
+  background: #f7f4f6 !important;
   border-color: #eecbd8 !important;
 }
 
@@ -10339,7 +10376,7 @@ body.agenda-day-mode #agendaCalendarModeToggle {
   bottom: 0;
   width: var(--revenue-bar-group-width, 10px);
   transform: translateX(-50%);
-  background: #f3e7ec;
+  background: #ebe8e5;
   z-index: 0;
 }
 
@@ -10468,7 +10505,7 @@ body.costs-action-mode #standardCostsBtn.fab.fab-secondary:not(.hidden) {
   font-weight: 700;
   line-height: 1;
   padding: 0 12px 4px;
-  box-shadow: 0 2px 8px rgba(84, 48, 65, 0.14);
+  box-shadow: 0 2px 8px rgba(84, 79, 65, 0.14);
   pointer-events: auto;
   touch-action: manipulation;
 }
@@ -10503,7 +10540,7 @@ body.costs-action-mode #standardCostsBtn.fab.fab-secondary:not(.hidden) {
   padding: 0 0 3px !important;
   font-size: 13px !important;
   line-height: 1 !important;
-  box-shadow: 0 1px 4px rgba(84, 48, 65, 0.12) !important;
+  box-shadow: 0 1px 4px rgba(170, 120, 145, 0.12) !important;
 }
 
 .agenda-day-hidden-nav:hover,
@@ -10547,7 +10584,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
    AGENDA: dagen van vorige/volgende maand opnieuw zichtbaar
 ========================================================= */
 .day-cell.other-month {
-  background: #fbf7f9;
+  background: #f7f4f6;
   border-color: #f1e7ed;
   color: #b7a9b2;
   opacity: 0.72;
@@ -10756,7 +10793,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
   gap: 12px;
   align-items: flex-start;
   padding: 12px;
-  border: 1px solid #f0dce5;
+  border: 1px solid #f2f0ee;
   border-radius: 16px;
   background: #fff;
 }
@@ -10836,7 +10873,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
   height: 100%;
   min-height: 0;
   display: grid;
-  background: #fbf7f9;
+  background: #f7f4f6;
   overflow: hidden;
 }
 
@@ -10846,7 +10883,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
   min-height: 0;
   border: 0;
   display: block;
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 /* =========================================================
@@ -10859,7 +10896,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
   padding: 14px 14px 34px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .admin-overview-card {
@@ -10908,9 +10945,9 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
   display: grid;
   gap: 7px;
   padding: 13px 10px;
-  border: 1px solid #f0e4ea;
+  border: 1px solid #e7e3df;
   border-radius: var(--radius-md);
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .admin-stat-card span {
@@ -11008,7 +11045,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
   min-width: 0;
   padding: 9px;
   border-radius: var(--radius-md);
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .admin-user-field span {
@@ -11032,7 +11069,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
   gap: 8px;
   padding: 10px 12px 12px;
   border-top: 1px solid var(--line);
-  background: #fffdfd;
+  background: #ffffff;
 }
 
 .admin-empty-state {
@@ -11083,7 +11120,7 @@ body.agenda-day-mode #agendaDayCalendar .agenda-day-hidden-nav-top {
 .header-support-btn {
   width: 34px;
   height: 34px;
-  border: 1px solid rgba(184, 109, 135, 0.22);
+  border: 1px solid rgba(185, 109, 135, 0.22);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.72);
   color: var(--primary-dark);
@@ -11843,9 +11880,9 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
   height: 34px;
   min-width: 34px;
   min-height: 34px;
-  border: 1px solid rgba(184, 109, 135, 0.22);
+  border: 1px solid rgba(185, 109, 135, 0.22);
   border-radius: 999px;
-  background: #bd6d89;
+  background: #d98ea7;
   color: #ffffff;
   font-family: 'Montserrat', sans-serif;
   font-size: 15px;
@@ -11982,7 +12019,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
   min-width: 32px;
   min-height: 32px;
   border-radius: 999px;
-  border: 1px solid rgba(184, 109, 135, 0.20);
+  border: 1px solid rgba(185, 109, 135, 0.20);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12090,8 +12127,8 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
 }
 
 #appTopbar .header-language-btn {
-  background: #bd6d89 !important;
-  border: 1px solid #bd6d89 !important;
+  background: #d98ea7 !important;
+  border: 1px solid #d5819d !important;
   color: #ffffff !important;
 }
 
@@ -12112,7 +12149,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
 
 #appTopbar .header-language-option {
   background: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid rgba(184, 109, 135, 0.20) !important;
+  border: 1px solid rgba(185, 109, 135, 0.20) !important;
   color: var(--primary-dark) !important;
 }
 
@@ -12186,8 +12223,8 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
 }
 
 #appTopbar .header-language-btn {
-  background: #bd6d89 !important;
-  border: 1px solid #bd6d89 !important;
+  background: #d98ea7 !important;
+  border: 1px solid #d5819d !important;
   color: #ffffff !important;
 }
 
@@ -12209,7 +12246,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
 
 #appTopbar .header-language-option {
   background: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid rgba(184, 109, 135, 0.20) !important;
+  border: 1px solid rgba(185, 109, 135, 0.20) !important;
   color: var(--primary-dark) !important;
 }
 
@@ -12259,7 +12296,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(84, 48, 65, 0.12);
+  box-shadow: 0 4px 10px rgba(170, 120, 145, 0.12);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
@@ -12293,7 +12330,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
 .subscription-page {
   min-height: 0;
   height: 100%;
-  background: #fbf7f9;
+  background: #f7f4f6;
 }
 
 .subscription-scroll {
@@ -12381,7 +12418,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
 .subscription-cancel-btn {
   margin-top: 12px;
   color: var(--danger);
-  border-color: #f5c2d2;
+  border-color: #d9d4cf;
   background: var(--danger-soft);
 }
 
@@ -12400,7 +12437,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
   gap: 8px 14px;
   margin-top: 18px;
   padding-top: 14px;
-  border-top: 1px solid #f2e8ed;
+  border-top: 1px solid #ebe8e5;
   font-size: 13px;
   line-height: 1.35;
 }
@@ -12417,7 +12454,7 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
 .account-legal-links a:active,
 .terms-checkbox-row a:hover,
 .terms-checkbox-row a:active {
-  color: #9f5f75;
+  color: #544f41;
 }
 
 .terms-checkbox-row span {
@@ -12510,8 +12547,17 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
   margin: 4px 0 0;
 }
 
-.deleted-appointment-restore-btn {
+.deleted-appointment-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
   flex: 0 0 auto;
+}
+
+.deleted-appointment-restore-btn,
+.deleted-appointment-delete-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .deleted-appointments-empty {
@@ -12520,12 +12566,641 @@ dialog.modal.has-app-topbar #registerForm.modal-card {
   color: var(--muted, #6b7280);
 }
 
+
+/* Verwijderde afspraken: geen overbodige witte onderband in fullscreen-weergave */
+#deletedAppointmentsDialog.modal > .deleted-appointments-modal-card {
+  padding-bottom: calc(18px + env(safe-area-inset-bottom)) !important;
+}
+
+#deletedAppointmentsDialog.modal .deleted-appointments-list {
+  max-height: calc(100dvh - 230px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+.settings-hero-compact {
+  align-items: flex-start;
+}
+
+.settings-hero-compact p {
+  margin: 0;
+}
+
 @media (max-width: 640px) {
   .deleted-appointment-card {
     flex-direction: column;
   }
 
-  .deleted-appointment-restore-btn {
+  .deleted-appointment-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .deleted-appointment-restore-btn,
+  .deleted-appointment-delete-btn {
     width: 100%;
   }
 }
+
+/* Agenda: compacte app-style melding voor openstaande afspraken */
+#appMessageDialog.agenda-unpaid-message-dialog {
+  width: min(420px, calc(100vw - 32px)) !important;
+  max-width: min(420px, calc(100vw - 32px)) !important;
+  height: auto !important;
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px) !important;
+  margin: auto !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: visible !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog > .app-message-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 32px) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 24px 20px 20px !important;
+  overflow-y: auto !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-text {
+  text-align: left;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageDialogActions {
+  justify-content: flex-end;
+}
+
+/* Agenda: openstaande afspraken als compacte app-style popup */
+#appMessageDialog.agenda-unpaid-message-dialog,
+dialog.modal.modal-small#appMessageDialog.agenda-unpaid-message-dialog {
+  width: min(80vw, 298px) !important;
+  max-width: min(80vw, 298px) !important;
+  height: auto !important;
+  max-height: calc(100dvh - 48px) !important;
+  min-height: 0 !important;
+  margin: auto !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog::backdrop {
+  background: rgba(44, 27, 36, 0.34) !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog > .app-message-card,
+dialog.modal#appMessageDialog.agenda-unpaid-message-dialog > .modal-card.app-message-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 48px) !important;
+  padding: 0 30px 18px !important;
+  border-radius: 0 !important;
+  box-shadow: 0 22px 46px rgba(84, 79, 65, 0.24) !important;
+  background: #fff !important;
+  overflow-y: auto !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog > .app-message-card::before {
+  content: "";
+  display: block;
+  height: 52px;
+  margin: 0 -30px 20px;
+  background: linear-gradient(180deg, rgba(246, 230, 238, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+  border-bottom: 1px solid rgba(236, 219, 228, 0.9);
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-badge {
+  position: absolute;
+  top: 12px;
+  left: 22px;
+  width: 34px;
+  height: 34px;
+  margin: 0;
+  border-radius: 0;
+  background: url("img/NB_logo.png") center / contain no-repeat !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-head {
+  position: absolute;
+  top: 0;
+  left: 66px;
+  right: 18px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 0;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-head h3 {
+  margin: 0;
+  text-align: left;
+  color: var(--primary-dark);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-text {
+  margin: 0;
+  color: var(--text);
+  text-align: left;
+  font-size: 10px;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageDialogActions,
+#appMessageDialog.agenda-unpaid-message-dialog .modal-actions.end-only {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin-top: 30px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  flex-wrap: nowrap !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageConfirmBtn,
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageDialogActions .btn,
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageDialogActions .btn.app-action-nav-btn {
+  flex: 0 0 auto !important;
+  width: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  min-height: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--muted) !important;
+  font-size: 10px !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageConfirmBtn:hover,
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageConfirmBtn:active {
+  background: transparent !important;
+  color: var(--primary-dark) !important;
+  transform: none !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-action-nav-ico {
+  width: 18px;
+  height: 18px;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-action-nav-icon {
+  width: 18px;
+  height: 18px;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-action-nav-label {
+  font-size: 10px;
+  line-height: 1;
+}
+
+
+/* Agenda: openstaande afspraken melding als compacte popup, zonder gedeelde app-header */
+#appMessageDialog.agenda-unpaid-message-dialog,
+dialog.modal.modal-small#appMessageDialog.agenda-unpaid-message-dialog {
+  width: min(298px, calc(100vw - 56px)) !important;
+  max-width: min(298px, calc(100vw - 56px)) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 56px) !important;
+  margin: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog > #appTopbar,
+#appMessageDialog.agenda-unpaid-message-dialog > .topbar,
+#appMessageDialog.agenda-unpaid-message-dialog > .modal-app-topbar {
+  display: none !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog > .modal-card.app-message-card {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 56px) !important;
+  padding: 0 30px 18px !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: 0 22px 46px rgba(84, 79, 65, 0.24) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog > .modal-card.app-message-card::before {
+  content: "";
+  display: block;
+  height: 52px;
+  margin: 0 -30px 20px;
+  background: linear-gradient(180deg, rgba(246, 230, 238, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+  border-bottom: 1px solid rgba(236, 219, 228, 0.9);
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-badge {
+  position: absolute !important;
+  top: 10px !important;
+  left: 22px !important;
+  display: block !important;
+  width: 36px !important;
+  height: 36px !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background: url("img/NB_logo.png") center / contain no-repeat !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-head {
+  position: absolute !important;
+  top: 0 !important;
+  left: 66px !important;
+  right: 18px !important;
+  height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin: 0 !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-head h3 {
+  margin: 0 !important;
+  text-align: left !important;
+  color: var(--primary-dark) !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-text {
+  margin: 0 !important;
+  text-align: left !important;
+  font-size: 10px !important;
+  line-height: 1.45 !important;
+  white-space: pre-line !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageDialogActions,
+#appMessageDialog.agenda-unpaid-message-dialog .modal-actions.end-only {
+  position: static !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  z-index: auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: auto !important;
+  margin: 30px 0 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageConfirmBtn {
+  flex: 0 0 auto !important;
+  width: 56px !important;
+  min-width: 56px !important;
+  max-width: 56px !important;
+  min-height: 42px !important;
+  height: 42px !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Agenda: finale positionering/typografie openstaande afspraken popup */
+#appMessageDialog.agenda-unpaid-message-dialog,
+dialog.modal.modal-small#appMessageDialog.agenda-unpaid-message-dialog {
+  position: fixed !important;
+  inset: 50% auto auto 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: min(298px, calc(100vw - 56px)) !important;
+  max-width: min(298px, calc(100vw - 56px)) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 56px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog > .modal-card.app-message-card {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: calc(100dvh - 56px) !important;
+  padding-bottom: 20px !important;
+  overflow-y: auto !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog .app-message-text {
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  white-space: pre-line !important;
+}
+
+#appMessageDialog.agenda-unpaid-message-dialog #appMessageDialogActions,
+#appMessageDialog.agenda-unpaid-message-dialog .modal-actions.end-only {
+  position: static !important;
+  width: auto !important;
+  margin: 28px 0 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+
+/* Kosten en To Do zijn in deze versie bewust uitgeschakeld. */
+.feature-retired { display: none !important; }
+
+
+/* =========================================================
+   BRAND REFRESH v2 — lichtere basis, iets fleuriger
+========================================================= */
+:root {
+  --bg: #f7f4f6;
+  --line: #eddfe6;
+  --line-strong: #e4d1da;
+  --primary: #d991ab;
+  --primary-dark: #b86d87;
+  --primary-soft: #f8e8ee;
+  --text: #4e4650;
+  --muted: #8c838d;
+}
+
+.app-shell {
+  background: linear-gradient(180deg, #ffffff 0%, #fffdfd 50%, #fbf7f9 100%);
+}
+
+#appTopbar.topbar {
+  background: linear-gradient(to bottom, #f8e8ee 0%, rgba(248, 232, 238, 0) 100%) !important;
+  border-bottom-color: #eddfe6 !important;
+}
+
+.nav-btn.active,
+.day-cell.selected,
+.revenue-period-tile.active,
+.todo-filter-btn.active,
+.app-select-option.is-selected {
+  background: #f8e8ee !important;
+}
+
+#appTopbar .header-language-btn {
+  background: linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%) !important;
+  border-color: #d5819d !important;
+  color: #fff !important;
+  box-shadow: 0 5px 12px rgba(185, 109, 135, 0.18) !important;
+}
+
+#appTopbar .header-language-option {
+  border-color: rgba(185, 109, 135, 0.20) !important;
+  color: #544f41 !important;
+}
+
+#appTopbar .header-language-option:hover,
+#appTopbar .header-language-option:active {
+  background: #f8e8ee !important;
+  color: #b86d87 !important;
+}
+
+.btn-primary, .fab {
+  background: linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%) !important;
+}
+
+/* =========================================================
+   BRAND REFRESH v5 — topklanten + agenda kalender-toggle
+========================================================= */
+.statistics-top-customer-rank {
+  background: linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(185, 109, 135, 0.24) !important;
+  box-shadow: 0 3px 8px rgba(185, 109, 135, 0.16);
+}
+
+.agenda-calendar-mode-toggle {
+  background: #f8e8ee !important;
+  color: #b86d87 !important;
+  border-top-color: #efd8e2 !important;
+  border-bottom-color: #efd8e2 !important;
+}
+
+.agenda-calendar-mode-toggle:hover,
+.agenda-calendar-mode-toggle:active {
+  background: #f3dce5 !important;
+}
+
+.agenda-calendar-toggle-chevrons,
+.agenda-calendar-toggle-chevrons span {
+  color: #b86d87 !important;
+}
+
+/* =========================================================
+   LOGIN KNOP - EIGEN ACHTERGRONDKLEUR
+   Alleen de knop "Inloggen"; andere primaire knoppen blijven ongewijzigd.
+========================================================= */
+#loginBtn {
+  background: linear-gradient(180deg, #e6b1c3 0%, #d98ea7 100%);
+  color: #ffffff;
+}
+
+#loginBtn:hover,
+#loginBtn:active {
+  background: #d5819d;
+}
+
+
+
+/* =========================================================
+   VRIJE DAGEN / VRIJE PERIODES
+========================================================= */
+.settings-free-days {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.settings-free-days-hint {
+  margin: 0 0 12px;
+}
+
+.settings-free-days-subgroup {
+  padding: 12px 0;
+  border-top: 1px solid #ece8e5;
+}
+
+.settings-free-days-subgroup:first-of-type {
+  border-top: none;
+  padding-top: 4px;
+}
+
+.settings-free-days-subtitle {
+  margin-bottom: 9px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.settings-free-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.settings-free-day-chip {
+  display: block;
+  min-width: 0;
+}
+
+.settings-free-day-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.settings-free-day-chip span {
+  min-height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-free-day-chip input:checked + span {
+  background: #d9d7d5;
+  border-color: #aaa6a2;
+  color: #514d49;
+  box-shadow: inset 0 0 0 1px #c9c6c3;
+}
+
+.settings-free-day-chip input:focus-visible + span {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.settings-free-days-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-free-week-interval {
+  width: 76px;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+.settings-free-days-note {
+  margin: 7px 0 0;
+  font-size: 11px;
+}
+
+.settings-free-period-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.settings-free-period-grid .field-label {
+  margin-top: 0;
+}
+
+.settings-free-holidays-row .settings-switch-row {
+  padding: 0;
+}
+
+/* Iets donkerder dan de vorige versie, maar nog duidelijk lichter dan tekst/kaarten. */
+.day-cell.fixed-free-day {
+  background: #dedcda;
+  border-color: #c6c2bf;
+}
+
+.day-cell.fixed-free-day.selected {
+  background: #d6d3d1;
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px rgba(184, 109, 135, 0.18);
+}
+
+.day-cell.fixed-free-day.other-month {
+  background: #e7e5e3;
+}
+
+.agenda-day-calendar.is-fixed-free-day,
+.agenda-day-calendar.is-fixed-free-day .agenda-day-scroll,
+.agenda-day-calendar.is-fixed-free-day .agenda-day-grid,
+.agenda-day-calendar.is-fixed-free-day.has-pinned-private-day .agenda-day-scroll,
+.agenda-day-calendar.is-fixed-free-day.has-pinned-private-day .agenda-day-grid {
+  background: #d8d6d4 !important;
+}
+
+.agenda-day-calendar.is-fixed-free-day .agenda-day-hour-line {
+  border-top-color: #bdb9b6 !important;
+}
+
+.agenda-day-calendar.is-fixed-free-day .agenda-day-hour-label {
+  color: #544f4c !important;
+}
+
+.settings-free-period-field {
+  position: relative;
+}
+
+.settings-free-period-field .appointment-picker-display {
+  min-height: 44px;
+}
+
+@media (max-width: 420px) {
+  .settings-free-days-grid {
+    gap: 4px;
+  }
+
+  .settings-free-day-chip span {
+    min-height: 36px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+
+  .settings-free-period-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Meervoudige selectie in Verwijderde afspraken */
+.deleted-appointments-selection-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+.deleted-appointments-selection-bar .btn:disabled { opacity:.5; cursor:not-allowed; }
+.deleted-appointment-select { display:flex; align-items:flex-start; padding-top:3px; flex:0 0 auto; cursor:pointer; }
+.deleted-appointment-select input { width:20px; height:20px; accent-color:var(--primary, #008080); cursor:pointer; }
+.deleted-appointment-main { flex:1 1 auto; }
+
+/* Verwijderde afspraken: compacte selectie vóór de naam */
+.deleted-appointment-name-row {display:flex;align-items:center;gap:9px;min-width:0;}
+.deleted-appointment-name-row strong {min-width:0;}
+.deleted-appointment-name-row .deleted-appointment-select {padding:0;align-items:center;}
+.deleted-appointment-main {flex:1 1 auto;min-width:0;}
+#deletedAppointmentsDialog .app-busy-overlay {position:fixed;inset:0;z-index:2147483647;}
