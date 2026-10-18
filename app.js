@@ -9,11 +9,7 @@ function formatDateInput(d) {
 const todayStr = formatDateInput(today);
 
 
-const SUPPORTED_LANGUAGES = [
-  { code: "nl-BE", label: "Nederlands" },
-  { code: "en-GB", label: "English" },
-  { code: "fr-FR", label: "Français" }
-];
+const SUPPORTED_LANGUAGES = [{ code: "nl-BE", label: "Nederlands" }];
 
 const SUPPORTED_CURRENCIES = [
   { code: "EUR", label: "Euro", symbol: "€" },
@@ -29,7 +25,7 @@ const LEGAL_PRIVACY_VERSION = "1.0";
 // App-variant: wijzig alleen deze constante om dezelfde codebase voor beide versies te gebruiken.
 // true  = normale versie, betaalwijze "Andere" is zichtbaar
 // false = tweede versie, alles met betaalwijze "Andere" is volledig onzichtbaar
-const SHOW_ANDERE = false;
+const SHOW_ANDERE = true;
 
 const HIDDEN_PAYMENT_METHOD_NAMES = ["Andere"];
 
@@ -66,32 +62,12 @@ const i18n = {
     language: "Taal", currency: "Valuta", appPreferences: "App-voorkeuren", currencyChangeWarning: "Nieuwe afspraken gebruiken voortaan deze valuta. Bestaande afspraken en omzet blijven in hun oorspronkelijke munteenheid staan en worden niet omgerekend.",
     firstName: "Voornaam", lastName: "Naam", salonName: "Salonnaam", vatNumber: "BTW-nummer", email: "E-mail", password: "Wachtwoord", confirmPassword: "Bevestig wachtwoord", optional: "optioneel",
     noRevenueForSelection: "Geen omzetgegevens voor deze selectie.", paid: "Betaald", unpaid: "Onbetaald", paymentMethod: "Betaalwijze", unknown: "Onbekend", settingsSaved: "Instellingen opgeslagen.", settingsSavedDevice: "Instellingen opgeslagen op dit toestel.", saveSettings: "Instellingen opslaan", ok: "OK", confirmTitle: "Bevestiging", confirm: "Bevestigen"
-  },
-  "en-GB": {
-    agenda: "Agenda", revenue: "Revenue", clients: "Clients", services: "Services", paymentMethods: "Payment methods", statistics: "Statistics", settings: "Settings", support: "Support", account: "Account",
-    save: "Save", cancel: "Cancel", register: "Register", login: "Log in", logout: "Log out", editProfile: "Edit details", changePassword: "Change password",
-    language: "Language", currency: "Currency", appPreferences: "App preferences", currencyChangeWarning: "New appointments will use this currency from now on. Existing appointments and revenue remain in their original currency and are not converted.",
-    firstName: "First name", lastName: "Last name", salonName: "Salon name", vatNumber: "VAT number", email: "Email", password: "Password", confirmPassword: "Confirm password", optional: "optional",
-    noRevenueForSelection: "No revenue data for this selection.", paid: "Paid", unpaid: "Unpaid", paymentMethod: "Payment method", unknown: "Unknown", settingsSaved: "Settings saved.", settingsSavedDevice: "Settings saved on this device.", saveSettings: "Save settings", ok: "OK", confirmTitle: "Confirmation", confirm: "Confirm"
-  },
-  "fr-FR": {
-    agenda: "Agenda", revenue: "Chiffre d’affaires", clients: "Clients", services: "Services", paymentMethods: "Modes de paiement", statistics: "Statistiques", settings: "Paramètres", support: "Support", account: "Compte",
-    save: "Enregistrer", cancel: "Annuler", register: "S’inscrire", login: "Connexion", logout: "Déconnexion", editProfile: "Modifier les données", changePassword: "Modifier le mot de passe",
-    language: "Langue", currency: "Devise", appPreferences: "Préférences de l’application", currencyChangeWarning: "Les nouveaux rendez-vous utiliseront désormais cette devise. Les rendez-vous et revenus existants restent dans leur devise d’origine et ne sont pas convertis.",
-    firstName: "Prénom", lastName: "Nom", salonName: "Nom du salon", vatNumber: "Numéro de TVA", email: "E-mail", password: "Mot de passe", confirmPassword: "Confirmer le mot de passe", optional: "optionnel",
-    noRevenueForSelection: "Aucune donnée de chiffre d’affaires pour cette sélection.", paid: "Payé", unpaid: "Impayé", paymentMethod: "Mode de paiement", unknown: "Inconnu", settingsSaved: "Paramètres enregistrés.", settingsSavedDevice: "Paramètres enregistrés sur cet appareil.", saveSettings: "Enregistrer les paramètres", ok: "OK", confirmTitle: "Confirmation", confirm: "Confirmer"
   }
 };
 
 const i18nExtra = {
   "nl-BE": {
-    planning: "Planning", notifications: "Meldingen", extras: "Interessante extra's", defaultBreak: "Standaard pauze tussen 2 afspraken (min)", overlapWarnings: "Overlapwaarschuwingen", overlapWarningsHint: "Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.", enableNotifications: "Meldingen inschakelen", enableNotificationsHint: "Voorbereid voor afspraakherinneringen in de app.", enableAgendaFabMenu: "Tab-menu activeren", enableAgendaFabMenuHint: "Toon rond de + knop snelle knoppen voor afspraak, kost, taak, klant, dienst en betaalwijze.", reminderBefore: "Herinnering vóór afspraak", savePending: "Instellingen opslaan...", notificationsOff: "Meldingen zijn uitgeschakeld.", notificationsActive: "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.", notificationsBlocked: "Meldingen zijn geblokkeerd in je browserinstellingen.", notificationsUnsupported: "Deze browser ondersteunt geen webmeldingen.", notificationsPermissionHint: "Schakel meldingen in en geef toestemming om herinneringen te tonen.", appointmentsOn: "Afspraken op", noAppointmentsOnDay: "Geen afspraken op deze dag.", noClientsFound: "Geen klanten gevonden.", noPhone: "Geen gsm", appointmentSingular: "afspraak", appointmentPlural: "afspraken", noActiveServices: "Nog geen actieve diensten.", inactive: "inactief", showInactiveServices: "Toon inactieve diensten", allPaymentMethods: "Alle betaalwijzen", allStatuses: "Alle statussen", day: "Dag", week: "Week", month: "Maand", year: "Jaar", today: "Vandaag", total: "Totaal", revenueOn: "Omzet op", revenueReport: "Omzetrapport", paymentMethodTitle: "Betaalwijze", unknownCustomer: "Onbekende klant", chooseMonth: "Maand kiezen", choose: "Kies", newAppointment: "Nieuwe afspraak", editAppointment: "Afspraak bewerken", customer: "Klant", date: "Datum", time: "Tijd", service: "Dienst", duration: "Duur (min)", price: "Prijs", status: "Status", planned: "Gepland", completed: "Afgerond", newClient: "Nieuwe klant", phone: "Telefoon", note: "Notitie", appointmentRemarks: "Opmerkingen", newService: "Nieuwe dienst", serviceName: "Naam dienst", newPaymentMethod: "Nieuwe betaalwijze", paymentMethodName: "Naam betaalwijze", editProfileTitle: "Profiel bewerken", currentPassword: "Huidig wachtwoord", newPassword: "Nieuw wachtwoord", message: "Melding", registerHere: "Nog geen account? Registreer hier"
-  },
-  "en-GB": {
-    planning: "Planning", notifications: "Notifications", extras: "Useful extras", defaultBreak: "Default break between 2 appointments (min)", overlapWarnings: "Overlap warnings", overlapWarningsHint: "Warn when an appointment overlaps with an existing appointment, taking duration and break time into account.", enableNotifications: "Enable notifications", enableNotificationsHint: "Prepared for appointment reminders in the app.", enableAgendaFabMenu: "Enable tab menu", enableAgendaFabMenuHint: "Show quick buttons around the + button for appointment, cost, task, client, service and payment method.", reminderBefore: "Reminder before appointment", savePending: "Saving settings...", notificationsOff: "Notifications are disabled.", notificationsActive: "Notifications are active on this device while the browser or app supports notifications.", notificationsBlocked: "Notifications are blocked in your browser settings.", notificationsUnsupported: "This browser does not support web notifications.", notificationsPermissionHint: "Enable notifications and allow permission to show reminders.", appointmentsOn: "Appointments on", noAppointmentsOnDay: "No appointments on this day.", noClientsFound: "No clients found.", noPhone: "No mobile", appointmentSingular: "appointment", appointmentPlural: "appointments", noActiveServices: "No active services yet.", inactive: "inactive", showInactiveServices: "Show inactive services", allPaymentMethods: "All payment methods", allStatuses: "All statuses", day: "Day", week: "Week", month: "Month", year: "Year", today: "Today", total: "Total", revenueOn: "Revenue on", revenueReport: "Revenue report", paymentMethodTitle: "Payment method", unknownCustomer: "Unknown client", chooseMonth: "Choose month", choose: "Choose", newAppointment: "New appointment", editAppointment: "Edit appointment", customer: "Client", date: "Date", time: "Time", service: "Service", duration: "Duration (min)", price: "Price", status: "Status", planned: "Planned", completed: "Completed", newClient: "New client", phone: "Phone", note: "Note", appointmentRemarks: "Remarks", newService: "New service", serviceName: "Service name", newPaymentMethod: "New payment method", paymentMethodName: "Payment method name", editProfileTitle: "Edit profile", currentPassword: "Current password", newPassword: "New password", message: "Message", registerHere: "No account yet? Register here"
-  },
-  "fr-FR": {
-    planning: "Planning", notifications: "Notifications", extras: "Extras utiles", defaultBreak: "Pause standard entre 2 rendez-vous (min)", overlapWarnings: "Avertissements de chevauchement", overlapWarningsHint: "Avertir lorsqu’un rendez-vous chevauche un rendez-vous existant, en tenant compte de la durée et de la pause.", enableNotifications: "Activer les notifications", enableNotificationsHint: "Prévu pour les rappels de rendez-vous dans l’application.", enableAgendaFabMenu: "Activer le menu d’onglets", enableAgendaFabMenuHint: "Afficher autour du bouton + des raccourcis pour rendez-vous, frais, tâche, client, service et mode de paiement.", reminderBefore: "Rappel avant le rendez-vous", savePending: "Enregistrement des paramètres...", notificationsOff: "Les notifications sont désactivées.", notificationsActive: "Les notifications sont actives sur cet appareil tant que le navigateur ou l’application les prend en charge.", notificationsBlocked: "Les notifications sont bloquées dans les paramètres de votre navigateur.", notificationsUnsupported: "Ce navigateur ne prend pas en charge les notifications web.", notificationsPermissionHint: "Activez les notifications et autorisez-les pour afficher les rappels.", appointmentsOn: "Rendez-vous le", noAppointmentsOnDay: "Aucun rendez-vous ce jour-là.", noClientsFound: "Aucun client trouvé.", noPhone: "Pas de GSM", appointmentSingular: "rendez-vous", appointmentPlural: "rendez-vous", noActiveServices: "Aucun service actif pour le moment.", inactive: "inactif", showInactiveServices: "Afficher les services inactifs", allPaymentMethods: "Tous les modes de paiement", allStatuses: "Tous les statuts", day: "Jour", week: "Semaine", month: "Mois", year: "Année", today: "Aujourd’hui", total: "Total", revenueOn: "Chiffre d’affaires le", revenueReport: "Rapport du chiffre d’affaires", paymentMethodTitle: "Mode de paiement", unknownCustomer: "Client inconnu", chooseMonth: "Choisir le mois", choose: "Choisir", newAppointment: "Nouveau rendez-vous", editAppointment: "Modifier le rendez-vous", customer: "Client", date: "Date", time: "Heure", service: "Service", duration: "Durée (min)", price: "Prix", status: "Statut", planned: "Planifié", completed: "Terminé", newClient: "Nouveau client", phone: "Téléphone", note: "Note", appointmentRemarks: "Remarques", newService: "Nouveau service", serviceName: "Nom du service", newPaymentMethod: "Nouveau mode de paiement", paymentMethodName: "Nom du mode de paiement", editProfileTitle: "Modifier le profil", currentPassword: "Mot de passe actuel", newPassword: "Nouveau mot de passe", message: "Message", registerHere: "Pas encore de compte ? Inscrivez-vous ici"
+    planning: "Planning", paymentDetailsQr: "Betaalgegevens QR-code", googleCalendar: "Google kalender", until: "tot", allDay: "Hele dag", minutesUnit: "minuten", oneHour: "1 uur", twentyFourHours: "24 uur", notifications: "Meldingen", extras: "Interessante extra's", defaultBreak: "Standaard pauze tussen 2 afspraken (min)", overlapWarnings: "Overlapwaarschuwingen", overlapWarningsHint: "Waarschuw als een afspraak overlapt met een bestaande afspraak, rekening houdend met duur en pauze.", enableNotifications: "Meldingen inschakelen", enableNotificationsHint: "Voorbereid voor afspraakherinneringen in de app.", enableAgendaFabMenu: "Tab-menu activeren", enableAgendaFabMenuHint: "Toon rond de + knop snelle knoppen voor afspraak, klant, dienst en betaalwijze.", reminderBefore: "Herinnering vóór afspraak", savePending: "Instellingen opslaan...", notificationsOff: "Meldingen zijn uitgeschakeld.", notificationsActive: "Meldingen zijn actief op dit toestel zolang browser of app meldingen ondersteunt.", notificationsBlocked: "Meldingen zijn geblokkeerd in je browserinstellingen.", notificationsUnsupported: "Deze browser ondersteunt geen webmeldingen.", notificationsPermissionHint: "Schakel meldingen in en geef toestemming om herinneringen te tonen.", appointmentsOn: "Afspraken op", noAppointmentsOnDay: "Geen afspraken op deze dag.", noClientsFound: "Geen klanten gevonden.", noPhone: "Geen gsm", appointmentSingular: "afspraak", appointmentPlural: "afspraken", noActiveServices: "Nog geen actieve diensten.", inactive: "inactief", showInactiveServices: "Toon inactieve diensten", allPaymentMethods: "Alle betaalwijzen", allStatuses: "Alle statussen", day: "Dag", week: "Week", month: "Maand", year: "Jaar", today: "Vandaag", total: "Totaal", revenueOn: "Omzet op", revenueReport: "Omzetrapport", paymentMethodTitle: "Betaalwijze", unknownCustomer: "Onbekende klant", chooseMonth: "Maand kiezen", choose: "Kies", newAppointment: "Nieuwe afspraak", editAppointment: "Afspraak bewerken", customer: "Klant", date: "Datum", time: "Tijd", service: "Dienst", duration: "Duur (min)", price: "Prijs", status: "Status", planned: "Gepland", completed: "Afgerond", newClient: "Nieuwe klant", phone: "Telefoon", note: "Notitie", appointmentRemarks: "Opmerkingen", newService: "Nieuwe dienst", serviceName: "Naam dienst", newPaymentMethod: "Nieuwe betaalwijze", paymentMethodName: "Naam betaalwijze", editProfileTitle: "Profiel bewerken", currentPassword: "Huidig wachtwoord", newPassword: "Nieuw wachtwoord", message: "Melding", registerHere: "Nog geen account? Registreer hier"
   }
 };
 Object.keys(i18nExtra).forEach(lang => Object.assign(i18n[lang], i18nExtra[lang]));
@@ -104,52 +80,53 @@ const i18nMore = {
     customerNumber:"Klantnummer", appointments:"Afspraken", totalLower:"totaal", noAppointmentsYet:"Nog geen afspraken.", noPaymentMethods:"Nog geen betaalwijzen.", paymentSingular:"betaling", paymentPlural:"betalingen",
     customerCount:"Aantal klanten", pastAppointments:"Afgeronde afspraken", futureAppointments:"Geplande afspraken", totalRevenueUntilToday:"Totale omzet tot vandaag", chosenServices:"Gekozen behandelingen", revenueByService:"Omzet per behandeling", chosenPaymentMethod:"Gekozen betaalwijze", topCustomers:"Top klanten", all:"Alle", noCustomerStats:"Nog geen klantgegevens beschikbaar.", more:"Meer...", less:"Minder",
     serviceNameRequired:"Geef een naam voor de dienst in.", duplicateServiceTitle:"Dubbele dienstnaam", saveAnyway:"Toch opslaan", saveFailed:"Opslaan mislukt", duplicateServiceMessage:"Er bestaat al een dienst met de naam \"{name}\".\n\nWil je toch opslaan? Dan wordt deze dienst opgeslagen als \"{uniqueName}\".", chooseDate:"Kies datum", chooseTime:"Kies tijd", chooseCustomer:"Kies een klant...", chooseService:"Kies een dienst...", choosePaymentMethod:"Kies een betaalwijze...", chooseConfirm:"Kies"
-  },
-  "en-GB": {
-    mondayShort:"Mon", tuesdayShort:"Tue", wednesdayShort:"Wed", thursdayShort:"Thu", fridayShort:"Fri", saturdayShort:"Sat", sundayShort:"Sun",
-    searchClientPlaceholder:"Search client...", searchAppointmentCustomerPlaceholder:"Search by name, phone or email...", searchServicePlaceholder:"Search service...",
-    delete:"Delete", edit:"Edit", editClient:"Edit client", editService:"Edit service", editPaymentMethod:"Edit payment method", reactivateService:"Reactivate service", reactivateServiceHint:"The service will appear again in the active services list and for new appointments.",
-    customerNumber:"Client number", appointments:"Appointments", totalLower:"total", noAppointmentsYet:"No appointments yet.", noPaymentMethods:"No payment methods yet.", paymentSingular:"payment", paymentPlural:"payments",
-    customerCount:"Number of clients", pastAppointments:"Completed appointments", futureAppointments:"Planned appointments", totalRevenueUntilToday:"Total revenue until today", chosenServices:"Selected services", revenueByService:"Revenue per service", chosenPaymentMethod:"Selected payment method", topCustomers:"Top clients", all:"All", noCustomerStats:"No client data available yet.", more:"More...", less:"Less",
-    serviceNameRequired:"Enter a service name.", duplicateServiceTitle:"Duplicate service name", saveAnyway:"Save anyway", saveFailed:"Save failed", duplicateServiceMessage:"A service named \"{name}\" already exists.\n\nDo you still want to save it? This service will be saved as \"{uniqueName}\".", chooseDate:"Choose date", chooseTime:"Choose time", chooseCustomer:"Choose a client...", chooseService:"Choose a service...", choosePaymentMethod:"Choose a payment method...", chooseConfirm:"Choose"
-  },
-  "fr-FR": {
-    mondayShort:"Lu", tuesdayShort:"Ma", wednesdayShort:"Me", thursdayShort:"Je", fridayShort:"Ve", saturdayShort:"Sa", sundayShort:"Di",
-    searchClientPlaceholder:"Rechercher un client...", searchAppointmentCustomerPlaceholder:"Rechercher par nom, téléphone ou e-mail...", searchServicePlaceholder:"Rechercher un service...",
-    delete:"Supprimer", edit:"Modifier", editClient:"Modifier le client", editService:"Modifier le service", editPaymentMethod:"Modifier le mode de paiement", reactivateService:"Réactiver le service", reactivateServiceHint:"Le service réapparaîtra dans la liste des services actifs et pour les nouveaux rendez-vous.",
-    customerNumber:"Numéro client", appointments:"Rendez-vous", totalLower:"au total", noAppointmentsYet:"Pas encore de rendez-vous.", noPaymentMethods:"Aucun mode de paiement pour le moment.", paymentSingular:"paiement", paymentPlural:"paiements",
-    customerCount:"Nombre de clients", pastAppointments:"Rendez-vous terminés", futureAppointments:"Rendez-vous planifiés", totalRevenueUntilToday:"Chiffre d’affaires total jusqu’à aujourd’hui", chosenServices:"Soins choisis", revenueByService:"Chiffre d’affaires par soin", chosenPaymentMethod:"Mode de paiement choisi", topCustomers:"Meilleurs clients", all:"Tous", noCustomerStats:"Aucune donnée client disponible pour le moment.", more:"Plus...", less:"Moins",
-    serviceNameRequired:"Indiquez un nom de service.", duplicateServiceTitle:"Nom de service en double", saveAnyway:"Enregistrer quand même", saveFailed:"Échec de l’enregistrement", duplicateServiceMessage:"Un service nommé \"{name}\" existe déjà.\n\nVoulez-vous quand même l’enregistrer ? Ce service sera enregistré sous \"{uniqueName}\".", chooseDate:"Choisir la date", chooseTime:"Choisir l’heure", chooseCustomer:"Choisir un client...", chooseService:"Choisir un service...", choosePaymentMethod:"Choisir un mode de paiement...", chooseConfirm:"Choisir"
   }
 };
 Object.keys(i18nMore).forEach(lang => Object.assign(i18n[lang], i18nMore[lang]));
 
 const i18nTodo = {
-  "nl-BE": { todo: "To Do", newTodo: "Nieuwe taak", editTodo: "Taak bewerken", todoTitle: "Titel", todoDescription: "Omschrijving", addBullet: "Bullet toevoegen", noTodos: "Nog geen taken.", markDone: "Afvinken", markOpen: "Terug openzetten", completed: "Afgewerkt", open: "Open" },
-  "en-GB": { todo: "To Do", newTodo: "New task", editTodo: "Edit task", todoTitle: "Title", todoDescription: "Description", addBullet: "Add bullet", noTodos: "No tasks yet.", markDone: "Mark done", markOpen: "Reopen", completed: "Done", open: "Open" },
-  "fr-FR": { todo: "To Do", newTodo: "Nouvelle tâche", editTodo: "Modifier la tâche", todoTitle: "Titre", todoDescription: "Description", addBullet: "Ajouter une puce", noTodos: "Aucune tâche pour le moment.", markDone: "Terminer", markOpen: "Rouvrir", completed: "Terminée", open: "Ouverte" }
+  "nl-BE": { todo: "To Do", newTodo: "Nieuwe taak", editTodo: "Taak bewerken", todoTitle: "Titel", todoDescription: "Omschrijving", addBullet: "Bullet toevoegen", noTodos: "Nog geen taken.", markDone: "Afvinken", markOpen: "Terug openzetten", completed: "Afgewerkt", open: "Open" }
 };
 Object.keys(i18nTodo).forEach(lang => Object.assign(i18n[lang], i18nTodo[lang]));
 
 const i18nCosts = {
-  "nl-BE": { costs: "Kosten", newCost: "Nieuwe kost", editCost: "Kost bewerken", costDescription: "Omschrijving", costDate: "Datum", costAmountInclVat: "Bedrag incl. btw", vat: "Btw", standardCost: "Standaardkost", noCosts: "Nog geen kosten.", saveAsStandardCostQuestion: "Wil je deze kost opslaan als standaardkost zodat je ze later snel opnieuw kunt selecteren?", costSaved: "Kost opgeslagen.", costDeleted: "Kost verwijderd.", chooseStandardCost: "Zoek of kies een standaardkost...", totalInclVat: "Totaal incl. btw", totalExclVat: "Totaal excl. btw", standardCosts: "Standaardkosten", noStandardCosts: "Nog geen standaardkosten.", editStandardCost: "Standaardkost aanpassen", deleteStandardCostConfirm: "Deze standaardkost verwijderen?" },
-  "en-GB": { costs: "Costs", newCost: "New cost", editCost: "Edit cost", costDescription: "Description", costDate: "Date", costAmountInclVat: "Amount incl. VAT", vat: "VAT", standardCost: "Standard cost", noCosts: "No costs yet.", saveAsStandardCostQuestion: "Do you want to save this cost as a standard cost so you can quickly select it again later?", costSaved: "Cost saved.", costDeleted: "Cost deleted.", chooseStandardCost: "Search or choose a standard cost...", totalInclVat: "Total incl. VAT", totalExclVat: "Total excl. VAT", standardCosts: "Standard costs", noStandardCosts: "No standard costs yet.", editStandardCost: "Edit standard cost", deleteStandardCostConfirm: "Delete this standard cost?" },
-  "fr-FR": { costs: "Frais", newCost: "Nouveau frais", editCost: "Modifier le frais", costDescription: "Description", costDate: "Date", costAmountInclVat: "Montant TVAC", vat: "TVA", standardCost: "Frais standard", noCosts: "Aucun frais pour le moment.", saveAsStandardCostQuestion: "Voulez-vous enregistrer ce frais comme frais standard afin de pouvoir le sélectionner rapidement plus tard ?", costSaved: "Frais enregistré.", costDeleted: "Frais supprimé.", chooseStandardCost: "Rechercher ou choisir un frais standard...", totalInclVat: "Total TVAC", totalExclVat: "Total HTVA", standardCosts: "Frais standard", noStandardCosts: "Aucun frais standard pour le moment.", editStandardCost: "Modifier le frais standard", deleteStandardCostConfirm: "Supprimer ce frais standard ?" }
+  "nl-BE": { costs: "Kosten", newCost: "Nieuwe kost", editCost: "Kost bewerken", costDescription: "Omschrijving", costDate: "Datum", costAmountInclVat: "Bedrag incl. btw", vat: "Btw", standardCost: "Standaardkost", noCosts: "Nog geen kosten.", saveAsStandardCostQuestion: "Wil je deze kost opslaan als standaardkost zodat je ze later snel opnieuw kunt selecteren?", costSaved: "Kost opgeslagen.", costDeleted: "Kost verwijderd.", chooseStandardCost: "Zoek of kies een standaardkost...", totalInclVat: "Totaal incl. btw", totalExclVat: "Totaal excl. btw", standardCosts: "Standaardkosten", noStandardCosts: "Nog geen standaardkosten.", editStandardCost: "Standaardkost aanpassen", deleteStandardCostConfirm: "Deze standaardkost verwijderen?" }
 };
 Object.keys(i18nCosts).forEach(lang => Object.assign(i18n[lang], i18nCosts[lang]));
 
 const i18nSubscription = {
-  "nl-BE": { subscription: "Abonnement" },
-  "en-GB": { subscription: "Subscription" },
-  "fr-FR": { subscription: "Abonnement" }
+  "nl-BE": { subscription: "Abonnement" }
 };
 Object.keys(i18nSubscription).forEach(lang => Object.assign(i18n[lang], i18nSubscription[lang]));
+
+
+const i18nSettingsComplete = {
+  "nl-BE": {
+    settingsIntro: "Beheer je planning, meldingen, app-voorkeuren, betaalgegevens en kalenderkoppeling op één overzichtelijke plaats.",
+    planningSubtitle: "Standaardgedrag bij het maken en controleren van afspraken.",
+    notificationsSubtitle: "Voorbereid voor afspraakherinneringen in de app.",
+    paymentDetailsQr: "Betaalgegevens QR-code",
+    paymentDetailsSubtitle: "Gegevens voor SEPA/bank-QR-codes bij betalingen.",
+    beneficiaryName: "Naam begunstigde", beneficiaryPlaceholder: "Bijv. Salonnaam", accountNumber: "Rekeningnummer", paymentReference: "Mededeling",
+    paymentDetailsInfo: "Deze gegevens worden gebruikt om een SEPA/bank-QR-code te maken. Klanten scannen de QR met hun bankapp.",
+    googleCalendar: "Google kalender", googleCalendarSubtitle: "Synchroniseer NailBooker-afspraken via een persoonlijke kalenderlink.",
+    googleCalendarInfo: "Maak een persoonlijke kalenderlink en voeg die één keer toe in Google Calendar via Andere agenda’s → Via URL. Google haalt daarna automatisch de actuele NailBooker-afspraken op.",
+    personalCalendarLink: "Persoonlijke kalenderlink", calendarLinkPlaceholder: "Maak eerst een kalenderlink", createCopyLink: "Maak/kopieer link", openGoogleCalendar: "Open Google Calendar", createNewLink: "Nieuwe link maken",
+    calendarFeedStatusEmpty: "Maak eerst een persoonlijke kalenderlink. Daarna kun je die één keer toevoegen in Google Calendar.",
+    calendarFeedStatusReady: "Deze link kun je één keer toevoegen in Google Calendar via ‘Via URL’. Nieuwe wijzigingen in NailBooker komen daarna automatisch mee zodra Google de feed ververst.",
+    calendarRefreshNote: "Let op: Google Calendar ververst externe kalenderlinks niet onmiddellijk. Wijzigingen verschijnen meestal later automatisch.",
+    deletedAppointments: "Verwijderde afspraken", deletedAppointmentsSubtitle: "Bekijk en herstel afspraken die uit de agenda, omzet en statistieken verborgen zijn.", openDeletedAppointments: "Verwijderde afspraken openen",
+    freeDays: "Vrije dagen", freeDaysHint: "Stel terugkerende vrije dagen, een vrije periode en Belgische feestdagen in. De agenda markeert deze dagen grijs, maar afspraken en privé-afspraken blijven altijd mogelijk.", recurringFreeDays: "Terugkerende vrije dagen", repeatEvery: "Elke", weeksUnit: "week/weken", repeatWeekHint: "Bij 2, 3 of 4 weken start de cyclus in de week waarin je deze instelling opslaat.", freePeriod: "Vrije periode", from: "Van", belgianHolidays: "Belgische feestdagen", belgianHolidaysHint: "Markeer de officiële Belgische wettelijke feestdagen automatisch als vrije dag.",
+    filter: "Filter", deletedAppointmentsSearchPlaceholder: "Alle, klantnaam, dienst, datum, opmerking..."
+  }
+};
+Object.keys(i18nSettingsComplete).forEach(lang => Object.assign(i18n[lang], i18nSettingsComplete[lang]));
 
 
 let currentProfilePreferences = { language: DEFAULT_LANGUAGE, currency: DEFAULT_CURRENCY };
 
 function normalizeLanguage(code) {
-  return SUPPORTED_LANGUAGES.some(item => item.code === code) ? code : DEFAULT_LANGUAGE;
+  return DEFAULT_LANGUAGE;
 }
 
 function normalizeCurrency(code) {
@@ -157,7 +134,7 @@ function normalizeCurrency(code) {
 }
 
 function getCurrentLanguage() {
-  return normalizeLanguage(currentProfilePreferences.language || getData()?.settings?.language || DEFAULT_LANGUAGE);
+  return DEFAULT_LANGUAGE;
 }
 
 function getCurrentCurrency() {
@@ -165,8 +142,7 @@ function getCurrentCurrency() {
 }
 
 function t(key) {
-  const lang = getCurrentLanguage();
-  return i18n[lang]?.[key] || i18n[DEFAULT_LANGUAGE]?.[key] || key;
+  return i18n[DEFAULT_LANGUAGE]?.[key] || key;
 }
 
 function getCurrencyLabel(code) {
@@ -396,6 +372,12 @@ async function saveHeaderLanguagePreference(language) {
       notifications_enabled: Boolean(currentSettings.notificationsEnabled ?? false),
       reminder_minutes: Number(currentSettings.reminderMinutes ?? 30),
       overlap_warnings_enabled: currentSettings.overlapWarningsEnabled !== false,
+      free_weekdays: getFixedFreeWeekdays(currentSettings),
+      free_week_interval: getFreeWeekInterval(currentSettings),
+      free_week_anchor_date: getFreeWeekAnchorDate(currentSettings) || null,
+      free_period_start: normalizeOptionalDate(currentSettings.freePeriodStart) || null,
+      free_period_end: normalizeOptionalDate(currentSettings.freePeriodEnd) || null,
+      belgian_holidays_enabled: Boolean(currentSettings.belgianHolidaysEnabled),
       language: nextLanguage,
       currency: normalizeCurrency(currentSettings.currency || getCurrentCurrency()),
       payment_beneficiary_name: currentSettings.paymentBeneficiaryName || null,
@@ -540,6 +522,13 @@ function updateStaticI18n() {
     if (el) el.textContent = t(key);
   });
 
+  const settingsPlanningTitle = document.querySelector('[data-settings-title="planning"]');
+  if (settingsPlanningTitle) settingsPlanningTitle.textContent = t("planning");
+  const settingsPaymentTitle = document.querySelector('[data-settings-title="paymentDetailsQr"]');
+  if (settingsPaymentTitle) settingsPaymentTitle.textContent = t("paymentDetailsQr");
+  const settingsCalendarTitle = document.querySelector('[data-settings-title="googleCalendar"]');
+  if (settingsCalendarTitle) settingsCalendarTitle.textContent = t("googleCalendar");
+
   const settingsLabels = document.querySelectorAll("#settingsScreen .detail-label");
   [[1, "planning"], [2, "notifications"]].forEach(([index, key]) => {
     if (settingsLabels[index]) settingsLabels[index].textContent = t(key);
@@ -630,6 +619,11 @@ function updateStaticI18n() {
 
   const screenTitle = document.getElementById("screenTitle");
   if (screenTitle) screenTitle.textContent = getScreenTitle(state.currentScreen, screenTitle.textContent);
+
+  rebuildSettingsSelectOptions();
+  refreshAppSelect(document.getElementById("settingsReminderMinutes"));
+  refreshAppSelect(document.getElementById("settingsLanguage"));
+  refreshAppSelect(document.getElementById("settingsCurrency"));
 
   applyNavStyleActionButtons();
 }
@@ -756,12 +750,135 @@ function isAgendaFabMenuEnabled() {
   return readAgendaFabMenuEnabledPreference();
 }
 
+function normalizeFreeWeekdays(value) {
+  const source = Array.isArray(value) ? value : [];
+  return Array.from(new Set(source
+    .map(day => Number(day))
+    .filter(day => Number.isInteger(day) && day >= 0 && day <= 6)))
+    .sort((a, b) => a - b);
+}
+
+function normalizeFreeWeekInterval(value) {
+  const interval = Number(value || 1);
+  return [1, 2, 3, 4].includes(interval) ? interval : 1;
+}
+
+function normalizeOptionalDate(value) {
+  const text = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : "";
+}
+
+function getWeekMondayDate(dateStr = todayStr) {
+  const d = new Date(`${dateStr}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return todayStr;
+  const day = d.getDay() || 7;
+  d.setDate(d.getDate() - day + 1);
+  return formatDateInput(d);
+}
+
+function getFixedFreeWeekdays(settings = getSettings()) {
+  return normalizeFreeWeekdays(settings?.freeWeekdays);
+}
+
+function getFreeWeekInterval(settings = getSettings()) {
+  return normalizeFreeWeekInterval(settings?.freeWeekInterval);
+}
+
+function getFreeWeekAnchorDate(settings = getSettings()) {
+  return normalizeOptionalDate(settings?.freeWeekAnchorDate) || getWeekMondayDate(todayStr);
+}
+
+function getFreePeriod(settings = getSettings()) {
+  return {
+    start: normalizeOptionalDate(settings?.freePeriodStart),
+    end: normalizeOptionalDate(settings?.freePeriodEnd)
+  };
+}
+
+function easterSundayDate(year) {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(year, month - 1, day);
+}
+
+function belgianPublicHolidayDates(year) {
+  const easter = easterSundayDate(year);
+  const movable = days => {
+    const d = new Date(easter);
+    d.setDate(d.getDate() + days);
+    return formatDateInput(d);
+  };
+  return new Set([
+    `${year}-01-01`,
+    movable(1),
+    `${year}-05-01`,
+    movable(39),
+    movable(50),
+    `${year}-07-21`,
+    `${year}-08-15`,
+    `${year}-11-01`,
+    `${year}-11-11`,
+    `${year}-12-25`
+  ]);
+}
+
+function isBelgianPublicHoliday(dateStr, settings = getSettings()) {
+  if (!settings?.belgianHolidaysEnabled) return false;
+  const date = new Date(`${dateStr}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return false;
+  return belgianPublicHolidayDates(date.getFullYear()).has(dateStr);
+}
+
+function isRecurringFreeWeekday(dateStr, settings = getSettings()) {
+  const date = new Date(`${dateStr}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return false;
+  if (!getFixedFreeWeekdays(settings).includes(date.getDay())) return false;
+
+  const interval = getFreeWeekInterval(settings);
+  if (interval === 1) return true;
+
+  const targetMonday = new Date(`${getWeekMondayDate(dateStr)}T00:00:00`);
+  const anchorMonday = new Date(`${getWeekMondayDate(getFreeWeekAnchorDate(settings))}T00:00:00`);
+  const diffWeeks = Math.round((targetMonday - anchorMonday) / 604800000);
+  return ((diffWeeks % interval) + interval) % interval === 0;
+}
+
+function isFreePeriodDay(dateStr, settings = getSettings()) {
+  const { start, end } = getFreePeriod(settings);
+  if (!start || !end) return false;
+  return dateStr >= start && dateStr <= end;
+}
+
+function isFixedFreeDay(dateStr, settings = getSettings()) {
+  return isRecurringFreeWeekday(dateStr, settings)
+    || isFreePeriodDay(dateStr, settings)
+    || isBelgianPublicHoliday(dateStr, settings);
+}
+
 function getDefaultSettings() {
   return {
     defaultBreakMinutes: 10,
     notificationsEnabled: false,
     reminderMinutes: 30,
     overlapWarningsEnabled: true,
+    freeWeekdays: [],
+    freeWeekInterval: 1,
+    freeWeekAnchorDate: "",
+    freePeriodStart: "",
+    freePeriodEnd: "",
+    belgianHolidaysEnabled: false,
     agendaFabMenuEnabled: readAgendaFabMenuEnabledPreference(),
     showTipsOnOpen: true,
     language: DEFAULT_LANGUAGE,
@@ -1221,18 +1338,18 @@ function getPrivateAgendaDisplayTime(appointment, dateStr) {
   const endTime = String(appointment?.privateEndTime || appointment?.private_end_time || startTime || "00:00").slice(0, 5);
 
   if (bounds.end <= bounds.start) {
-    return { main: startTime, sub: `tot ${endTime}` };
+    return { main: startTime, sub: `${t("until")} ${endTime}` };
   }
 
   if (currentDate === bounds.start) {
-    return { main: startTime, sub: "tot 00:00" };
+    return { main: startTime, sub: `${t("until")} 00:00` };
   }
 
   if (currentDate === bounds.end) {
-    return { main: "00:00", sub: `tot ${endTime}` };
+    return { main: "00:00", sub: `${t("until")} ${endTime}` };
   }
 
-  return { main: "Hele dag", sub: `tot ${formatShortDate(bounds.end)}` };
+  return { main: t("allDay"), sub: `${t("until")} ${formatShortDate(bounds.end)}` };
 }
 
 function getAppointmentSortMinutesForDate(appointment, dateStr) {
@@ -1427,6 +1544,12 @@ async function ensureCalendarFeedToken({ forceNew = false } = {}) {
     notifications_enabled: Boolean(currentSettings.notificationsEnabled),
     reminder_minutes: Number(currentSettings.reminderMinutes ?? 30),
     overlap_warnings_enabled: currentSettings.overlapWarningsEnabled !== false,
+    free_weekdays: getFixedFreeWeekdays(currentSettings),
+    free_week_interval: getFreeWeekInterval(currentSettings),
+    free_week_anchor_date: getFreeWeekAnchorDate(currentSettings) || null,
+    free_period_start: normalizeOptionalDate(currentSettings.freePeriodStart) || null,
+    free_period_end: normalizeOptionalDate(currentSettings.freePeriodEnd) || null,
+    belgian_holidays_enabled: Boolean(currentSettings.belgianHolidaysEnabled),
     language: normalizeLanguage(currentSettings.language || getCurrentLanguage()),
     currency: normalizeCurrency(currentSettings.currency || getCurrentCurrency()),
     payment_beneficiary_name: currentSettings.paymentBeneficiaryName || null,
@@ -1459,9 +1582,7 @@ function renderCalendarFeedSettings() {
 
   if (input) input.value = url || "";
   if (status) {
-    status.textContent = url
-      ? "Deze link kun je één keer toevoegen in Google Calendar via ‘Via URL’. Nieuwe wijzigingen in NailBooker komen daarna automatisch mee zodra Google de feed ververst."
-      : "Maak eerst een persoonlijke kalenderlink. Daarna kun je die één keer toevoegen in Google Calendar.";
+    status.textContent = url ? t("calendarFeedStatusReady") : t("calendarFeedStatusEmpty");
   }
 }
 
@@ -2282,7 +2403,7 @@ function buildAccountAvatar(profile = null) {
 	version="1.1"
 	id="svg-login"
 	<g>
-		<path style="fill:#df9db3;fill-opacity:1;stroke-width:0" 
+		<path style="fill:#d98ea7;fill-opacity:1;stroke-width:0" 
 		d="M 0.02065483,7.2874174 C 0.03201486,7.2209141 0.0639516,7.0141483 0.0916248,6.8279378 0.21895894,5.9711217 0.37280855,5.6926829 0.89086309,5.3814668 1.05004,5.2858419 1.6348599,5.0375849 2.1757299,4.8360375 L 2.3600042,4.7673699 2.1596079,5.0209379 C 1.986093,5.2404912 1.6851358,5.7017814 1.6851358,5.7481817 c 0,0.00863 0.1250337,0.015698 0.2778528,0.015698 H 2.2408415 L 2.8530307,6.2532212 C 3.4230649,6.7088655 3.4699877,6.7395931 3.5344423,6.6994453 3.572515,6.6757307 3.8673267,6.455528 4.1895795,6.2101045 L 4.7754942,5.7638794 h 0.2766182 c 0.1521396,0 0.2766166,-0.00707 0.2766166,-0.015698 0,-0.046142 -0.3004675,-0.5070727 -0.4721889,-0.724357 L 4.658428,4.773145 5.0661282,4.925074 c 1.4784506,0.5509424 1.6869677,0.7647133 1.8561126,1.9028638 0.027673,0.1862105 0.05961,0.3929763 0.07097,0.4594796 L 7.013865,7.4083333 H 3.506933 0 Z M 2.9062392,5.7770326 C 2.5804514,5.5192332 2.3091449,5.2949832 2.3033355,5.2786978 2.2975266,5.2624127 2.3672545,5.1257806 2.4582872,4.9750705 2.6052344,4.731793 2.6226959,4.6838039 2.6139482,4.5472776 L 2.6040958,4.3935012 2.313898,4.3703343 C 1.9190568,4.3388129 1.7026179,4.2988831 1.4862662,4.2176449 1.2820603,4.1409668 0.99423866,3.9021911 1.0690015,3.8714841 1.1742715,3.8282454 1.3668014,3.6176736 1.4424658,3.4630209 1.5789141,3.1841313 1.6206478,2.8667813 1.6206478,2.1081004 c 0,-0.5052406 0.012687,-0.7323499 0.04862,-0.8703043 0.1442381,-0.5537686 0.4971434,-0.94225993 1.0324557,-1.13656738 0.4257712,-0.15454662 0.8256262,-0.13233376 1.2243837,0.0680206 0.1479511,0.074337 0.2709037,0.11335661 0.3568949,0.11326152 0.1686944,-1.2176e-4 0.4425545,0.0814004 0.5938668,0.17691926 0.2466422,0.15569834 0.4171024,0.44569742 0.5023768,0.8546797 0.03596,0.1724636 0.046482,0.4192716 0.041689,0.97791 -0.00533,0.6212567 0.00301,0.7825573 0.049466,0.9568124 0.067097,0.2516667 0.2364139,0.5209458 0.390194,0.6205583 0.061721,0.03998 0.1124,0.083788 0.1126194,0.097349 C 5.9738228,4.004197 5.7850672,4.1119303 5.5866834,4.1873546 5.3821139,4.2651294 5.0219102,4.328291 4.5951743,4.3612147 l -0.2982582,0.023011 v 0.1528807 c 0,0.1381665 0.020172,0.1796259 0.2095871,0.430743 C 4.6217766,5.1206739 4.7155066,5.2571026 4.7147935,5.271026 4.7137087,5.2917587 3.749698,6.0689008 3.5545424,6.2063455 3.5060758,6.2404797 3.4192546,6.1829855 2.9062397,5.7770334 Z"
 		id="path-login" />
 	</g>
@@ -3396,12 +3517,10 @@ function getScreenTitle(screenId, fallback = "") {
 
 
 const agendaFabActions = [
-  { key: "payment", screenId: "paymentMethodsScreen", labelKey: "newPaymentMethod", iconScreen: "paymentMethodsScreen", dx: -92, dy: 0, open: () => openNewPaymentMethodDialog() },
-  { key: "services", screenId: "servicesScreen", labelKey: "newService", iconScreen: "servicesScreen", dx: -74, dy: -54, open: () => openNewServiceDialog() },
-  { key: "clients", screenId: "clientsScreen", labelKey: "newClient", iconScreen: "clientsScreen", dx: -28, dy: -88, open: () => openNewClientDialog() },
-  { key: "costs", screenId: "costsScreen", labelKey: "newCost", iconScreen: "costsScreen", dx: 28, dy: -88, open: () => openNewCostDialog() },
-  { key: "todo", screenId: "todoScreen", labelKey: "newTodo", iconScreen: "todoScreen", dx: 74, dy: -54, open: () => openNewTodoDialog() },
-  { key: "agenda", screenId: "agendaScreen", labelKey: "newAppointment", iconScreen: "agendaScreen", dx: 92, dy: 0, open: () => openNewAppointmentDialog() }
+  { key: "payment", screenId: "paymentMethodsScreen", labelKey: "newPaymentMethod", iconScreen: "paymentMethodsScreen", dx: -82, dy: -36, open: () => openNewPaymentMethodDialog() },
+  { key: "services", screenId: "servicesScreen", labelKey: "newService", iconScreen: "servicesScreen", dx: -32, dy: -88, open: () => openNewServiceDialog() },
+  { key: "clients", screenId: "clientsScreen", labelKey: "newClient", iconScreen: "clientsScreen", dx: 32, dy: -88, open: () => openNewClientDialog() },
+  { key: "agenda", screenId: "agendaScreen", labelKey: "newAppointment", iconScreen: "agendaScreen", dx: 82, dy: -36, open: () => openNewAppointmentDialog() }
 ];
 
 let agendaFabMenuDocumentHandlersInstalled = false;
@@ -3686,7 +3805,8 @@ function createCalendarDayCell(dateStr, dayNumber, { isOtherMonth = false, inter
   const cell = document.createElement("div");
   const isSelected = dateStr === state.selectedDate;
   const isToday = dateStr === todayStr;
-  cell.className = `day-cell${isSelected ? " selected" : ""}${isToday ? " today" : ""}${isOtherMonth ? " other-month" : ""}`;
+  const isFreeDay = isFixedFreeDay(dateStr);
+  cell.className = `day-cell${isSelected ? " selected" : ""}${isToday ? " today" : ""}${isOtherMonth ? " other-month" : ""}${isFreeDay ? " fixed-free-day" : ""}`;
   cell.innerHTML = `<button class="day-button" aria-label="${dateStr}"${preview ? ' tabindex="-1" aria-hidden="true"' : ""}></button><span class="day-number">${dayNumber}</span>`;
 
   if (appts.length) {
@@ -4473,7 +4593,7 @@ function renderAgendaList() {
     row.innerHTML = `
       <div class="time-block">
         <div class="time">${privateApp ? privateDisplayTime.main : app.time}</div>
-        <div class="time-end">${privateApp ? privateDisplayTime.sub : `tot ${endTime}`}</div>
+        <div class="time-end">${privateApp ? privateDisplayTime.sub : `${t("until")} ${endTime}`}</div>
       </div>
       <div>
         <div class="main-name appointment-main-name">${privateApp ? htmlEscape(app.privateTitle || "Privé") : `${customer ? fullName(customer) : "Onbekend"}${String(app.remarks || "").trim() ? '<span class="appointment-remarks-star" title="Opmerking aanwezig" aria-label="Opmerking aanwezig">★</span>' : ""}`}</div>
@@ -4829,7 +4949,7 @@ function getRevenueRenderSignature() {
     ].join(":"))
     .join("|");
 
-  return [type, anchor, appointmentSignature].join("||");
+  return [getCurrentLanguage(), type, anchor, appointmentSignature].join("||");
 }
 
 function syncRevenueToSelectedDateBeforePreview() {
@@ -4877,7 +4997,7 @@ function attachRevenuePeriodSwipe(button, mode, target = "revenue") {
   button.dataset.revenueSwipeReady = "1";
   button.dataset.revenueSwipeTarget = target;
 
-  const threshold = 20;
+  const threshold = 15;
   const maxDrag = 5;
   const resetSwipeVisual = () => {
     button.classList.remove("is-revenue-swiping", "is-revenue-swipe-committing", "is-revenue-swipe-settling");
@@ -4900,8 +5020,8 @@ function attachRevenuePeriodSwipe(button, mode, target = "revenue") {
   const commitSwipe = (step) => {
     const anchor = target === "costs" ? getCostsPeriodDate() : (document.getElementById("revenueDate")?.value || todayStr);
     const nextDate = shiftRevenueDate(anchor, mode, step);
-    const exitY = step > 0 ? -14 : 14;
-    const enterY = step > 0 ? 14 : -14;
+    const exitY = step > 0 ? -10 : 10;
+    const enterY = step > 0 ? 10 : -10;
 
     button.dataset.revenueSwipeSuppressClick = "1";
     window.setTimeout(() => delete button.dataset.revenueSwipeSuppressClick, 360);
@@ -5207,6 +5327,16 @@ function syncCostDateDisplay() {
   if (dateBtn && dateInput) dateBtn.textContent = formatAppointmentDateLabel(dateInput.value || todayStr);
 }
 
+function syncSettingsFreePeriodDisplays() {
+  const startInput = document.getElementById("settingsFreePeriodStart");
+  const endInput = document.getElementById("settingsFreePeriodEnd");
+  const startBtn = document.getElementById("settingsFreePeriodStartDisplayBtn");
+  const endBtn = document.getElementById("settingsFreePeriodEndDisplayBtn");
+
+  if (startBtn && startInput) startBtn.textContent = formatAppointmentDateLabel(startInput.value);
+  if (endBtn && endInput) endBtn.textContent = formatAppointmentDateLabel(endInput.value);
+}
+
 function syncPrivateEndTimeWithStart() {
   const isPrivate = Boolean(document.getElementById("appointmentIsPrivate")?.checked);
   if (!isPrivate) return;
@@ -5472,7 +5602,10 @@ function applyAppointmentWheelPickerSelection() {
   }
 
   const dateInput = document.getElementById(appointmentPickerState.targetInputId || "appointmentDate");
-  if (dateInput) dateInput.value = appointmentPickerState.selected.date || dateInput.value || state.selectedDate || todayStr;
+  if (dateInput) {
+    dateInput.value = appointmentPickerState.selected.date || dateInput.value || state.selectedDate || todayStr;
+    dateInput.dispatchEvent(new Event("change", { bubbles: true }));
+  }
 
   const startDateInput = document.getElementById("appointmentDate");
   const endDateInput = document.getElementById("appointmentPrivateEndDate");
@@ -5487,6 +5620,7 @@ function applyAppointmentWheelPickerSelection() {
 
   syncAppointmentDateTimeDisplays();
   syncCostDateDisplay();
+  syncSettingsFreePeriodDisplays();
   syncFollowUpDisplays();
   updatePrivateRepeatWeeklyLabel();
 }
@@ -7415,7 +7549,7 @@ function buildStatisticsDonut(items, valueFormatter = value => String(value)) {
     `;
   }
 
-  const palette = ['#d991ab', '#b86d87', '#f1bfd0', '#8c838d', '#df9db3', '#f8e8ee', '#c97b97', '#b3a1ac'];
+  const palette = ['#ff654a', '#00a6a6', '#f2b705', '#4385d1', '#a85ad4', '#39a96b', '#f05b9d', '#66788a'];
   const center = 100;
   const radius = 90;
   const innerRadius = 42;
@@ -7809,6 +7943,10 @@ function getSettingsFormSnapshot() {
     "settingsNotificationsEnabled",
     "settingsReminderMinutes",
     "settingsOverlapWarningsEnabled",
+    "settingsFreeWeekInterval",
+    "settingsFreePeriodStart",
+    "settingsFreePeriodEnd",
+    "settingsBelgianHolidaysEnabled",
     "settingsAgendaFabMenuEnabled",
     "settingsShowTipsOnOpen",
     "settingsLanguage",
@@ -7824,6 +7962,11 @@ function getSettingsFormSnapshot() {
     acc[id] = el.type === "checkbox" ? Boolean(el.checked) : String(el.value || "");
     return acc;
   }, {});
+
+  snapshot.settingsFreeWeekdays = Array.from(document.querySelectorAll('[data-free-weekday]'))
+    .filter(input => input.checked)
+    .map(input => Number(input.dataset.freeWeekday))
+    .sort((a, b) => a - b);
 
   return JSON.stringify(snapshot);
 }
@@ -7912,6 +8055,10 @@ function renderSettings() {
   const notificationsToggle = document.getElementById("settingsNotificationsEnabled");
   const reminderSelect = document.getElementById("settingsReminderMinutes");
   const overlapToggle = document.getElementById("settingsOverlapWarningsEnabled");
+  const freeWeekIntervalSelect = document.getElementById("settingsFreeWeekInterval");
+  const freePeriodStartInput = document.getElementById("settingsFreePeriodStart");
+  const freePeriodEndInput = document.getElementById("settingsFreePeriodEnd");
+  const belgianHolidaysToggle = document.getElementById("settingsBelgianHolidaysEnabled");
   const agendaFabMenuToggle = document.getElementById("settingsAgendaFabMenuEnabled");
   const tipsToggle = document.getElementById("settingsShowTipsOnOpen");
   const reminderWrap = document.getElementById("settingsReminderWrap");
@@ -7930,6 +8077,15 @@ function renderSettings() {
   notificationsToggle.checked = Boolean(settings.notificationsEnabled);
   reminderSelect.value = String(settings.reminderMinutes || 30);
   overlapToggle.checked = settings.overlapWarningsEnabled !== false;
+  const freeWeekdays = getFixedFreeWeekdays(settings);
+  document.querySelectorAll('[data-free-weekday]').forEach(input => {
+    input.checked = freeWeekdays.includes(Number(input.dataset.freeWeekday));
+  });
+  if (freeWeekIntervalSelect) freeWeekIntervalSelect.value = String(getFreeWeekInterval(settings));
+  if (freePeriodStartInput) freePeriodStartInput.value = normalizeOptionalDate(settings.freePeriodStart);
+  if (freePeriodEndInput) freePeriodEndInput.value = normalizeOptionalDate(settings.freePeriodEnd);
+  syncSettingsFreePeriodDisplays();
+  if (belgianHolidaysToggle) belgianHolidaysToggle.checked = Boolean(settings.belgianHolidaysEnabled);
   if (agendaFabMenuToggle) agendaFabMenuToggle.checked = settings.agendaFabMenuEnabled !== false;
   if (tipsToggle) tipsToggle.checked = settings.showTipsOnOpen !== false;
   if (paymentBeneficiaryNameInput) paymentBeneficiaryNameInput.value = settings.paymentBeneficiaryName || "";
@@ -7986,8 +8142,13 @@ function shouldShowWelcomeGuide() {
 function setWelcomeGuideVisible(visible) {
   const overlay = document.getElementById("welcomeGuideOverlay");
   if (!overlay) return;
+  if (visible) {
+    const activeDialog = document.getElementById("deletedAppointmentsDialog");
+    if (activeDialog?.open && !activeDialog.contains(overlay)) activeDialog.appendChild(overlay);
+  }
   overlay.classList.toggle("hidden", !visible);
   overlay.setAttribute("aria-hidden", visible ? "false" : "true");
+  if (!visible && overlay.parentElement?.id === "deletedAppointmentsDialog") document.body.appendChild(overlay);
   if (visible) {
     sessionStorage.setItem("nailbooker_welcome_guide_shown_this_session", "true");
   }
@@ -8062,7 +8223,7 @@ async function loadSettingsFromSupabase() {
 
   const { data, error } = await supabaseClient
     .from("user_settings")
-    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled, language, currency, payment_beneficiary_name, payment_reference_prefix, calendar_feed_token")
+    .select("default_break_minutes, notifications_enabled, reminder_minutes, overlap_warnings_enabled, free_weekdays, free_week_interval, free_week_anchor_date, free_period_start, free_period_end, belgian_holidays_enabled, language, currency, payment_beneficiary_name, payment_reference_prefix, calendar_feed_token")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -8076,6 +8237,12 @@ async function loadSettingsFromSupabase() {
     notificationsEnabled: Boolean(data?.notifications_enabled ?? false),
     reminderMinutes: Number(data?.reminder_minutes ?? 30),
     overlapWarningsEnabled: data?.overlap_warnings_enabled !== false,
+    freeWeekdays: normalizeFreeWeekdays(data?.free_weekdays),
+    freeWeekInterval: normalizeFreeWeekInterval(data?.free_week_interval),
+    freeWeekAnchorDate: normalizeOptionalDate(data?.free_week_anchor_date),
+    freePeriodStart: normalizeOptionalDate(data?.free_period_start),
+    freePeriodEnd: normalizeOptionalDate(data?.free_period_end),
+    belgianHolidaysEnabled: Boolean(data?.belgian_holidays_enabled),
     agendaFabMenuEnabled: readAgendaFabMenuEnabledPreference(),
     showTipsOnOpen: getData()?.settings?.showTipsOnOpen !== false,
     language: normalizeLanguage(data?.language || DEFAULT_LANGUAGE),
@@ -8092,11 +8259,28 @@ async function saveSettingsFromForm(event) {
   if (event) event.preventDefault();
   if (!(await ensureDataWriteAccess())) return;
 
+  const previousSettings = getSettings();
+  const nextFreeWeekdays = normalizeFreeWeekdays(Array.from(document.querySelectorAll('[data-free-weekday]'))
+    .filter(input => input.checked)
+    .map(input => Number(input.dataset.freeWeekday)));
+  const nextFreeWeekInterval = normalizeFreeWeekInterval(document.getElementById("settingsFreeWeekInterval")?.value || 1);
+  const sameRecurringRule = JSON.stringify(nextFreeWeekdays) === JSON.stringify(getFixedFreeWeekdays(previousSettings))
+    && nextFreeWeekInterval === getFreeWeekInterval(previousSettings);
+  const nextFreeWeekAnchorDate = sameRecurringRule && normalizeOptionalDate(previousSettings.freeWeekAnchorDate)
+    ? normalizeOptionalDate(previousSettings.freeWeekAnchorDate)
+    : getWeekMondayDate(todayStr);
+
   const settings = {
     defaultBreakMinutes: Math.max(0, Number(document.getElementById("settingsDefaultBreakMinutes")?.value || 0)),
     notificationsEnabled: Boolean(document.getElementById("settingsNotificationsEnabled")?.checked),
     reminderMinutes: Number(document.getElementById("settingsReminderMinutes")?.value || 30),
     overlapWarningsEnabled: Boolean(document.getElementById("settingsOverlapWarningsEnabled")?.checked),
+    freeWeekdays: nextFreeWeekdays,
+    freeWeekInterval: nextFreeWeekInterval,
+    freeWeekAnchorDate: nextFreeWeekAnchorDate,
+    freePeriodStart: normalizeOptionalDate(document.getElementById("settingsFreePeriodStart")?.value),
+    freePeriodEnd: normalizeOptionalDate(document.getElementById("settingsFreePeriodEnd")?.value),
+    belgianHolidaysEnabled: Boolean(document.getElementById("settingsBelgianHolidaysEnabled")?.checked),
     agendaFabMenuEnabled: Boolean(document.getElementById("settingsAgendaFabMenuEnabled")?.checked),
     showTipsOnOpen: document.getElementById("settingsShowTipsOnOpen")?.checked !== false,
     language: normalizeLanguage(document.getElementById("settingsLanguage")?.value || getCurrentLanguage()),
@@ -8107,6 +8291,15 @@ async function saveSettingsFromForm(event) {
     paymentReferencePrefix: String(document.getElementById("settingsPaymentReferencePrefix")?.value || "").trim(),
     calendarFeedToken: getSettings().calendarFeedToken || ""
   };
+
+  if ((settings.freePeriodStart && !settings.freePeriodEnd) || (!settings.freePeriodStart && settings.freePeriodEnd)) {
+    await appAlert("Vul voor een vrije periode zowel een begindatum als een einddatum in.", { title: "Vrije periode", variant: "warning" });
+    return;
+  }
+  if (settings.freePeriodStart && settings.freePeriodEnd && settings.freePeriodEnd < settings.freePeriodStart) {
+    await appAlert("De einddatum van de vrije periode moet op of na de begindatum liggen.", { title: "Vrije periode", variant: "warning" });
+    return;
+  }
 
   if (settings.paymentAccountNumber && !isValidBankAccountNumber(settings.paymentAccountNumber)) {
     await appAlert("Het rekeningnummer is niet geldig. Controleer het rekeningnummer en probeer opnieuw.", {
@@ -8148,6 +8341,12 @@ async function saveSettingsFromForm(event) {
     notifications_enabled: settings.notificationsEnabled,
     reminder_minutes: settings.reminderMinutes,
     overlap_warnings_enabled: settings.overlapWarningsEnabled,
+    free_weekdays: settings.freeWeekdays,
+    free_week_interval: settings.freeWeekInterval,
+    free_week_anchor_date: settings.freeWeekAnchorDate || null,
+    free_period_start: settings.freePeriodStart || null,
+    free_period_end: settings.freePeriodEnd || null,
+    belgian_holidays_enabled: settings.belgianHolidaysEnabled,
     language: settings.language,
     currency: settings.currency,
     payment_beneficiary_name: settings.paymentBeneficiaryName || null,
@@ -10269,7 +10468,12 @@ async function deleteCurrentAppointment() {
   }
 }
 
+let selectedDeletedAppointmentIds = new Set();
+let deletedAppointmentsRenderVersion = 0;
+
 async function openDeletedAppointmentsDialog() {
+  selectedDeletedAppointmentIds.clear();
+  updateDeletedAppointmentsSelectionToolbar();
   const dialog = document.getElementById("deletedAppointmentsDialog");
   if (!dialog) return;
   const searchInput = document.getElementById("deletedAppointmentsSearch");
@@ -10300,7 +10504,12 @@ async function renderDeletedAppointmentsDialog() {
   if (!list) return;
   list.innerHTML = '<div class="deleted-appointments-empty">Even geduld...</div>';
 
+  const renderVersion = ++deletedAppointmentsRenderVersion;
   const deletedAppointments = await loadDeletedAppointmentsFromSupabase();
+  if (renderVersion !== deletedAppointmentsRenderVersion) return;
+  const availableIds = new Set(deletedAppointments.map(a => String(a.id)));
+  selectedDeletedAppointmentIds.forEach(id => { if (!availableIds.has(id)) selectedDeletedAppointmentIds.delete(id); });
+  updateDeletedAppointmentsSelectionToolbar();
   const query = String(document.getElementById("deletedAppointmentsSearch")?.value || "").trim().toLowerCase();
   const filtered = query
     ? deletedAppointments.filter(appointment => buildDeletedAppointmentSearchText(appointment).includes(query))
@@ -10325,7 +10534,7 @@ async function renderDeletedAppointmentsDialog() {
     return `
       <article class="deleted-appointment-card" data-appointment-id="${htmlEscape(String(appointment.id))}">
         <div class="deleted-appointment-main">
-          <strong>${htmlEscape(title)}</strong>
+          <div class="deleted-appointment-name-row"><label class="deleted-appointment-select"><input type="checkbox" data-select-deleted-id="${htmlEscape(String(appointment.id))}" ${selectedDeletedAppointmentIds.has(String(appointment.id)) ? "checked" : ""} aria-label="Selecteer afspraak van ${htmlEscape(title)}" /></label><strong>${htmlEscape(title)}</strong></div>
           <span>${htmlEscape(formatLongDate(appointment.date))} · ${htmlEscape(appointment.time || "--:--")} · ${htmlEscape(serviceName)}</span>
           ${remarks ? `<p>${htmlEscape(remarks)}</p>` : '<p class="deleted-appointment-muted">Geen opmerkingen.</p>'}
           <small>Verwijderd op ${htmlEscape(appointment.deletedAt ? new Date(appointment.deletedAt).toLocaleString("nl-BE") : "onbekend")}</small>
@@ -10336,6 +10545,15 @@ async function renderDeletedAppointmentsDialog() {
         </div>
       </article>`;
   }).join("");
+
+  list.querySelectorAll("[data-select-deleted-id]").forEach(input => {
+    input.addEventListener("change", () => {
+      const id = input.getAttribute("data-select-deleted-id");
+      if (input.checked) selectedDeletedAppointmentIds.add(id);
+      else selectedDeletedAppointmentIds.delete(id);
+      updateDeletedAppointmentsSelectionToolbar();
+    });
+  });
 
   list.querySelectorAll("[data-restore-appointment-id]").forEach(button => {
     button.addEventListener("click", async event => {
@@ -10381,11 +10599,29 @@ async function restoreDeletedAppointment(id) {
   await renderDeletedAppointmentsDialog();
 }
 
-async function permanentlyDeleteAppointment(id) {
-  if (!(await ensureDataWriteAccess())) return;
-  if (!id) return;
+function updateDeletedAppointmentsSelectionToolbar() {
+  const button = document.getElementById("deleteSelectedAppointmentsBtn");
+  const counter = document.getElementById("deletedAppointmentsSelectionCount");
+  const count = selectedDeletedAppointmentIds.size;
+  if (button) {
+    button.disabled = count === 0;
+    button.textContent = `Selectie definitief verwijderen (${count})`;
+  }
+  if (counter) counter.textContent = `${count} geselecteerd`;
+}
 
-  const confirmed = await appConfirm("Deze afspraak wordt definitief verwijderd. Dit kan niet ongedaan gemaakt worden.", {
+async function permanentlyDeleteAppointment(id) {
+  await permanentlyDeleteAppointments([id]);
+}
+
+async function permanentlyDeleteAppointments(ids) {
+  if (!(await ensureDataWriteAccess())) return;
+  const uniqueIds = [...new Set(ids.map(Number).filter(Number.isFinite))];
+  if (!uniqueIds.length) return;
+  const multiple = uniqueIds.length > 1;
+  const confirmed = await appConfirm(multiple
+    ? `Deze ${uniqueIds.length} afspraken worden definitief verwijderd. Dit kan niet ongedaan gemaakt worden.`
+    : "Deze afspraak wordt definitief verwijderd. Dit kan niet ongedaan gemaakt worden.", {
     title: "Definitief verwijderen",
     confirmText: "Definitief verwijderen",
     cancelText: t("cancel"),
@@ -10393,24 +10629,29 @@ async function permanentlyDeleteAppointment(id) {
   });
   if (!confirmed) return;
 
-  const user = await getCurrentUser();
-  if (!user) return;
+  // Pas NA bevestiging de overlay tonen; het venster blijft intussen open.
+  await runWithGlobalActionBusy(async () => {
+    const startedAt = Date.now();
+    await waitForBusyOverlayPaint();
+    const user = await getCurrentUser();
+    if (!user) return;
+    const { error } = await supabaseClient
+      .from("appointments")
+      .delete()
+      .in("id", uniqueIds)
+      .eq("user_id", user.id)
+      .not("deleted_at", "is", null);
 
-  const { error } = await supabaseClient
-    .from("appointments")
-    .delete()
-    .eq("id", Number(id))
-    .eq("user_id", user.id)
-    .not("deleted_at", "is", null);
-
-  if (error) {
-    await appAlert("Afspraak definitief verwijderen mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
-    return;
-  }
-
-  await loadAllDataFromSupabase();
-  rerenderAll();
-  await renderDeletedAppointmentsDialog();
+    if (error) {
+      await appAlert("Afspraken definitief verwijderen mislukt: " + error.message, { title: "Verwijderen mislukt", variant: "danger" });
+      return;
+    }
+    uniqueIds.forEach(id => selectedDeletedAppointmentIds.delete(String(id)));
+    await loadAllDataFromSupabase();
+    rerenderAll();
+    await renderDeletedAppointmentsDialog();
+    await keepBusyOverlayVisibleSince(startedAt, 750);
+  });
 }
 
 async function deleteCurrentService() {
@@ -11839,6 +12080,10 @@ function registerEvents() {
   });
 
   document.getElementById("appointmentDateDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date"));
+  document.getElementById("settingsFreePeriodStartDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date", "settingsFreePeriodStart"));
+  document.getElementById("settingsFreePeriodEndDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date", "settingsFreePeriodEnd"));
+  document.getElementById("settingsFreePeriodStart")?.addEventListener("change", syncSettingsFreePeriodDisplays);
+  document.getElementById("settingsFreePeriodEnd")?.addEventListener("change", syncSettingsFreePeriodDisplays);
   document.getElementById("appointmentTimeDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("time", "appointmentTime"));
   document.getElementById("appointmentPrivateEndDateDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("date", "appointmentPrivateEndDate"));
   document.getElementById("appointmentPrivateEndTimeDisplayBtn")?.addEventListener("click", () => openAppointmentWheelPicker("time", "appointmentPrivateEndTime"));
@@ -11890,6 +12135,7 @@ function registerEvents() {
   document.getElementById("deleteAppointmentBtn").addEventListener("click", withActionLock(deleteCurrentAppointment));
   document.getElementById("openDeletedAppointmentsBtn")?.addEventListener("click", openDeletedAppointmentsDialog);
   document.getElementById("deletedAppointmentsSearch")?.addEventListener("input", () => renderDeletedAppointmentsDialog());
+  document.getElementById("deleteSelectedAppointmentsBtn")?.addEventListener("click", () => permanentlyDeleteAppointments([...selectedDeletedAppointmentIds]));
 
   document.getElementById("clientForm").addEventListener("submit", withActionLock(saveClientFromForm));
 
@@ -12715,9 +12961,22 @@ function enhanceAppSelect(select) {
   renderAppSelectOptions(select);
 }
 
+function buildReminderOptions(selectedValue = "30") {
+  const values = [5, 10, 15, 30, 60, 1440];
+  const selected = String(selectedValue || "30");
+  return values.map(value => {
+    let label;
+    if (value === 60) label = t("oneHour");
+    else if (value === 1440) label = t("twentyFourHours");
+    else label = `${value} ${t("minutesUnit")}`;
+    return `<option value="${value}"${String(value) === selected ? " selected" : ""}>${label}</option>`;
+  }).join("");
+}
+
 function rebuildSettingsSelectOptions() {
   const languageSelect = document.getElementById('settingsLanguage');
   const currencySelect = document.getElementById('settingsCurrency');
+  const reminderSelect = document.getElementById('settingsReminderMinutes');
 
   if (languageSelect) {
     const selectedLanguage = normalizeLanguage(languageSelect.value || getCurrentLanguage());
@@ -12729,6 +12988,12 @@ function rebuildSettingsSelectOptions() {
     const selectedCurrency = normalizeCurrency(currencySelect.value || getCurrentCurrency());
     currencySelect.innerHTML = buildCurrencyOptions(selectedCurrency);
     currencySelect.value = selectedCurrency;
+  }
+
+  if (reminderSelect) {
+    const selectedReminder = String(reminderSelect.value || getSettings().reminderMinutes || 30);
+    reminderSelect.innerHTML = buildReminderOptions(selectedReminder);
+    reminderSelect.value = selectedReminder;
   }
 }
 
@@ -12849,6 +13114,17 @@ function setGlobalActionBusyVisible(visible) {
   }
 
   const overlay = getAppBusyOverlay();
+  // Een open native <dialog> staat in de browser-toplaag, boven iedere
+  // z-index van een overlay onder <body>. Plaats de overlay daarom tijdelijk
+  // IN het geopende venster met verwijderde afspraken.
+  if (overlay) {
+    const deletedDialog = document.getElementById("deletedAppointmentsDialog");
+    if (visible && deletedDialog?.open && overlay.parentElement !== deletedDialog) {
+      deletedDialog.appendChild(overlay);
+    } else if (!visible && overlay.parentElement === deletedDialog) {
+      document.body.appendChild(overlay);
+    }
+  }
 
   if (globalActionBusyHideTimer) {
     clearTimeout(globalActionBusyHideTimer);
@@ -13402,7 +13678,7 @@ async function startApp() {
         const width = columnWidth;
         const displayTime = privateApp ? getPrivateAgendaDisplayTime(app, dateStr) : {
           main: String(app.time || "00:00").slice(0, 5),
-          sub: `tot ${getAppointmentDisplayEndTime(app, Number(getSettings().defaultBreakMinutes || 0))}`
+          sub: `${t("until")} ${getAppointmentDisplayEndTime(app, Number(getSettings().defaultBreakMinutes || 0))}`
         };
         const title = privateApp
           ? (app.privateTitle || "Privé")
@@ -13515,7 +13791,7 @@ async function startApp() {
       const width = columnWidth;
       const displayTime = privateApp ? getPrivateAgendaDisplayTime(app, state.selectedDate) : {
         main: String(app.time || "00:00").slice(0, 5),
-        sub: `tot ${getAppointmentDisplayEndTime(app, Number(getSettings().defaultBreakMinutes || 0))}`
+        sub: `${t("until")} ${getAppointmentDisplayEndTime(app, Number(getSettings().defaultBreakMinutes || 0))}`
       };
       const title = privateApp
         ? (app.privateTitle || "Privé")
@@ -13545,6 +13821,7 @@ async function startApp() {
     }).join("");
 
     wrap.classList.toggle("has-pinned-private-day", pinnedPrivateAppointments.length > 0);
+    wrap.classList.toggle("is-fixed-free-day", isFixedFreeDay(state.selectedDate));
     wrap.innerHTML = `
       ${pinnedBlocks ? `<div class="agenda-day-pinned-private-wrap">${pinnedBlocks}</div>` : ""}
       <button class="agenda-day-hidden-nav agenda-day-hidden-nav-top hidden" type="button" aria-label="Toon eerdere verborgen afspraken">...</button>
